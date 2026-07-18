@@ -4,9 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
-  gal
   geolocator_windows
-  syncfusion_pdfviewer_windows
   url_launcher_windows
 )
 

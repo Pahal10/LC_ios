@@ -5,19 +5,13 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/services.dart';
-import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
-import 'package:gal/gal.dart';
-import 'dart:io';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:flutter/cupertino.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,58 +28,6 @@ const Map<String, int> stageOrder = {
   "playdate": 4,
   "hygge": 5,
 };
-final List<Map<String, String>> premiumRewards = [
-
-  {
-    "title": "IMDb Movie Hack",
-    "description":
-    "Watch movies by typing 'play' before imdb in the URL.",
-    "logoimage": "asset/imdblogo.png",
-    "bgimage": "asset/imdbbg.jpg",
-  },
-
-  {
-    "title": "LEGO Discounts",
-    "description":
-    "Use SetSniper free trial to track LEGO deals.",
-    "logoimage": "asset/legologo.png",
-    "bgimage": "asset/legobg.jpg",
-  },
-
-  {
-    "title": "UNiDAYS Student Discounts",
-    "description":
-    "Use your university email to unlock student discounts.",
-    "logoimage": "asset/rewards/unidays.png",
-    "bgimage": "",
-  },
-
-  {
-    "title": "Starbucks Unlimited Refills",
-    "description":
-    "Get unlimited refills until you leave the store.",
-    "logoimage": "asset/starbuckslogo.png",
-    "bgimage": "asset/starbucksbg.png",
-  },
-  {
-    "title": "Qatar Airways 10% discount",
-    "description": "go to Qatar Airways website -> in the main menu or drop down click on experience -> onboard -> dining -> scroll down to first class dining -> unveil your reward (the code is valid for only 72 hours).",
-    "logoimage":"asset/QAlogo.png",
-    "bgimage": "asset/QAbg.jpg",
-  },
-  {
-    "title": "free coffee at IKEA",
-    "description": "signing up to the IKEA family loyalty program can give you free coffee on your visits. The sign up is free",
-    "logoimage": "asset/IKEAlogo.png",
-    "bgimage": "asset/IKEAbg.png",
-  },
-  {
-    "title": "college book pdf",
-    "description": "you can download almost all college books at libgen.ac (you might try searching books even if you aren't a student. It might give it to you!)",
-    "logoimage": "asset/booklogo.png",
-    "bgimage": "asset/bookbg.png",
-  },
-];
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -161,78 +103,6 @@ class _SplashScreenState
       );
     }
   }
-  /*Future<void> updateLocation() async {
-
-    bool serviceEnabled =
-    await Geolocator.isLocationServiceEnabled();
-
-    if (!serviceEnabled) {
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Please turn on Location Services to use verification.",
-            ),
-          ),
-        );
-      }
-
-      return;
-    }
-
-    LocationPermission permission =
-    await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-
-      permission = await Geolocator.requestPermission();
-
-      if (permission == LocationPermission.denied) {
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                "Location permission is required for verification.",
-              ),
-            ),
-          );
-        }
-
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Location permission permanently denied. Enable it from Settings.",
-            ),
-          ),
-        );
-      }
-
-      return;
-    }
-
-    Position position =
-    await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    await supabase
-        .from('users')
-        .update({
-      'last_latitude': position.latitude,
-      'last_longitude': position.longitude,
-    })
-        .eq('username', Session.username);
-  }*/
-
   @override
   Widget build(BuildContext context) {
 
@@ -347,12 +217,28 @@ class _LoginPageState extends State<LoginPage> {
         );
         await updateCurrentLocation();
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const MainPage(),
-          ),
-        );
+        final introCompleted =
+            response.first["intro_completed"] ?? false;
+
+        if (!introCompleted) {
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const LonelyPage(),
+            ),
+          );
+
+        } else {
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const MainPage(),
+            ),
+          );
+
+        }
       } else {
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -579,7 +465,7 @@ class _LoginPageState extends State<LoginPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                      const RegisterPage(),
+                      const GetStartedPage(),
                     ),
                   );
 
@@ -1138,6 +1024,258 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 }
+
+class GetStartedPage extends StatefulWidget {
+  const GetStartedPage({super.key});
+
+  @override
+  State<GetStartedPage> createState() =>
+      _GetStartedPageState();
+}
+
+class _GetStartedPageState
+    extends State<GetStartedPage> {
+
+  final emailController =
+  TextEditingController();
+
+  bool loading = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+  Future<void> sendGetStartedEmail(String email) async {
+
+    final response =
+    await Supabase.instance.client.functions.invoke(
+      'get-started',
+      body: {
+        'email': email,
+      },
+    );
+
+    if (response.status != 200) {
+      throw Exception("Couldn't send email");
+    }
+
+  }
+
+  Future<void> sendEmail() async {
+
+    final email =
+    emailController.text.trim();
+
+    if (email.isEmpty) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+
+        const SnackBar(
+
+          content: Text(
+            "Please enter your email.",
+          ),
+
+        ),
+
+      );
+
+      return;
+    }
+
+    setState(() {
+      loading = true;
+    });
+
+    try {
+
+      await sendGetStartedEmail(email);
+
+      if (!mounted) return;
+
+      showDialog(
+
+        context: context,
+
+        builder: (_) => AlertDialog(
+
+          title: const Text(
+            "Check your email",
+          ),
+
+          content: const Text(
+
+            "We've sent you an email containing the link to create your Let's Connect account.",
+
+          ),
+
+          actions: [
+
+            TextButton(
+
+              onPressed: () {
+
+                Navigator.pop(context);
+
+                Navigator.pop(context);
+
+              },
+
+              child: const Text(
+                "OK",
+              ),
+
+            )
+
+          ],
+
+        ),
+
+      );
+
+    } catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+
+        SnackBar(
+          content: Text("$e"),
+        ),
+
+      );
+
+    }
+
+    setState(() {
+
+      loading = false;
+
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+
+      backgroundColor:
+      const Color(0xFF4CAF50),
+
+      appBar: AppBar(
+
+        backgroundColor:
+        const Color(0xFF388E3C),
+
+        title: const Text(
+          "Get Started",
+        ),
+
+      ),
+
+      body: Padding(
+
+        padding:
+        const EdgeInsets.all(30),
+
+        child: SingleChildScrollView(
+          child: Column(
+
+          children: [
+
+            const SizedBox(height:40),
+
+            Image.asset(
+
+              "asset/LCLogo2.png",
+
+              height:120,
+
+            ),
+
+            const SizedBox(height:40),
+
+            const Text(
+
+              "Enter your email and we'll send you a link to create your account.",
+
+              textAlign: TextAlign.center,
+
+              style: TextStyle(
+
+                color: Colors.white,
+
+                fontSize:18,
+
+              ),
+
+            ),
+
+            const SizedBox(height:40),
+
+            TextField(
+
+              controller:
+              emailController,
+
+              keyboardType:
+              TextInputType.emailAddress,
+
+              decoration:
+              const InputDecoration(
+
+                filled:true,
+
+                fillColor: Colors.white,
+
+                labelText:"Email",
+
+                border:
+                OutlineInputBorder(),
+
+              ),
+
+            ),
+
+            const SizedBox(height:40),
+
+            SizedBox(
+
+              width: double.infinity,
+
+              child: ElevatedButton(
+
+                onPressed:
+                loading
+                    ? null
+                    : sendEmail,
+
+                child: Text(
+
+                  loading
+                      ? "Sending..."
+                      : "Get Started",
+
+                ),
+
+              ),
+
+            )
+
+          ],
+
+        ),
+
+      ),
+      ),
+
+    );
+
+  }
+
+}
+
+
 
 final List<String> stages = [
 
@@ -2068,7 +2206,16 @@ class LonelyPage extends StatelessWidget {
 
             // Option 1
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                await supabase
+                    .from("users")
+                    .update({
+                  "intro_completed": true,
+                })
+                    .eq(
+                  "username",
+                  Session.username,
+                );
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -2367,223 +2514,101 @@ class _TaskPageState extends State<TaskPage> {
     )
     ];
   }
-  /*Future<void> handleRewardFlow() async {
-
-    final user = await supabase
-        .from('users')
-        .select('premium')
-        .eq(
-      'username',
-      Session.username,
-    )
-        .single();
-
-    bool premium =
-        user['premium'] ?? false;
-
-    if (!mounted) return;
-
-    if (premium) {
-
-      final reward =
-      premiumRewards[
-      Random().nextInt(
-        premiumRewards.length,
-      )
-      ];
-
-      Navigator.pushReplacement(
-
-        context,
-
-        MaterialPageRoute(
-
-          builder: (_) =>
-              PremiumRewardPage(
-
-                title:
-                reward["title"]!,
-
-                description:
-                reward["description"]!,
-
-                imagePath:
-                reward["image"]!,
-              ),
-        ),
-      );
-
-    }
-  }*/
 
   Future<void> handleRewardFlow() async {
 
     final user = await supabase
-        .from('users')
-        .select(
-      'shown_imdb, premium',
-    )
-        .eq(
-      'username',
-      Session.username,
-    )
-        .single();
-
-    bool shownImdb =
-        user['shown_imdb'] ?? false;
-
-    bool premium =
-        user['premium'] ?? false;
-
-    /// FIRST TIME EVER
-
-    if (!shownImdb) {
-
-      await supabase
-          .from('users')
-          .update({
-        'shown_imdb': true,
-      })
-          .eq(
-        'username',
-        Session.username,
-      );
-
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-
-        context,
-
-        MaterialPageRoute(
-          builder: (_) => PremiumRewardPage(
-            title: "Secret Movie Trick",
-            description:
-            "Go to IMDb.\n\nBefore imdb in the URL add the word play.\n\nThe movie player opens automatically.",
-            backgroundImage:
-            "asset/imdbbg.jpg",
-            logoImage:
-            "asset/imdblogo.png",
-
-            showPremiumOfferAfterDone: true,
-          ),
-        ),
-      );
-
-      return;
-    }
-
-    /// PREMIUM REWARD
-
-    if (premium) {
-
-      final user = await supabase
-          .from("users")
-          .select("claimed_rewards")
-          .eq("username", Session.username)
-          .single();
-
-      List claimed =
-      (user["claimed_rewards"] ?? []) as List;
-      final availableRewards =
-      premiumRewards.where((reward) {
-
-        return !claimed.contains(
-          reward["title"],
-        );
-
-      }).toList();
-      final reward =
-      availableRewards[
-      Random().nextInt(
-        availableRewards.length,
-      )];
-      claimed.add(
-        reward["title"],
-      );
-
-      await supabase
-          .from("users")
-          .update({
-
-        "claimed_rewards": claimed,
-
-      })
-          .eq(
-        "username",
-        Session.username,
-      );
-      final result = await RewardCycler.pickNext(pool: premiumRewards, column: "claimed_rewards");
-
-      if (!mounted) return;
-      if (result.didReset) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("That's all the rewards! Starting a new round 🎉")),
-        );
-      }
-
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-
-        context,
-
-        MaterialPageRoute(
-
-          builder: (_) =>
-              PremiumRewardPage(
-                title:
-                reward["title"]!,
-
-                description:
-                reward["description"]!,
-
-                logoImage:
-                reward["logoimage"]!,
-
-                backgroundImage:
-                reward["bgimage"]!,
-              ),
-        ),
-      );
-
-      return;
-    }
-
-    /// NORMAL FREE USER
-
-    if (!mounted) return;
-    final response = await supabase
         .from("users")
-        .select("verifyshow")
+        .select("premium")
         .eq("username", Session.username)
         .single();
 
-    Session.verifyShow =
-        response["verifyshow"] ?? true;
+    final premium = user["premium"] ?? false;
 
-    if (Session.verifyShow) {
+    if (premium) {
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const VerifyChoicePage(),
-        ),
-            (route) => false,
+      final response =
+      await supabase.functions.invoke(
+        "send-reward",
+        body: {
+          "username": Session.username,
+        },
       );
 
-    } else {
-
-      Navigator.pushAndRemoveUntil(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => const MainPage(),
         ),
-            (route) => false,
       );
 
+      if (response.status != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Couldn't send reward."),
+          ),
+        );
+      }
+
+    } else {
+      final user = await supabase
+          .from("users")
+          .select("shown_imdb, email")
+          .eq("username", Session.username)
+          .single();
+
+      if (user["shown_imdb"] == false) {
+        final String email = user["email"];
+
+        await Supabase.instance.client.functions.invoke(
+          "first-free-reward",
+          body: {
+            "email": user["email"],
+            "username": Session.username,
+          },
+        );
+
+        await Supabase.instance.client.functions.invoke(
+          'premium-offer',
+          body: {
+            'email': user["email"],
+          },
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MainPage(),
+          ),
+        );
+      }
+      else {
+        final response =
+        await supabase.functions.invoke(
+          "send-verify",
+          body: {
+            "username": Session.username,
+          },
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MainPage(),
+          ),
+        );
+
+        if (response.status != 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Couldn't send Task Verification Link."),
+            ),
+          );
+        }
+      }
+
     }
+
   }
+
   Future<bool> askConnectionQuestion() async {
 
     final result =
@@ -3086,49 +3111,18 @@ class _TaskPageState extends State<TaskPage> {
             /// NO
             TextButton(
               onPressed: () async {
-                final response = await supabase
-                    .from("users")
-                    .select("verifyshow")
-                    .eq("username", Session.username)
-                    .single();
-
-                Session.verifyShow =
-                    response["verifyshow"] ?? true;
-                if (Session.verifyShow) {
-
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const VerifyChoicePage(),
-                    ),
-                        (route) => false,
-                  );
-
-                } else {
-
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const MainPage(),
-                    ),
-                        (route) => false,
-                  );
-
-                }
+                Navigator.pop(context);
+                await handleRewardFlow();
               },
-
               child: const Text("No"),
             ),
 
             /// SOMEWHAT
             TextButton(
               onPressed: () async {
-
                 Navigator.pop(context);
-
                 await increaseProgress(1);
                 await handleRewardFlow();
-
               },
 
               child: const Text("Somewhat"),
@@ -3137,9 +3131,7 @@ class _TaskPageState extends State<TaskPage> {
             /// YES
             TextButton(
               onPressed: () async {
-
                 Navigator.pop(context);
-
                 await increaseProgress(2);
                 await handleRewardFlow();
 
@@ -3186,6 +3178,27 @@ class _TaskPageState extends State<TaskPage> {
         );
 
         await showGraduationDialog();
+      }
+      if (currentStage == "mediumtalk") {
+        final user = await supabase
+            .from("users")
+            .select("email")
+            .eq("username", Session.username)
+            .single();
+
+        final email = user["email"];
+
+          final response =
+          await Supabase.instance.client.functions.invoke(
+            'PMF-feedback',
+            body: {
+              'email': email,
+            },
+          );
+
+          if (response.status != 200) {
+            throw Exception("Couldn't send email");
+          }
       }
 
       final answeredYes =
@@ -3643,7 +3656,6 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    loadPremiumStatus();
     refreshLocation();
 
 
@@ -3656,22 +3668,6 @@ class _MainPageState extends State<MainPage> {
         });
       }
     });
-  }
-
-  Future<void> loadPendingRewards() async {
-
-    final response = await supabase
-        .from("users")
-        .select("pending_rewards")
-        .eq("username", Session.username)
-        .single();
-
-    setState(() {
-
-      pendingRewards = response["pending_rewards"] ?? 0;
-
-    });
-
   }
 
   @override
@@ -3696,25 +3692,6 @@ class _MainPageState extends State<MainPage> {
 
     }
 
-  }
-
-  Future<void> loadPremiumStatus() async {
-
-    final data =
-    await supabase
-        .from('users')
-        .select('premium')
-        .eq(
-      'username',
-      Session.username,
-    )
-        .single();
-
-    setState(() {
-
-      isPremium =
-          data['premium'] ?? false;
-    });
   }
 
   final List<Map<String, dynamic>> pages = [
@@ -4026,7 +4003,7 @@ class _MainPageState extends State<MainPage> {
         ),
 
         content: const Text(
-          "Questions?\n\n"
+          "Got feedback, want to report problems or just need someone to talk to?\n\n"
               "Email:\n"
               "pahal.bhatti11@gmail.com",
         ),
@@ -4095,146 +4072,140 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-  Future<void> accessPendingRewards() async {
+  Future<void> deleteAccount() async {
+
+    final passwordController = TextEditingController();
+
+    final confirm = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (_) => CupertinoAlertDialog(
+        title: const Text("Delete Account"),
+        content: const Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: Text(
+            "Are you sure you want to permanently delete your account?",
+          ),
+        ),
+        actions: [
+
+          CupertinoDialogAction(
+            child: const Text("No"),
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+          ),
+
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text("Yes"),
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+          ),
+
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final password = await showCupertinoDialog<String>(
+      context: context,
+      builder: (_) => CupertinoAlertDialog(
+
+        title: const Text("Enter Password"),
+
+        content: Column(
+
+          children: [
+
+            const SizedBox(height: 10),
+
+            CupertinoTextField(
+              controller: passwordController,
+              obscureText: true,
+              placeholder: "Password",
+            ),
+
+          ],
+
+        ),
+
+        actions: [
+
+          CupertinoDialogAction(
+            child: const Text("Cancel"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+
+          CupertinoDialogAction(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.pop(
+                context,
+                passwordController.text.trim(),
+              );
+            },
+          ),
+
+        ],
+      ),
+    );
+
+    if (password == null) return;
 
     try {
 
       final response = await supabase
-
           .from("users")
+          .select()
+          .eq("username", Session.username)
+          .eq("password", password);
 
-          .select("pending_rewards")
-
-          .eq(
-        "username",
-        Session.username,
-      )
-
-          .single();
-
-      int pendingRewards =
-      response["pending_rewards"];
-
-      if (pendingRewards == 0) {
+      if (response.isEmpty) {
 
         ScaffoldMessenger.of(context).showSnackBar(
-
           const SnackBar(
-
-            content: Text(
-              "No pending rewards.",
-            ),
-
+            content: Text("Incorrect password."),
           ),
-
         );
 
         return;
-
       }
 
-      /// Remove one pending reward
-
-      await supabase
-
-          .from("users")
-
-          .update({
-
-        "pending_rewards":
-        pendingRewards - 1,
-
-      })
-
-          .eq(
-        "username",
-        Session.username,
-      );
-
-      await loadPendingRewards();
-
-      /// Give a random reward
-
-      final user = await supabase
-          .from("users")
-          .select("claimed_rewards")
-          .eq("username", Session.username)
-          .single();
-
-      List claimed =
-      (user["claimed_rewards"] ?? []) as List;
-      final availableRewards =
-      premiumRewards.where((reward) {
-
-        return !claimed.contains(
-          reward["title"],
-        );
-
-      }).toList();
-      final reward =
-      availableRewards[
-      Random().nextInt(
-        availableRewards.length,
-      )];
-      claimed.add(
-        reward["title"],
-      );
-
       await supabase
           .from("users")
-          .update({
+          .delete()
+          .eq("username", Session.username);
 
-        "claimed_rewards": claimed,
+      final prefs =
+      await SharedPreferences.getInstance();
 
-      })
-          .eq(
-        "username",
-        Session.username,
+      await prefs.clear();
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+
+        context,
+
+        MaterialPageRoute(
+          builder: (_) => const LoginPage(),
+        ),
+
+            (route) => false,
+
       );
 
-    if (!mounted) return;
+    } catch (e) {
 
-    Navigator.push(
-
-    context,
-
-    MaterialPageRoute(
-
-    builder: (_) => PremiumRewardPage(
-
-    title:
-    reward["title"]!,
-
-    description:
-    reward["description"]!,
-
-    logoImage:
-    reward["logoimage"]!,
-
-    backgroundImage:
-    reward["bgimage"]!,
-
-    ),
-
-    ),
-
-    );
-
-    }
-
-    catch (e) {
-
-    ScaffoldMessenger.of(context).showSnackBar(
-
-    SnackBar(
-
-    content: Text(
-    "Error: $e",
-    ),
-
-    ),
-
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("$e"),
+        ),
+      );
 
     }
 
@@ -4562,36 +4533,6 @@ class _MainPageState extends State<MainPage> {
             ),
 
             ListTile(
-              leading: const Icon(Icons.email),
-
-              title: const Text(
-                "Access pending rewards",
-              ),
-
-              trailing: pendingRewards > 0
-                  ? Container(
-                padding: const EdgeInsets.all(7),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  pendingRewards > 99
-                      ? "99+"
-                      : pendingRewards.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-                  : null,
-
-              onTap: accessPendingRewards,
-            ),
-
-            ListTile(
               leading:
               const Icon(Icons.email),
               title: const Text("My promo code"),
@@ -4601,9 +4542,6 @@ class _MainPageState extends State<MainPage> {
               showPromoCodeDialog(context);
               },
             ),
-
-            //const Spacer(),
-
             ListTile(
               leading:
               const Icon(Icons.logout),
@@ -4613,43 +4551,17 @@ class _MainPageState extends State<MainPage> {
                 showLogoutDialog();
               },
             ),
-
             ListTile(
-
-              leading: Icon(
-                Icons.star,
+              leading: const Icon(
+                Icons.delete_forever,
+                color: Colors.red,
               ),
-
-              title: Text(
-
-                isPremium
-                    ? "Switch To Free"
-                    : "Upgrade To Premium",
+              title: const Text(
+                "Delete account",
+                style: TextStyle(color: Colors.red),
               ),
-
-              onTap: () async {
-
-                await supabase
-                    .from('users')
-                    .update({
-
-                  'premium':
-                  !isPremium,
-
-                })
-                    .eq(
-
-                  'username',
-                  Session.username,
-                );
-
-                loadPremiumStatus();
-
-                Navigator.pop(context);
-              },
+              onTap: deleteAccount,
             ),
-
-            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -5880,1496 +5792,6 @@ class _UCLAPageState extends State<UCLAPage> {
   }
 }
 
-class ImdbHackPage
-    extends StatelessWidget {
-
-  const ImdbHackPage({
-    super.key,
-  });
-
-  @override
-  Widget build(
-      BuildContext context) {
-
-    return Scaffold(
-
-      backgroundColor:
-      const Color(0xFF4CAF50),
-
-      body: Center(
-
-        child: Padding(
-
-          padding:
-          const EdgeInsets.all(24),
-
-          child: Column(
-
-            mainAxisAlignment:
-            MainAxisAlignment.center,
-
-            children: [
-
-              Icon(
-                Icons.movie,
-                size: 90,
-                color: Colors.white,
-              ),
-
-              SizedBox(height: 30),
-
-              Text(
-
-                "Secret Movie Trick",
-
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight:
-                  FontWeight.bold,
-                ),
-              ),
-
-              SizedBox(height: 25),
-
-              Text(
-
-                "Go to IMDb.\n\nBefore imdb in the URL add the word play.\n\nThe movie player opens automatically.",
-
-                textAlign:
-                TextAlign.center,
-
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
-
-              SizedBox(height: 30),
-
-              ElevatedButton(
-
-                onPressed: () {
-
-                  Navigator.pushReplacement(
-
-                    context,
-
-                    MaterialPageRoute(
-
-                      builder: (_) =>
-                      const PremiumOfferPage(),
-                    ),
-                  );
-                },
-
-                child: Text(
-                  "Continue",
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class PremiumOfferPage extends StatefulWidget {
-
-  const PremiumOfferPage({
-    super.key,
-  });
-
-  @override
-  State<PremiumOfferPage> createState() =>
-      _PremiumOfferPageState();
-}
-
-class _PremiumOfferPageState
-    extends State<PremiumOfferPage> {
-
-  final supabase =
-      Supabase.instance.client;
-
-  Future<void> activatePremium() async {
-
-    await supabase
-        .from('users')
-        .update({
-
-      'premium': true,
-
-    })
-        .eq(
-      'username',
-      Session.username,
-    );
-
-    if (!mounted) return;
-
-    Navigator.pushAndRemoveUntil(
-
-      context,
-
-      MaterialPageRoute(
-
-        builder: (_) =>
-        const MainPage(),
-      ),
-
-          (route) => false,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-
-      backgroundColor:
-      const Color(0xFF4CAF50),
-
-      body: SingleChildScrollView(
-        child: Center(
-
-        child: Padding(
-
-          padding:
-          const EdgeInsets.all(25),
-
-          child: Column(
-
-            mainAxisAlignment:
-            MainAxisAlignment.center,
-
-            children: [
-
-              const Icon(
-                Icons.workspace_premium,
-                color: Colors.amber,
-                size: 100,
-              ),
-
-              const SizedBox(
-                height: 30,
-              ),
-
-              const Text(
-
-                "Unlock Premium",
-
-                style: TextStyle(
-
-                  color: Colors.white,
-
-                  fontSize: 32,
-
-                  fontWeight:
-                  FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(
-                height: 30,
-              ),
-
-              const Text(
-
-                "✓ Hidden Student Perks\n\n"
-                    "✓ Discounts\n\n"
-                    "✓ Travel Rewards\n\n"
-                    "✓ Secret Internet Tricks\n\n"
-                    "✓ Premium Reward After Every Task",
-
-                textAlign:
-                TextAlign.center,
-
-                style: TextStyle(
-
-                  color: Colors.white,
-
-                  fontSize: 18,
-                ),
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-
-              ElevatedButton(
-
-                onPressed:
-                activatePremium,
-
-                child: const Text(
-                  "Start Premium",
-                ),
-              ),
-
-              const SizedBox(
-                height: 15,
-              ),
-
-              TextButton(
-
-                onPressed: () {
-
-                  Navigator.pushAndRemoveUntil(
-
-                    context,
-
-                    MaterialPageRoute(
-
-                      builder: (_) =>
-                      const MainPage(),
-                    ),
-
-                        (route) => false,
-                  );
-                },
-
-                child: const Text(
-
-                  "Continue Free",
-
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      ),
-    );
-  }
-}
-
-class PremiumRewardPage extends StatefulWidget {
-  final String title;
-  final String description;
-
-  /// background image
-  final String backgroundImage;
-
-  /// logo image
-  final String logoImage;
-
-  final bool showPremiumOfferAfterDone;
-
-  const PremiumRewardPage({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.backgroundImage,
-    required this.logoImage,
-    this.showPremiumOfferAfterDone = false,
-  });
-
-  @override
-  State<PremiumRewardPage> createState() => _PremiumRewardPageState();
-}
-
-class _PremiumRewardPageState
-    extends State<PremiumRewardPage> {
-
-  final GlobalKey cardKey = GlobalKey();
-
-  Future<Uint8List?> captureCard() async {
-
-    try {
-
-      final boundary =
-      cardKey.currentContext!
-          .findRenderObject()
-      as RenderRepaintBoundary;
-
-      final image =
-      await boundary.toImage(
-        pixelRatio: 3,
-      );
-
-      final byteData =
-      await image.toByteData(
-        format: ImageByteFormat.png,
-      );
-
-      return byteData!
-          .buffer
-          .asUint8List();
-
-    } catch (e) {
-
-      debugPrint(e.toString());
-
-      return null;
-    }
-  }
-
-  Future<void> downloadCard() async {
-
-    final bytes =
-    await captureCard();
-
-    if (bytes == null) return;
-
-    final dir =
-    await getTemporaryDirectory();
-
-    final file = File(
-      '${dir.path}/reward.png',
-    );
-
-    await file.writeAsBytes(
-      bytes,
-    );
-
-    await Gal.putImage(
-      file.path,
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-
-      const SnackBar(
-
-        content: Text(
-          "Saved to gallery",
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-
-      backgroundColor: const Color(0xFF4CAF50),
-
-      appBar: AppBar(
-        title: const Text("Premium Reward"),
-        backgroundColor: Colors.green,
-      ),
-
-      body: SingleChildScrollView(
-        child: Center(
-
-          child: Padding(
-
-            padding: const EdgeInsets.all(20),
-
-            child: Column(
-
-              mainAxisAlignment: MainAxisAlignment.center,
-
-              children: [
-
-                /// REWARD CARD
-
-              RepaintBoundary(
-              key: cardKey,
-
-              child: Container(
-                constraints: const BoxConstraints(minHeight: 420),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-
-                    borderRadius:
-                    BorderRadius.circular(30),
-
-                    image: DecorationImage(
-
-                      image: AssetImage(
-                        widget.backgroundImage,
-                      ),
-
-                      fit: BoxFit.cover,
-                    ),
-
-                    boxShadow: [
-
-                      BoxShadow(
-
-                        blurRadius: 20,
-
-                        color:
-                        Colors.black.withOpacity(
-                          0.35,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  child: Container(
-
-                    decoration: BoxDecoration(
-
-                      borderRadius:
-                      BorderRadius.circular(30),
-
-                      color:
-                      Colors.black.withOpacity(
-                        0.45,
-                      ),
-                    ),
-
-                    child: Padding(
-
-                      padding:
-                      const EdgeInsets.all(24),
-
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment:
-                        MainAxisAlignment.center,
-
-                        children: [
-
-                          /// LOGO
-
-                          CircleAvatar(
-
-                            radius: 40,
-
-                            backgroundColor:
-                            Colors.white,
-
-                            backgroundImage:
-                            AssetImage(
-                              widget.logoImage,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 25,
-                          ),
-
-                          /// TITLE
-
-                          Text(
-
-                            widget.title,
-
-                            textAlign:
-                            TextAlign.center,
-
-                            style:
-                            const TextStyle(
-
-                              color:
-                              Colors.white,
-
-                              fontSize: 28,
-
-                              fontWeight:
-                              FontWeight.bold,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 25,
-                          ),
-
-                          /// DESCRIPTION
-
-                          Text(
-
-                            widget.description,
-
-                            textAlign:
-                            TextAlign.center,
-
-                            style:
-                            const TextStyle(
-
-                              color:
-                              Colors.white,
-
-                              fontSize: 18,
-
-                              height: 1.4,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 35,
-                          ),
-
-                          /// COPY + DOWNLOAD
-
-                          Row(
-
-                            children: [
-
-                              Expanded(
-
-                                child: ElevatedButton.icon(
-
-                                  onPressed: () async {
-
-                                    await Clipboard.setData(
-
-                                      ClipboardData(
-                                        text:
-                                        widget.description,
-                                      ),
-                                    );
-
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-
-                                      const SnackBar(
-
-                                        content: Text(
-                                          "Copied to clipboard",
-                                        ),
-                                      ),
-                                    );
-                                  },
-
-                                  icon: const Icon(
-                                    Icons.copy,
-                                  ),
-
-                                  label: const Text(
-                                    "Copy",
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(
-                                width: 15,
-                              ),
-
-                              Expanded(
-
-                                child:
-                                ElevatedButton.icon(
-
-                                  onPressed: downloadCard,
-
-                                  icon: const Icon(
-                                    Icons.download,
-                                  ),
-
-                                  label: const Text(
-                                    "Download",
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ),
-                ),
-
-                const SizedBox(
-                  height: 25,
-                ),
-
-                /// DONE BUTTON
-
-                SizedBox(
-
-                  width: 220,
-
-                  child: ElevatedButton(
-
-                    style:
-                    ElevatedButton.styleFrom(
-
-                      backgroundColor:
-                      Colors.amber,
-
-                      foregroundColor:
-                      Colors.black,
-                    ),
-
-                    onPressed: () {
-
-                      if (widget.showPremiumOfferAfterDone) {
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                            const PremiumOfferPage(),
-                          ),
-                        );
-
-                      } else {
-
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                            const MainPage(),
-                          ),
-                              (route) => false,
-                        );
-
-                      }
-                    },
-
-                    child: const Text(
-
-                      "Done",
-
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight:
-                        FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class VerifyChoicePage extends StatelessWidget {
-  const VerifyChoicePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text("Verify Connection"),
-        backgroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 20,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-
-              const Icon(
-                Icons.verified,
-                color: Colors.blue,
-                size: 90,
-              ),
-
-              const SizedBox(height: 30),
-
-              const Text(
-                "Would you like to verify this connection?",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              const Text(
-                "We want to know if you actually did the task.\nIf you verify, you can unlock one Premium reward.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 17,
-                  color: Colors.white70,
-                ),
-              ),
-
-              const SizedBox(height: 60),
-
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const VerifyUsernamePage(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "VERIFY",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const MainPage(),
-                      ),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                      color: Colors.white38,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "NOT VERIFY",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              ),
-
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class VerifyUsernamePage extends StatefulWidget {
-  const VerifyUsernamePage({super.key});
-
-  @override
-  State<VerifyUsernamePage> createState() => _VerifyUsernamePageState();
-}
-
-class _VerifyUsernamePageState extends State<VerifyUsernamePage> {
-  final TextEditingController user1Controller = TextEditingController();
-  final TextEditingController user2Controller = TextEditingController();
-  final supabase = Supabase.instance.client;
-
-
-  Future<void> verifyUsers() async {
-
-    final user1 = user1Controller.text.trim();
-    final user2 = user2Controller.text.trim();
-
-    if (user1.isEmpty || user2.isEmpty) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            "Please enter both usernames.",
-          ),
-        ),
-
-      );
-
-      return;
-    }
-
-    if (user1 == user2) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            "You cannot verify with yourself.",
-          ),
-        ),
-
-      );
-
-      return;
-    }
-
-    try {
-      await updateCurrentLocation();
-
-      final response = await supabase
-
-          .from('users')
-
-          .select('username, device_id, last_latitude, last_longitude, current_stage',)
-
-          .inFilter('username', [
-
-        user1,
-        user2,
-
-      ]);
-
-      if (response.length != 2) {
-
-        ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(
-            content: Text(
-              "One or both usernames do not exist.",
-            ),
-          ),
-
-        );
-
-        return;
-      }
-
-      final first =
-      response.firstWhere(
-            (e) => e["username"] == user1,
-      );
-
-      final second =
-      response.firstWhere(
-            (e) => e["username"] == user2,
-      );
-
-      if (second["last_latitude"] == null ||
-          second["last_longitude"] == null) {
-
-        ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(
-
-            content: Text(
-              "Ask the other user to open the app once, then try again.",
-            ),
-
-          ),
-
-        );
-
-        return;
-
-      }
-
-      final device1 = first["device_id"];
-      final device2 = second["device_id"];
-
-      if (device1 == device2) {
-
-        ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(
-
-            content: Text(
-
-              "Nice try 😊\n\nWe encourage connecting with other people instead of mining rewards.",
-
-            ),
-
-          ),
-
-        );
-
-        return;
-      }
-
-      await verifyLocation(
-        first,
-        second,
-      );
-
-    }
-
-    catch(e){
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        SnackBar(
-          content: Text("$e"),
-        ),
-
-      );
-
-    }
-
-  }
-  Future<bool> alreadyVerified(String userA, String userB, String stage) async {
-    final sorted = [userA, userB]..sort();
-
-    final existing = await supabase
-        .from('verification_pairs')
-        .select('id')
-        .eq('user1', sorted[0])
-        .eq('user2', sorted[1])
-        .eq('stage', stage);
-
-    return existing.isNotEmpty;
-  }
-
-  Future<void> verifyLocation(Map firstUser, Map secondUser) async {
-    final stage = firstUser['current_stage'];
-
-    if (await alreadyVerified(firstUser["username"], secondUser["username"], stage)) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You've already verified this stage with this person.")),
-      );
-      return;
-    }
-
-    final sorted = [firstUser["username"], secondUser["username"]]..sort();
-
-    Future<void> recordPair() => supabase.from("verification_pairs").insert({
-      "user1": sorted[0],
-      "user2": sorted[1],
-      "stage": stage,
-      "verified_at": DateTime.now().toIso8601String(),
-    });
-
-    // check distance FIRST if this is a voicecall stage — before touching rewards
-    if (stage == "voicecall") {
-      double lat1 = (firstUser["last_latitude"] as num).toDouble();
-      double lon1 = (firstUser["last_longitude"] as num).toDouble();
-      double lat2 = (secondUser["last_latitude"] as num).toDouble();
-      double lon2 = (secondUser["last_longitude"] as num).toDouble();
-      double distance = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
-
-      if (distance > 100) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(
-            "You appear to be too far apart.\nIf you're together, ask the other user to open the app once and try again.",
-          )),
-        );
-        return;
-      }
-    }
-
-    // only reached once verification is actually going to succeed
-    final result = await RewardCycler.pickNext(pool: premiumRewards, column: "claimed_rewards");
-
-    if (!mounted) return;
-    if (result.didReset) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("That's all the rewards! Starting a new round 🎉")),
-      );
-    }
-
-    if (stage != "voicecall") {
-      await supabase.from("users").update({"verifyshow": false}).eq("username", Session.username);
-      Session.verifyShow = false;
-    }
-
-    await recordPair();
-
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (_) => PremiumRewardPage(
-        title: result.item["title"]!,
-        description: result.item["description"]!,
-        logoImage: result.item["logoimage"]!,
-        backgroundImage: result.item["bgimage"]!,
-      ),
-    ));
-  }
-
-  @override
-  void dispose() {
-    user1Controller.dispose();
-    user2Controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xff111111),
-
-      appBar: AppBar(
-        backgroundColor: const Color(0xff111111),
-        elevation: 0,
-        title: const Text(
-          "Verify Connection",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-
-                  const Icon(
-                    Icons.verified_rounded,
-                    color: Colors.blue,
-                    size: 80,
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  const Text(
-                    "Verify Your Connection",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  const Text(
-                    "Enter both usernames below.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  TextField(
-                    controller: user1Controller,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "Username 1",
-                      hintStyle:
-                      const TextStyle(color: Colors.white54),
-                      filled: true,
-                      fillColor: const Color(0xff222222),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  TextField(
-                    controller: user2Controller,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "Username 2",
-                      hintStyle:
-                      const TextStyle(color: Colors.white54),
-                      filled: true,
-                      fillColor: const Color(0xff222222),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 35),
-
-                  SizedBox(
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: verifyUsers,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: const Text(
-                        "CHECK",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RewardWheelPage()),
-                      );                    },
-                    child: const Text(
-                      "The other user said no",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Put your wheel image in assets/images/wheel.png and add to pubspec.yaml ───
-// assets:
-//   - assets/images/wheel.png
-
-class RewardWheelPage extends StatefulWidget {
-  const RewardWheelPage({super.key});
-
-  @override
-  State<RewardWheelPage> createState() => _RewardWheelPageState();
-}
-
-class _RewardWheelPageState extends State<RewardWheelPage>
-    with SingleTickerProviderStateMixin {
-
-  late final AnimationController _controller;
-  late Animation<double> _animation;
-
-  bool _spinning = false;
-  double _currentAngle = 0;
-
-
-
-  final Random _random = Random();
-  static const double _imageOffsetDeg = 0;
-  final supabase = Supabase.instance.client;
-
-
-  // ── Slice layout of YOUR wheel image (starting from top, going clockwise) ──
-  // Matches the image you sent:
-  // 0: Premium Reward  ← reward
-  // 1: Better Luck Next Time
-  // 2: Bonus Reward    ← reward
-  // 3: Almost There!
-  // 4: Secret Surprise ← reward
-  // 5: Try Again
-  // 6: Mini Reward     ← reward
-  // 7: Keep Connecting!
-  static const int _totalSlices = 8;
-  static const List<bool> _isReward = [
-    true,  // Premium Reward
-    false, // Better Luck Next Time
-    true,  // Bonus Reward
-    false, // Almost There!
-    true,  // Secret Surprise
-    false, // Try Again
-    true,  // Mini Reward
-    false, // Keep Connecting!
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _spin() async {
-    if (_spinning) return;
-    setState(() => _spinning = true);
-
-    // ── Predetermine outcome (5% reward chance) ──
-    final bool won = _random.nextDouble() < 0.05;
-
-    // ── Pick a random slice matching the outcome ──
-    final List<int> candidateSlices = [];
-    for (int i = 0; i < _totalSlices; i++) {
-      if (_isReward[i] == won) candidateSlices.add(i);
-    }
-    final int targetSlice =
-    candidateSlices[_random.nextInt(candidateSlices.length)];
-
-    // ── Calculate the angle so that slice lands at the top pointer ──
-    // Each slice = 360° / 8 = 45°
-    // Slice 0 center is already at top in the image, so:
-    final double sliceDeg = 360.0 / _totalSlices;
-    final double targetDeg = targetSlice * sliceDeg + _imageOffsetDeg; // angle to rotate so this slice faces top
-    final int extraSpins = 5 + _random.nextInt(4);   // 5–8 full rotations
-    final double totalRotation =
-        (_currentAngle % 360) + (extraSpins * 360) + targetDeg;
-
-    _animation = Tween<double>(
-      begin: _currentAngle,
-      end: totalRotation,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    _controller.duration = const Duration(milliseconds: 4500);
-    _controller.reset();
-    await _controller.forward();
-
-    _currentAngle = totalRotation % 360;
-    final user = await supabase
-        .from("users")
-        .select("claimed_rewards")
-        .eq("username", Session.username)
-        .single();
-
-    List claimed =
-    (user["claimed_rewards"] ?? []) as List;
-    final availableRewards =
-    premiumRewards.where((reward) {
-
-      return !claimed.contains(
-        reward["title"],
-      );
-
-    }).toList();
-    final reward =
-    availableRewards[
-    Random().nextInt(
-      availableRewards.length,
-    )];
-    claimed.add(
-      reward["title"],
-    );
-
-    await supabase
-        .from("users")
-        .update({
-
-      "claimed_rewards": claimed,
-
-    })
-        .eq(
-      "username",
-      Session.username,
-    );
-
-    if (!mounted) return;
-
-    // ── Show result popup, then navigate ──
-    await _showResultDialog(won);
-
-    if (won) {
-      // TODO: replace with your PremiumRewardPage navigation
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => PremiumRewardPage(
-          title:
-          reward["title"]!,
-
-          description:
-          reward["description"]!,
-
-          logoImage:
-          reward["logoimage"]!,
-
-          backgroundImage:
-          reward["bgimage"]!,
-        )),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainPage()),
-      );
-    }
-  }
-
-  Future<void> _showResultDialog(bool won) async {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E0540),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFD4A843), width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFD4A843).withOpacity(.35),
-                blurRadius: 24,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                won ? '🎉' : '😔',
-                style: const TextStyle(fontSize: 52),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                won
-                    ? 'Congratulations!\nYou got a reward!'
-                    : 'Sorry,\ntry next time!',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4A843),
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF111111),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF111111),
-        title: const Text('Lucky Spin'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'The other user declined verification.\n\n'
-                    'You still have a small chance of unlocking a Premium reward.\n\n'
-                    'Chance of winning: 5%',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              const SizedBox(height: 40),
-
-              // ── Wheel image with pointer on top ──
-              SizedBox(
-                width: 320,
-                height: 360,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Pointer pin at top
-                    const Positioned(
-                      top: 0,
-                      child: Icon(
-                        Icons.arrow_drop_down,
-                        color: Color(0xFFD4A843),
-                        size: 48,
-                      ),
-                    ),
-
-                    // Spinning wheel image
-                    Positioned(
-                      top: 24,
-                      child: AnimatedBuilder(
-                        animation: _controller,
-                        builder: (_, __) {
-                          final angle = _controller.isAnimating
-                              ? _animation.value * pi / 180
-                              : _currentAngle * pi / 180;
-                          return Transform.rotate(
-                            angle: angle,
-                            child: Image.asset(
-                              'asset/wheel.png',
-                              width: 310,
-                              height: 310,
-                              fit: BoxFit.contain,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 36),
-
-              // ── Spin button ──
-              SizedBox(
-                width: double.infinity,
-                height: 58,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4A843),
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 8,
-                  ),
-                  onPressed: _spinning ? null : _spin,
-                  child: Text(
-                    _spinning ? 'Spinning...' : 'SPIN',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class DeviceService {
 
