@@ -3,7 +3,7 @@ workflows:
     name: iOS Workflow
     max_build_duration: 60
     integrations:
-      apple_developer_portal: Codemagic     # <-- replace with YOUR integration name from Phase 4
+      app_store_connect: Codemagic     # <-- replace with YOUR integration name from Phase 4
     environment:
       flutter: stable
       xcode: latest
