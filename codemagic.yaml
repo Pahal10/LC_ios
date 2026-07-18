@@ -25,7 +25,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - your-email@example.com     # <-- put YOUR email here to get build notifications
+          - pbhatti10@g.ucla.edu     # <-- put YOUR email here to get build notifications
       app_store_connect:
         auth: integration
         submit_to_testflight: true
