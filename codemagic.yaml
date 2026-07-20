@@ -16,11 +16,12 @@ workflows:
       - name: Fetch and Install Apple Certificates/Profiles
         script: xcode-project use-profiles --archive-method=app-store
 
+      # 👇 THIS IS THE FIX: Forcefully rewrite the project file to demand a Distribution identity
+      - name: Overwrite Hardcoded Xcode Identity
+        script: sed -i '' 's/"iPhone Developer"/"Apple Distribution"/g' ios/Runner.xcodeproj/project.pbxproj
+
       - name: Build Flutter IPA
-        script: >
-          flutter build ipa --release 
-          --export-options-plist=$HOME/export_options.plist 
-          --dart-define=DEVELOPMENT_TEAM=XX8NLKN253
+        script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
 
