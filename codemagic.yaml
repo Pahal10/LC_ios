@@ -19,8 +19,8 @@ workflows:
       - name: Build Flutter IPA
         script: >
           flutter build ipa --release 
-          --code-signing-identity="Apple Distribution" 
-          --export-options-plist=$HOME/export_options.plist
+          --export-options-plist=$HOME/export_options.plist 
+          -- CODE_SIGN_IDENTITY="Apple Distribution"
     artifacts:
       - build/ios/ipa/*.ipa
 
