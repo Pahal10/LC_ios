@@ -7,24 +7,20 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
-      vars:
-        BUNDLE_ID: "com.pahal.lc"
-        # 👇 GLOBAL ENVIRONMENT INJECTIONS FOR FLUTTER/XCODE
-        DEVELOPMENT_TEAM: "XX8NLKN253"
-        CODE_SIGN_STYLE: "Manual"
-
+      ios_signing:
+        certificates:
+          - LC
+        provisioning_profiles:
+          - LC
     scripts:
       - name: Set up compiler dependencies
         script: flutter pub get
-
-      - name: Fetch and Install Apple Certificates/Profiles
+      - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles --archive-method=app-store
-
       - name: Build Flutter IPA
         script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
-
     publishing:
       app_store_connect:
         auth: integration
