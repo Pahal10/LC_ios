@@ -20,9 +20,7 @@ workflows:
         script: >
           flutter build ipa --release 
           --export-options-plist=$HOME/export_options.plist 
-          --build-name=1.0.0 
-          --build-number=1 
-          -- "DEVELOPMENT_TEAM=XX8NLKN253"
+          --dart-define=DEVELOPMENT_TEAM=XX8NLKN253
     artifacts:
       - build/ios/ipa/*.ipa
 
