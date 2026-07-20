@@ -10,23 +10,14 @@ workflows:
       vars:
         BUNDLE_ID: "com.pahal.lc"
 
-    scripts:
+scripts:
       - name: Set up compiler dependencies
         script: flutter pub get
 
-      # 1. Initialize an ephemeral keychain on the cloud machine to hold your Apple certificates
-      - name: Initialize Mac Keychain
-        script: keychain initialize
-
-      # 2. Pull the certificates downloaded by Codemagic and install them into that keychain
-      - name: Add Certificates to Keychain
-        script: keychain add-certificates
-
-      # 3. Match the provisioning profiles explicitly to your project file
-      - name: Match Xcode Profiles
+      # 👇 THIS SINGLE NATIVE COMMAND REPLACES THE PREVIOUS INDIVIDUAL KEYCHAIN STEPS
+      - name: Fetch and Install Apple Certificates/Profiles
         script: xcode-project use-profiles --archive-method=app-store
 
-      # 4. Build the release binary pointing directly to the generated export plist
       - name: Build Flutter IPA
         script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
 
