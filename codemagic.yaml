@@ -13,13 +13,14 @@ workflows:
       - name: Set up compiler dependencies
         script: flutter pub get
 
-      # 👇 THIS SINGLE NATIVE COMMAND REPLACES THE PREVIOUS INDIVIDUAL KEYCHAIN STEPS
       - name: Fetch and Install Apple Certificates/Profiles
         script: xcode-project use-profiles --archive-method=app-store
 
       - name: Build Flutter IPA
-        script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
-
+        script: >
+          flutter build ipa --release 
+          --code-signing-identity="Apple Distribution" 
+          --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
 
