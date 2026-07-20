@@ -1,28 +1,25 @@
 workflows:
   ios-release:
     name: iOS Release
-
     instance_type: mac_mini_m2
-
     integrations:
       app_store_connect: codemagic
-
     environment:
       flutter: stable
       xcode: latest
-
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.pahal.lc
-
+      groups:
+        - app_store_credentials # Ensure your App Store API variables are imported if using an env group
+      vars:
+        XCODE_PROJECT: "ios/Runner.xcodeproj"
+        XCODE_SCHEME: "Runner"
     scripts:
       - flutter pub get
-      - xcode-project use-profiles
+      
+      # 1. Force your workspace to turn off Automatic signing before compiling
+      - xcode-project disable-automatic-signing --project $XCODE_PROJECT
+      
+      # 2. Map and download the profiles explicitly
+      - xcode-project use-profiles --project $XCODE_PROJECT
+      
+      # 3. Build using the exact profile generated in the previous step
       - flutter build ipa --release --export-options-plist=$HOME/export_options.plist
-    artifacts:
-      - build/ios/ipa/*.ipa
-
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
