@@ -3,23 +3,37 @@ workflows:
     name: iOS Release
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: codemagic
+      app_store_connect: codemagic # Must match your Team Integration name
     environment:
       flutter: stable
       xcode: latest
-      groups:
-        - app_store_credentials # Ensure your App Store API variables are imported if using an env group
       vars:
-        XCODE_PROJECT: "ios/Runner.xcodeproj"
-        XCODE_SCHEME: "Runner"
+        BUNDLE_ID: "com.pahal.lc"
+
     scripts:
-      - flutter pub get
-      
-      # 1. Force your workspace to turn off Automatic signing before compiling
-      - xcode-project disable-automatic-signing --project $XCODE_PROJECT
-      
-      # 2. Map and download the profiles explicitly
-      - xcode-project use-profiles --project $XCODE_PROJECT
-      
-      # 3. Build using the exact profile generated in the previous step
-      - flutter build ipa --release --export-options-plist=$HOME/export_options.plist
+      - name: Set up compiler dependencies
+        script: flutter pub get
+
+      # 1. Initialize an ephemeral keychain on the cloud machine to hold your Apple certificates
+      - name: Initialize Mac Keychain
+        script: keychain initialize
+
+      # 2. Pull the certificates downloaded by Codemagic and install them into that keychain
+      - name: Add Certificates to Keychain
+        script: keychain add-certificates
+
+      # 3. Match the provisioning profiles explicitly to your project file
+      - name: Match Xcode Profiles
+        script: xcode-project use-profiles --archive-method=app-store
+
+      # 4. Build the release binary pointing directly to the generated export plist
+      - name: Build Flutter IPA
+        script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
