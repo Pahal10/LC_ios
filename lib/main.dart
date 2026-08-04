@@ -80,12 +80,6 @@ class _SplashScreenState
       Session.username =
           prefs.getString("username") ?? "";
 
-      try {
-        await updateCurrentLocation();
-      } catch (e) {
-        debugPrint("Location update failed: $e");
-      }
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -215,8 +209,6 @@ class _LoginPageState extends State<LoginPage> {
           "username",
           username,
         );
-        await updateCurrentLocation();
-
         final introCompleted =
             response.first["intro_completed"] ?? false;
 
@@ -388,7 +380,7 @@ class _LoginPageState extends State<LoginPage> {
 
               const SizedBox(height: 30),
 
-              Container(
+              /*Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -407,9 +399,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 20),
+              ),*/
 
               /// LOGIN BUTTON
               ElevatedButton(
@@ -527,7 +517,7 @@ Future<void> updateCurrentLocation() async {
 
     "last_latitude": position.latitude,
     "last_longitude": position.longitude,
-
+    "last_location_update": DateTime.now().toUtc().toIso8601String(),
   })
       .eq(
     "username",
@@ -3656,8 +3646,6 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    refreshLocation();
-
 
     controller.addListener(() {
       final page = controller.page?.round() ?? 0;
@@ -3674,24 +3662,6 @@ class _MainPageState extends State<MainPage> {
   void dispose() {
     controller.dispose();
     super.dispose();
-  }
-
-  Future<void> refreshLocation() async {
-
-    try {
-
-      await updateCurrentLocation();
-
-    }
-
-    catch (e) {
-
-      debugPrint(
-        "Location update failed: $e",
-      );
-
-    }
-
   }
 
   final List<Map<String, dynamic>> pages = [
@@ -4529,6 +4499,44 @@ class _MainPageState extends State<MainPage> {
               const Text("Contact Us"),
               onTap: () {
                 showContactDialog();
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.location_on),
+              title: const Text("Update Location"),
+              subtitle: const Text(
+                "Needed only for reward verification",
+              ),
+              onTap: () async {
+
+                Navigator.pop(context);
+
+                try {
+
+                  await updateCurrentLocation();
+
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "Location updated successfully. You can turn off Location Services now.",
+                      ),
+                    ),
+                  );
+
+                } catch (e) {
+
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                    ),
+                  );
+
+                }
               },
             ),
 
