@@ -29,6 +29,8 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location to verify that tasks were completed together in person, so both participants can receive their reward.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>We use your location to verify that tasks were completed together in person, so both participants can receive their reward.</string>
 	<key>CFBundleSignature</key>
