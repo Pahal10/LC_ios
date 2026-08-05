@@ -12,6 +12,8 @@ import 'package:flutter/rendering.dart';
 import 'package:uuid/uuid.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -251,6 +253,64 @@ class _LoginPageState extends State<LoginPage> {
 
     }
   }
+  // --- inside _LoginPageState, after loginUser() ---
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize(
+        serverClientId: '97930640325-2lovusk7nfpd1ffklp7pnib5rcu4p0vg.apps.googleusercontent.com',
+      );
+      final googleUser = await googleSignIn.authenticate();
+      final idToken = googleUser.authentication.idToken;
+      if (idToken == null) throw 'No ID Token found.';
+
+      await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+      );
+      await _handlePostOAuthLogin();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google sign-in failed: $e")),
+      );
+    }
+  }
+
+  Future<void> _handlePostOAuthLogin() async {
+    final authUid = supabase.auth.currentUser!.id;
+
+    final existing = await supabase
+        .from('users')
+        .select()
+        .eq('auth_uid', authUid)
+        .maybeSingle();
+
+    if (!mounted) return;
+
+    if (existing != null) {
+      // returning OAuth user — log them in exactly like loginUser() does
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool("loggedIn", true);
+      await prefs.setString("username", existing['username']);
+
+      Session.username = existing['username'];
+      Session.deviceId = await DeviceService.getDeviceId();
+      Session.promoCode = existing["promo_code"];
+      Session.verifyShow = existing["verifyshow"] ?? true;
+
+      await supabase.from("users").update({"device_id": Session.deviceId})
+          .eq("username", existing['username']);
+
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (_) => (existing["intro_completed"] ?? false)
+              ? const MainPage() : const LonelyPage()));
+    } else {
+      // brand-new OAuth user — send them to pick a username
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (_) => ChooseUsernamePage(authUid: authUid)));
+    }
+  }
 
 
   @override
@@ -446,6 +506,56 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               const SizedBox(height: 20),
+
+              /// GOOGLE SIGN IN BUTTON
+              Container(
+                width: double.infinity,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.circular(20), // pill shape, matches your app
+                  border: Border.all(color: const Color(0xFF747775), width: 1),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: signInWithGoogle,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12, right: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('asset/G.png', height: 20, width: 20),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Sign in with Google',
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: const Color(0xFF1F1F1F),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              Center(
+                child: Text(
+                  "New here?",
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.85),
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
 
               /// REGISTER BUTTON
               ElevatedButton(
@@ -5882,5 +5992,135 @@ class RewardCycler {
     await _supabase.from('users').update({column: used}).eq('username', Session.username);
 
     return PickResult(item, didReset);
+  }
+}
+
+class ChooseUsernamePage extends StatefulWidget {
+  final String authUid;
+  const ChooseUsernamePage({super.key, required this.authUid});
+
+  @override
+  State<ChooseUsernamePage> createState() => _ChooseUsernamePageState();
+}
+
+class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
+  final usernameController = TextEditingController();
+  final supabase = Supabase.instance.client;
+  bool _loading = false;
+
+  String generatePromoCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    final random = Random();
+    String code = "LC";
+    for (int i = 0; i < 6; i++) {
+      code += chars[random.nextInt(chars.length)];
+    }
+    return code;
+  }
+
+  Future<void> _submit() async {
+    final username = usernameController.text.trim();
+    if (username.isEmpty) return;
+
+    setState(() => _loading = true);
+
+    try {
+      final existingUser = await supabase
+          .from('users')
+          .select()
+          .eq('username', username)
+          .maybeSingle();
+
+      if (existingUser != null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Username already exists")),
+        );
+        setState(() => _loading = false);
+        return;
+      }
+
+      final email = supabase.auth.currentUser?.email ?? '';
+
+      await supabase.from('users').insert({
+        'username': username,
+        'password': null,
+        'auth_uid': widget.authUid,
+        'email': email,
+        'current_stage': 'smalltalk',
+        'stage_progress': 0,
+        'intro_completed': false,
+        'bigtalk_intro_seen': false,
+        'playdate_intro_seen': false,
+        'hygge_intro_seen': false,
+        'graduated': false,
+        'graduation_seen': false,
+        'lonely_yes': 0,
+        'lonely_total': 0,
+        'premium': false,
+        'promo_code': generatePromoCode(),
+        'pending_rewards': 0,
+      });
+
+      Session.username = username;
+      Session.deviceId = await DeviceService.getDeviceId();
+
+      await supabase.from("users").update({"device_id": Session.deviceId})
+          .eq("username", username);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool("loggedIn", true);
+      await prefs.setString("username", username);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LonelyPage()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+      setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF4CAF50),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Choose a username",
+                style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: usernameController,
+                decoration: const InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelText: 'Username',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _loading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : ElevatedButton(
+                onPressed: _submit,
+                child: const Text("Continue"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
