@@ -556,6 +556,14 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: signInWithGoogle,
                 ),
               ),
+              if (Theme.of(context).platform == TargetPlatform.iOS) ...[
+                const SizedBox(height: 12),
+                SignInWithAppleButton(
+                  onPressed: signInWithApple,
+                  style: SignInWithAppleButtonStyle.black,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ],
               const SizedBox(height: 16),
 
               Center(
