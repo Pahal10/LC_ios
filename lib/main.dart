@@ -2706,13 +2706,6 @@ class _TaskPageState extends State<TaskPage> {
             "username": Session.username,
           },
         );
-
-        await Supabase.instance.client.functions.invoke(
-          'premium-offer',
-          body: {
-            'email': user["email"],
-          },
-        );
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
