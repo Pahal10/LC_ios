@@ -277,6 +277,34 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+  Future<void> signInWithApple() async {
+  try {
+    final rawNonce = supabase.auth.generateRawNonce();
+    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: hashedNonce,
+    );
+
+    final idToken = credential.identityToken;
+    if (idToken == null) throw 'No ID Token found.';
+
+    await supabase.auth.signInWithIdToken(
+      provider: OAuthProvider.apple,
+      idToken: idToken,
+      nonce: rawNonce,
+    );
+    await _handlePostOAuthLogin();
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Apple sign-in failed: $e")),
+    );
+  }
+}
 
   Future<void> _handlePostOAuthLogin() async {
     final authUid = supabase.auth.currentUser!.id;
