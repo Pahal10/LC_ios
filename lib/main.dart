@@ -4351,8 +4351,7 @@ class _MainPageState extends State<MainPage> {
 
               const Text(
 
-                "If you get new users to download LC using your promo code, both of you will receive one Premium Reward.\n\n"
-                    "You can later claim it from Access Pending Rewards.",
+                "While registering, if a new user enters your promo code, both of you will receive one Premium Reward.\n\n",
 
                 textAlign: TextAlign.center,
 
