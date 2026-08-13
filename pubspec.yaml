@@ -36,6 +36,7 @@ dependencies:
   url_launcher: ^6.3.0
   supabase_flutter: ^2.5.6
   geolocator: ^14.0.2
+  sign_in_with_apple: ^6.1.4
   flutter:
     sdk: flutter
   # The following adds the Cupertino Icons font to your application.
