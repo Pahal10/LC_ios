@@ -14,9 +14,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -539,7 +539,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 20),
 
               /// GOOGLE SIGN IN BUTTON
-              /*Container(
+              Container(
                 width: double.infinity,
                 height: 40,
                 decoration: BoxDecoration(
@@ -572,18 +572,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                ),
-              ),*/
-              SizedBox(
-                width: 200,
-                height: 40,
-                child: SignInButton(
-                  Buttons.Google,
-                  text: "Sign in with Google",
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  onPressed: signInWithGoogle,
                 ),
               ),
               if (Theme.of(context).platform == TargetPlatform.iOS) ...[
