@@ -1128,8 +1128,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                     content: Text(
 
-                                      "If you enter another user's promo code during registration, both of you will receive one Premium Reward.\n\n"
-                                          "Rewards can later be claimed from Access Pending Rewards.",
+                                      "If you enter another user's promo code during registration, both of you will receive one Premium Reward at your registered email.",
 
                                     ),
 
