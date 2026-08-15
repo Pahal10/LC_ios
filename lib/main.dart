@@ -1191,7 +1191,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: promoCodeController,
 
                           decoration: InputDecoration(
-
+                            filled: true,
+                            fillColor: Colors.white,
                             labelText: "Promo Code (Optional)",
 
                             suffixIcon: IconButton(
