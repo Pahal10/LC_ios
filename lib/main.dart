@@ -493,18 +493,130 @@ class _LoginPageState extends State<LoginPage> {
               ),*/
 
               /// LOGIN BUTTON
-              ElevatedButton(
-                onPressed: loginUser,
+              SizedBox(
+                            width: double.infinity,
+                            height: 60,
 
-                child: const Text(
-                  'Log in',
-                  style: TextStyle(
-                    color: Color(0xFF111A2D),
-                  ),
-                ),
-              ),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF149F5E),
+                                    Color(0xFF35D989),
+                                  ],
+                                ),
+
+                                borderRadius:
+                                BorderRadius.circular(18),
+
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF25D47D)
+                                        .withOpacity(0.22),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+
+                              child: ElevatedButton(
+                                onPressed: loginUser,
+
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                  Colors.transparent,
+
+                                  shadowColor:
+                                  Colors.transparent,
+
+                                  elevation: 0,
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                    BorderRadius.circular(18),
+                                  ),
+                                ),
+
+                                child: const Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+
+                                  children: [
+
+                                    Text(
+                                      "Log in",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 17,
+                                        fontWeight:
+                                        FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
 
               const SizedBox(height: 20),
+
+              Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.center,
+
+                            children: [
+
+                              Text(
+                                "New here?",
+                                style: TextStyle(
+                                  color:
+                                  Colors.white.withOpacity(0.60),
+                                  fontSize: 15,
+                                ),
+                              ),
+
+                              const SizedBox(width: 8),
+
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                      const RegisterPage(),
+                                    ),
+                                  );
+                                },
+
+                                child: const Row(
+                                  children: [
+
+                                    Text(
+                                      "Register",
+                                      style: TextStyle(
+                                        color:
+                                        Color(0xFF39D98A),
+                                        fontSize: 15.5,
+                                        fontWeight:
+                                        FontWeight.w700,
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 5),
+
+                                    Icon(
+                                      Icons.arrow_forward_rounded,
+                                      color:
+                                      Color(0xFF39D98A),
+                                      size: 19,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
 
               /// OR
               Row(
@@ -539,41 +651,49 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 20),
 
               /// GOOGLE SIGN IN BUTTON
-              Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.circular(20), // pill shape, matches your app
-                  border: Border.all(color: const Color(0xFF747775), width: 1),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: signInWithGoogle,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset('asset/G.png', height: 20, width: 20),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Sign in with Google',
-                            style: GoogleFonts.roboto(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: const Color(0xFF1F1F1F),
+              SizedBox(
+                            width: double.infinity,
+                            height: 40,
+
+                            child: Material(
+                              color: Colors.white,
+                              borderRadius:
+                              BorderRadius.circular(17),
+
+                              child: InkWell(
+                                borderRadius:
+                                BorderRadius.circular(17),
+
+                                onTap: signInWithGoogle,
+
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+
+                                  children: [
+
+                                    Image.asset(
+                                      'asset/G.png',
+                                      height: 21,
+                                      width: 21,
+                                    ),
+
+                                    const SizedBox(width: 12),
+
+                                    const Text(
+                                      "Continue with Google",
+                                      style: TextStyle(
+                                        color: Color(0xFF202124),
+                                        fontSize: 15.5,
+                                        fontWeight:
+                                        FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
               if (Theme.of(context).platform == TargetPlatform.iOS) ...[
                 const SizedBox(height: 12),
                 SignInWithAppleButton(
