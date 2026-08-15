@@ -469,7 +469,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               /*Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -560,63 +560,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-              const SizedBox(height: 20),
-
-              Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.center,
-
-                            children: [
-
-                              Text(
-                                "New here?",
-                                style: TextStyle(
-                                  color:
-                                  Colors.white.withOpacity(0.60),
-                                  fontSize: 15,
-                                ),
-                              ),
-
-                              const SizedBox(width: 8),
-
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                      const RegisterPage(),
-                                    ),
-                                  );
-                                },
-
-                                child: const Row(
-                                  children: [
-
-                                    Text(
-                                      "Register",
-                                      style: TextStyle(
-                                        color:
-                                        Color(0xFF39D98A),
-                                        fontSize: 15.5,
-                                        fontWeight:
-                                        FontWeight.w700,
-                                      ),
-                                    ),
-
-                                    SizedBox(width: 5),
-
-                                    Icon(
-                                      Icons.arrow_forward_rounded,
-                                      color:
-                                      Color(0xFF39D98A),
-                                      size: 19,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+              const SizedBox(height: 30),
 
               /// OR
               Row(
@@ -648,7 +592,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
               /// GOOGLE SIGN IN BUTTON
               SizedBox(
@@ -695,13 +639,69 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
               if (Theme.of(context).platform == TargetPlatform.iOS) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 SignInWithAppleButton(
                   onPressed: signInWithApple,
                   style: SignInWithAppleButtonStyle.black,
                   borderRadius: BorderRadius.circular(20),
                 ),
               ],
+              const SizedBox(height: 30),
+              Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.center,
+
+                            children: [
+
+                              Text(
+                                "New here?",
+                                style: TextStyle(
+                                  color:
+                                  Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
+
+                              const SizedBox(width: 8),
+
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                      const RegisterPage(),
+                                    ),
+                                  );
+                                },
+
+                                child: const Row(
+                                  children: [
+
+                                    Text(
+                                      "Register",
+                                      style: TextStyle(
+                                        color:
+                                        Color(0xFFFFD700),
+                                        fontSize: 15.5,
+                                        fontWeight:
+                                        FontWeight.w700,
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 5),
+
+                                    Icon(
+                                      Icons.arrow_forward_rounded,
+                                      color:
+                                      Color(0xFFFFD700),
+                                      size: 19,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
             ],
           ),
         ),
