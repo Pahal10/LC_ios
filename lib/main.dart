@@ -222,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => const LonelyPage(),
+              builder: (_) => const WelcomePage(),
             ),
           );
 
@@ -335,7 +335,7 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (_) => (existing["intro_completed"] ?? false)
-              ? const MainPage() : const LonelyPage()));
+              ? const MainPage() : const WelcomePage()));
     } else {
       // brand-new OAuth user — send them to pick a username
       Navigator.pushReplacement(context,
@@ -924,7 +924,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const LonelyPage(),
+          builder: (context) => const WelcomePage(),
         ),
       );
 
@@ -6189,7 +6189,7 @@ class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LonelyPage()),
+        MaterialPageRoute(builder: (context) => const WelcomePage()),
       );
     } catch (e) {
       if (!mounted) return;
