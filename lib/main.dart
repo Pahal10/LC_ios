@@ -702,42 +702,6 @@ class _LoginPageState extends State<LoginPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ],
-              const SizedBox(height: 16),
-
-              Center(
-                child: Text(
-                  "New here?",
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              /// REGISTER BUTTON
-              ElevatedButton(
-                onPressed: () {
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                      const RegisterPage(),
-                    ),
-                  );
-
-                },
-
-                child: const Text(
-                  'Register',
-
-                  style: TextStyle(
-                    color: Color(0xFF111A2D),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
