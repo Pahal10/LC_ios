@@ -458,7 +458,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       style: TextStyle(
 
-                        color: const Color(0xFFFFD700),
+                        color: Colors.white,
 
                         fontSize: 14,
 
@@ -494,71 +494,53 @@ class _LoginPageState extends State<LoginPage> {
 
               /// LOGIN BUTTON
               SizedBox(
-                            width: double.infinity,
-                            height: 60,
-
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Color(0xFF149F5E),
-                                    Color(0xFF35D989),
-                                  ],
-                                ),
-
-                                borderRadius:
-                                BorderRadius.circular(18),
-
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF25D47D)
-                                        .withOpacity(0.22),
-                                    blurRadius: 18,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-
-                              child: ElevatedButton(
-                                onPressed: loginUser,
-
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                  Colors.transparent,
-
-                                  shadowColor:
-                                  Colors.transparent,
-
-                                  elevation: 0,
-
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(18),
-                                  ),
-                                ),
-
-                                child: const Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-
-                                  children: [
-
-                                    Text(
-                                      "Log in",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 17,
-                                        fontWeight:
-                                        FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+  width: double.infinity,
+  height: 60,
+  child: DecoratedBox(
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [
+          Color(0xFF007AFF), // Vibrant modern blue
+          Color(0xFF00C6FF), // Bright accent blue
+        ],
+      ),
+      borderRadius: BorderRadius.circular(18),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF007AFF).withOpacity(0.35), // Updated shadow to match blue
+          blurRadius: 18,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    ),
+    child: ElevatedButton(
+      onPressed: loginUser,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Log in",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+)
 
               const SizedBox(height: 30),
 
@@ -567,7 +549,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Expanded(
                     child: Divider(
-                      color: const Color(0xFFFFD700),
+                      color: Colors.white,
                       thickness: 2,
                       endIndent: 10,
                     ),
@@ -576,7 +558,7 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     "or",
                     style: TextStyle(
-                      color: Color(0xFFFFD700),
+                      color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -584,7 +566,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   Expanded(
                     child: Divider(
-                      color: const Color(0xFFFFD700),
+                      color: Colors.white,
                       thickness: 2,
                       indent: 10,
                     ),
@@ -682,7 +664,7 @@ class _LoginPageState extends State<LoginPage> {
                                       "Register",
                                       style: TextStyle(
                                         color:
-                                        Color(0xFFFFD700),
+                                        Colors.white,
                                         fontSize: 15.5,
                                         fontWeight:
                                         FontWeight.w700,
@@ -694,7 +676,7 @@ class _LoginPageState extends State<LoginPage> {
                                     Icon(
                                       Icons.arrow_forward_rounded,
                                       color:
-                                      Color(0xFFFFD700),
+                                      Colors.white,
                                       size: 19,
                                     ),
                                   ],
