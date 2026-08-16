@@ -776,6 +776,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final supabase = Supabase.instance.client;
   bool _hidePassword = true;
   bool _hideConfirmPassword = true;
+  bool _agreedToCommunications = false;
 
   @override
   void dispose() {
@@ -4251,9 +4252,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
   Future<void> deleteAccount() async {
-
-    final passwordController = TextEditingController();
-
+ 
     final confirm = await showCupertinoDialog<bool>(
       context: context,
       builder: (_) => CupertinoAlertDialog(
@@ -4265,14 +4264,14 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
         actions: [
-
+ 
           CupertinoDialogAction(
             child: const Text("No"),
             onPressed: () {
               Navigator.pop(context, false);
             },
           ),
-
+ 
           CupertinoDialogAction(
             isDestructiveAction: true,
             child: const Text("Yes"),
@@ -4280,113 +4279,49 @@ class _MainPageState extends State<MainPage> {
               Navigator.pop(context, true);
             },
           ),
-
+ 
         ],
       ),
     );
-
+ 
     if (confirm != true) return;
-
-    final password = await showCupertinoDialog<String>(
-      context: context,
-      builder: (_) => CupertinoAlertDialog(
-
-        title: const Text("Enter Password"),
-
-        content: Column(
-
-          children: [
-
-            const SizedBox(height: 10),
-
-            CupertinoTextField(
-              controller: passwordController,
-              obscureText: true,
-              placeholder: "Password",
-            ),
-
-          ],
-
-        ),
-
-        actions: [
-
-          CupertinoDialogAction(
-            child: const Text("Cancel"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-
-          CupertinoDialogAction(
-            child: const Text("OK"),
-            onPressed: () {
-              Navigator.pop(
-                context,
-                passwordController.text.trim(),
-              );
-            },
-          ),
-
-        ],
-      ),
-    );
-
-    if (password == null) return;
-
+ 
     try {
-
-      final response = await supabase
-          .from("users")
-          .select()
-          .eq("username", Session.username)
-          .eq("password", password);
-
-      if (response.isEmpty) {
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Incorrect password."),
-          ),
-        );
-
-        return;
-      }
-
+ 
       await supabase
           .from("users")
           .delete()
           .eq("username", Session.username);
-
+ 
       final prefs =
       await SharedPreferences.getInstance();
-
+ 
       await prefs.clear();
-
+ 
       if (!mounted) return;
-
+ 
       Navigator.pushAndRemoveUntil(
-
+ 
         context,
-
+ 
         MaterialPageRoute(
           builder: (_) => const LoginPage(),
         ),
-
+ 
             (route) => false,
-
+ 
       );
-
+ 
     } catch (e) {
-
+ 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("$e"),
         ),
       );
-
+ 
     }
-
+ 
   }
   void showPromoCodeDialog(BuildContext context) {
 
