@@ -819,6 +819,15 @@ class _RegisterPageState extends State<RegisterPage> {
     confirmPasswordController.text.trim();
     final enteredPromo = promoCodeController.text.trim().toUpperCase();
 
+    /// EMAIL FORMAT CHECK
+final emailRegex = RegExp(r'^[\w\.\-+]+@[\w\-]+\.[\w\.\-]+$');
+if (!emailRegex.hasMatch(email)) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text("Please enter a valid email address")),
+  );
+  return;
+}
+
     /// PASSWORD MATCH CHECK
     if (password != confirmPassword) {
 
@@ -830,6 +839,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
       return;
     }
+    /// COMMUNICATIONS CONSENT CHECK
+if (!_agreedToCommunications) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Please agree to receive communications at your email to register"),
+    ),
+  );
+  return;
+}
 
     try {
 
@@ -1211,6 +1229,40 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
 
                         ),
+
+                        const SizedBox(height: 25),
+
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Checkbox(
+      value: _agreedToCommunications,
+      fillColor: WidgetStateProperty.resolveWith((states) => Colors.white),
+      checkColor: const Color(0xFF24B65E),
+      onChanged: (value) {
+        setState(() {
+          _agreedToCommunications = value ?? false;
+        });
+      },
+    ),
+    Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _agreedToCommunications = !_agreedToCommunications;
+          });
+        },
+        child: const Padding(
+          padding: EdgeInsets.only(top: 14),
+          child: Text(
+            "I agree to receive communications from you at this email",
+            style: TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ),
+      ),
+    ),
+  ],
+),
 
                         const SizedBox(height: 25),
 
