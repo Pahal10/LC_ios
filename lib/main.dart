@@ -108,7 +108,7 @@ class _SplashScreenState
     return Scaffold(
 
       backgroundColor:
-      const Color(0xFF4CAF50),
+      const Color(0xFF24B65E),
 
       body: Center(
 
@@ -348,7 +348,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -1043,7 +1043,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       appBar: AppBar(
         centerTitle: true,
@@ -1365,7 +1365,7 @@ class _GetStartedPageState
     return Scaffold(
 
       backgroundColor:
-      const Color(0xFF4CAF50),
+      const Color(0xFF24B65E),
 
       appBar: AppBar(
 
@@ -2382,7 +2382,7 @@ class LonelyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       appBar: AppBar(
         title: const Text('Questionnaire'),
@@ -2508,7 +2508,7 @@ class MoveCityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       appBar: AppBar(
         title: const Text('Moving to a New City'),
@@ -2588,7 +2588,7 @@ class LossPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       appBar: AppBar(
         title: const Text('Loss and Loneliness'),
@@ -3459,7 +3459,7 @@ class _TaskPageState extends State<TaskPage> {
     return Scaffold(
 
       backgroundColor:
-      const Color(0xFF4CAF50),
+      const Color(0xFF24B65E),
 
       appBar: AppBar(
 
@@ -3475,7 +3475,7 @@ class _TaskPageState extends State<TaskPage> {
         centerTitle: true,
 
         backgroundColor:
-        const Color(0xFF4CAF50),
+        const Color(0xFF24B65E),
       ),
 
       body: SingleChildScrollView(
@@ -4791,7 +4791,7 @@ class _MainPageState extends State<MainPage> {
       drawer: buildDrawer(),
       backgroundColor: currentPage == 1
           ? Colors.black
-          : const Color(0xFF4CAF50),
+          : const Color(0xFF24B65E),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF388E3C),
@@ -5289,7 +5289,7 @@ class StageSelectionPage extends StatelessWidget {
 
     return Scaffold(
 
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       appBar: AppBar(
         title: const Text(
@@ -5477,7 +5477,7 @@ class _ForgotPasswordPageState
     return Scaffold(
 
       backgroundColor:
-      const Color(0xFF4CAF50),
+      const Color(0xFF24B65E),
 
       appBar: AppBar(
 
@@ -5738,7 +5738,7 @@ class _VerifyCodePageState
     return Scaffold(
 
       backgroundColor:
-      const Color(0xFF4CAF50),
+      const Color(0xFF24B65E),
 
       appBar: AppBar(
 
@@ -6186,7 +6186,7 @@ class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(30),
@@ -6227,7 +6227,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF4CAF50),
+      backgroundColor: const Color(0xFF24B65E),
 
       body: SafeArea(
         child: Padding(
