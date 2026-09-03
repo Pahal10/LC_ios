@@ -6089,8 +6089,60 @@ class ChooseUsernamePage extends StatefulWidget {
 
 class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
   final usernameController = TextEditingController();
+	final promoCodeController = TextEditingController();
   final supabase = Supabase.instance.client;
   bool _loading = false;
+
+	@override
+void dispose() {
+  usernameController.dispose();
+  promoCodeController.dispose();
+  super.dispose();
+}
+	Future<void> checkPromoCode(String enteredPromo) async {
+  try {
+    final response = await supabase
+        .from("users")
+        .select()
+        .eq("promo_code", enteredPromo);
+
+    if (response.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid promo code.")),
+      );
+      return;
+    }
+
+    final owner = response.first;
+
+    if (owner["username"] == Session.username) return;
+
+    if (owner["device_id"] == Session.deviceId) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nice try 😊")),
+      );
+      return;
+    }
+
+    await supabase.from("users").update({
+      "pending_rewards": owner["pending_rewards"] + 1,
+    }).eq("username", owner["username"]);
+
+    final currentUser = await supabase
+        .from("users")
+        .select("pending_rewards")
+        .eq("username", Session.username)
+        .single();
+
+    await supabase.from("users").update({
+      "pending_rewards": currentUser["pending_rewards"] + 1,
+    }).eq("username", Session.username);
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+}
 
   String generatePromoCode() {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -6147,6 +6199,10 @@ class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
       });
 
       Session.username = username;
+		final enteredPromo = promoCodeController.text.trim().toUpperCase();
+if (enteredPromo.isNotEmpty) {
+  await checkPromoCode(enteredPromo);
+}
       Session.deviceId = await DeviceService.getDeviceId();
 
       await supabase.from("users").update({"device_id": Session.deviceId})
