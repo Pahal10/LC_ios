@@ -6158,6 +6158,14 @@ void dispose() {
   Future<void> _submit() async {
     final username = usernameController.text.trim();
     if (username.isEmpty) return;
+	  if (!_agreedToCommunications) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Please agree to receive communications to continue"),
+    ),
+  );
+  return;
+}
 
     setState(() => _loading = true);
 
@@ -6294,7 +6302,39 @@ if (enteredPromo.isNotEmpty) {
                           ),
 
                         ),
-							const SizedBox(height: 20),
+							const SizedBox(height: 30),
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Checkbox(
+      value: _agreedToCommunications,
+      fillColor: WidgetStateProperty.resolveWith((states) => Colors.white),
+      checkColor: const Color(0xFF24B65E),
+      onChanged: (value) {
+        setState(() {
+          _agreedToCommunications = value ?? false;
+        });
+      },
+    ),
+    Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _agreedToCommunications = !_agreedToCommunications;
+          });
+        },
+        child: const Padding(
+          padding: EdgeInsets.only(top: 14),
+          child: Text(
+            "I agree to receive occasional communications from Let's Connect",
+            style: TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ),
+      ),
+    ),
+  ],
+),
+const SizedBox(height: 30),
               _loading
                   ? const CircularProgressIndicator(color: Colors.white)
                   : ElevatedButton(
