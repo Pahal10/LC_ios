@@ -6092,6 +6092,7 @@ class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
 	final promoCodeController = TextEditingController();
   final supabase = Supabase.instance.client;
   bool _loading = false;
+	bool _agreedToCommunications = false;
 
 	@override
 void dispose() {
