@@ -6195,6 +6195,49 @@ class _ChooseUsernamePageState extends State<ChooseUsernamePage> {
                 ),
               ),
               const SizedBox(height: 20),
+							TextField(
+
+                          controller: promoCodeController,
+
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            labelText: "Promo Code (Optional)",
+
+                            suffixIcon: IconButton(
+
+                              icon: const Icon(Icons.info_outline),
+
+                              onPressed: () {
+
+                                showDialog(
+
+                                  context: context,
+
+                                  builder: (_) => const AlertDialog(
+
+                                    title: Text(
+                                      "Promo Code",
+                                    ),
+
+                                    content: Text(
+
+                                      "If you enter another user's promo code during registration, both of you will receive one Premium Reward at your registered email.",
+
+                                    ),
+
+                                  ),
+
+                                );
+
+                              },
+
+                            ),
+
+                          ),
+
+                        ),
+							const SizedBox(height: 20),
               _loading
                   ? const CircularProgressIndicator(color: Colors.white)
                   : ElevatedButton(
