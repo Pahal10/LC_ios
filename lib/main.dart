@@ -3374,6 +3374,7 @@ class _TaskPageState extends State<TaskPage> {
               onPressed: () async {
                 Navigator.pop(context);
                 await increaseProgress(1);
+				await ReviewService.registerComfortableTask();
                 await handleRewardFlow();
               },
 
@@ -3385,6 +3386,7 @@ class _TaskPageState extends State<TaskPage> {
               onPressed: () async {
                 Navigator.pop(context);
                 await increaseProgress(2);
+                await ReviewService.registerComfortableTask();
                 await handleRewardFlow();
 
               },
