@@ -17,6 +17,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -6445,6 +6446,53 @@ class WelcomePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+class ReviewService {
+  static const _kTaskCount = "review_task_count";
+  static const _kRequested = "review_requested";
+  static const _kPending   = "review_pending";
+
+  /// How many comfortable task completions before we ask.
+  static const _threshold = 3;
+
+  /// Call this only when the user says the task felt OK.
+  static Future<void> registerComfortableTask() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getBool(_kRequested) ?? false) return;
+
+    final count = (prefs.getInt(_kTaskCount) ?? 0) + 1;
+    await prefs.setInt(_kTaskCount, count);
+
+    if (count >= _threshold) {
+      await prefs.setBool(_kPending, true);
+    }
+  }
+
+  /// Call this from a calm screen — never while a dialog is up.
+  static Future<void> maybeRequestReview() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (!(prefs.getBool(_kPending) ?? false)) return;
+    if (prefs.getBool(_kRequested) ?? false) return;
+
+    final inAppReview = InAppReview.instance;
+    if (!await inAppReview.isAvailable()) return;
+
+    // Burn the flags before asking — the OS may silently no-op,
+    // and we never want to re-ask on every MainPage build.
+    await prefs.setBool(_kPending, false);
+    await prefs.setBool(_kRequested, true);
+
+    await inAppReview.requestReview();
+  }
+
+  /// Manual "Rate us" — always opens the real store page.
+  static Future<void> openStoreListing() async {
+    await InAppReview.instance.openStoreListing(
+      appStoreId: "6792295616",
     );
   }
 }
