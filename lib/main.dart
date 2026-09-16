@@ -4743,6 +4743,16 @@ class _MainPageState extends State<MainPage> {
               },
             ),
 
+			            ListTile(
+              leading: const Icon(Icons.star_rate_rounded),
+              title: const Text("Rate this app"),
+              onTap: () async {
+                Navigator.pop(context);
+                await ReviewService.openStoreListing();
+              },
+            ),
+			
+
             ListTile(
               leading:
               const Icon(Icons.email),
