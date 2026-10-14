@@ -45,6 +45,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+	// 1. Define the four localization delegates
+      localizationsDelegates: const [
+        // AppLocalizations.delegate, // Uncomment this line if you are using the automatically generated l10n delegate
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      // 2. Set the supported locales to English, Portuguese, and Spanish
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('pt'), // Portuguese
+        Locale('es'), // Spanish
+      ],
       home: const SplashScreen(),
     );
   }
