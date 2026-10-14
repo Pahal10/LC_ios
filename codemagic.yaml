@@ -17,6 +17,8 @@ workflows:
         script: flutter pub get
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles --archive-method=app-store
+      - name: Generate localizations
+        script: flutter gen-l10n
       - name: Build Flutter IPA
         script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
