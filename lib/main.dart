@@ -4820,16 +4820,25 @@ class _MainPageState extends State<MainPage> {
         backgroundColor: const Color(0xFF388E3C),
         elevation: 0,
 
-        title: GestureDetector(
-          onTap: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage:
-            AssetImage("asset/LCicon.png"),
-          ),
+        
+        title: const CircleAvatar(
+          radius: 20,
+          backgroundImage: AssetImage("asset/LCicon.png"),
         ),
+
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.menu,
+              color: Colors.white,
+              size: 24,
+            ),
+            tooltip: 'Open menu',
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
+          ),
+        ],
 
         /*actions: [
           PopupMenuButton<String>(
