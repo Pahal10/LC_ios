@@ -19,7 +19,8 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:flutter/material.dart';
-import 'l10n/app_localizations.dart'; 
+import 'l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
