@@ -45,12 +45,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 	// 1. Define the four localization delegates
-      localizationsDelegates: const [
-        // AppLocalizations.delegate, // Uncomment this line if you are using the automatically generated l10n delegate
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      
+localizationsDelegates: [
+  AppLocalizations.delegate,
+  GlobalMaterialLocalizations.delegate,
+  GlobalWidgetsLocalizations.delegate,
+  GlobalCupertinoLocalizations.delegate,
+],
+
 
       // 2. Set the supported locales to English, Portuguese, and Spanish
       supportedLocales: const [
