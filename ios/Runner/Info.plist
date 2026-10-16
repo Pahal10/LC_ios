@@ -23,6 +23,12 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>lc_app</string>
+	<key>CFBundleLocalizations</key>
+   <array>
+     <string>en</string>
+     <string>pt</string>
+     <string>es</string>
+   </array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>CFBundlePackageType</key>
