@@ -5019,6 +5019,28 @@ class _MainPageState extends State<MainPage> {
                 showContactDialog();
               },
             ),
+			
+ListTile(
+  leading: const Icon(
+    Icons.people_alt_outlined,
+    color: Colors.white,
+  ),
+  title: const Text(
+    'My Friends',
+    style: TextStyle(color: Colors.white),
+  ),
+  onTap: () {
+    Navigator.pop(context);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const FriendsPage(),
+      ),
+    );
+  },
+),
+
 
             ListTile(
               leading: const Icon(Icons.location_on),
