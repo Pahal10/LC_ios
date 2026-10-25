@@ -38,6 +38,299 @@ const Map<String, int> stageOrder = {
   "hygge": 5,
 };
 
+const List<String> lcStages = [
+  'smalltalk',
+  'mediumtalk',
+  'bigtalk',
+  'playdate',
+  'hygge',
+];
+
+String lcStageLabel(String stage) {
+  switch (stage) {
+    case 'smalltalk':
+      return 'Small Talk';
+    case 'mediumtalk':
+      return 'Medium Talk';
+    case 'bigtalk':
+      return 'Big Talk';
+    case 'playdate':
+      return 'Play Date';
+    case 'hygge':
+      return 'Hygge';
+    default:
+      return stage;
+  }
+}
+
+/// Call this after a user completes a task.
+/// The user can skip recording the interaction.
+Future<void> showFriendInteractionDialog(
+  BuildContext context,
+  String completedStage,
+) async {
+  final supabase = Supabase.instance.client;
+  final username = Session.username;
+
+  if (username.isEmpty) return;
+
+  final friends = await supabase
+      .from('friends')
+      .select('id, display_name')
+      .eq('username', username)
+      .order('display_name');
+
+  if (!context.mounted) return;
+
+  final nameController = TextEditingController();
+  final notesController = TextEditingController();
+
+  int? selectedFriendId;
+  int comfort = 3;
+  int happiness = 3;
+  bool addNewFriend = friends.isEmpty;
+
+  try {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Who did you talk to?'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Give this person a name you will recognize '
+                      'next time.',
+                    ),
+                    const SizedBox(height: 16),
+
+                    if (friends.isNotEmpty) ...[
+                      RadioListTile<bool>(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Someone I know'),
+                        value: false,
+                        groupValue: addNewFriend,
+                        onChanged: (value) {
+                          setDialogState(() {
+                            addNewFriend = value!;
+                          });
+                        },
+                      ),
+                      if (!addNewFriend)
+                        DropdownButtonFormField<int>(
+                          isExpanded: true,
+                          value: selectedFriendId,
+                          decoration: const InputDecoration(
+                            labelText: 'Choose a friend',
+                          ),
+                          items: friends.map<DropdownMenuItem<int>>(
+                            (friend) {
+                              return DropdownMenuItem<int>(
+                                value: friend['id'] as int,
+                                child: Text(
+                                  friend['display_name'] as String,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            },
+                          ).toList(),
+                          onChanged: (value) {
+                            setDialogState(() {
+                              selectedFriendId = value;
+                            });
+                          },
+                        ),
+                      RadioListTile<bool>(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Add someone new'),
+                        value: true,
+                        groupValue: addNewFriend,
+                        onChanged: (value) {
+                          setDialogState(() {
+                            addNewFriend = value!;
+                          });
+                        },
+                      ),
+                    ],
+
+                    if (addNewFriend)
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Name or nickname',
+                          hintText: 'e.g. Person from my class',
+                        ),
+                      ),
+
+                    const SizedBox(height: 18),
+                    const Text('How comfortable did you feel?'),
+                    Slider(
+                      value: comfort.toDouble(),
+                      min: 1,
+                      max: 5,
+                      divisions: 4,
+                      label: '$comfort / 5',
+                      onChanged: (value) {
+                        setDialogState(() {
+                          comfort = value.round();
+                        });
+                      },
+                    ),
+
+                    const Text('How happy did you feel afterwards?'),
+                    Slider(
+                      value: happiness.toDouble(),
+                      min: 1,
+                      max: 5,
+                      divisions: 4,
+                      label: '$happiness / 5',
+                      onChanged: (value) {
+                        setDialogState(() {
+                          happiness = value.round();
+                        });
+                      },
+                    ),
+
+                    TextField(
+                      controller: notesController,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                        labelText: 'Optional note',
+                        hintText: 'What would help next time?',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Skip'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      int friendId;
+
+                      if (addNewFriend) {
+                        final name = nameController.text.trim();
+                        if (name.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Enter a name or nickname first.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final inserted = await supabase
+                            .from('friends')
+                            .insert({
+                              'username': username,
+                              'display_name': name,
+                              'comfort_rating': comfort,
+                              'happiness_rating': happiness,
+                              'highest_stage': completedStage,
+                            })
+                            .select('id')
+                            .single();
+
+                        friendId = inserted['id'] as int;
+                      } else {
+                        if (selectedFriendId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Choose a friend first.'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        friendId = selectedFriendId!;
+                      }
+
+                      await supabase.from('friend_interactions').insert({
+                        'username': username,
+                        'friend_id': friendId,
+                        'stage': completedStage,
+                        'comfort_rating': comfort,
+                        'happiness_rating': happiness,
+                        'notes': notesController.text.trim().isEmpty
+                            ? null
+                            : notesController.text.trim(),
+                      });
+
+                      // Update the most recent interaction and
+                      // keep the highest stage reached.
+                      final existingFriend = await supabase
+                          .from('friends')
+                          .select('highest_stage')
+                          .eq('id', friendId)
+                          .eq('username', username)
+                          .single();
+
+                      final previousStage =
+                          existingFriend['highest_stage'] as String;
+                      final previousIndex =
+                          lcStages.indexOf(previousStage);
+                      final completedIndex =
+                          lcStages.indexOf(completedStage);
+
+                      final highestStage =
+                          completedIndex > previousIndex
+                              ? completedStage
+                              : previousStage;
+
+                      await supabase
+                          .from('friends')
+                          .update({
+                            'comfort_rating': comfort,
+                            'happiness_rating': happiness,
+                            'highest_stage': highestStage,
+                            'last_interaction_at':
+                                DateTime.now().toUtc().toIso8601String(),
+                          })
+                          .eq('id', friendId)
+                          .eq('username', username);
+
+                      if (context.mounted) {
+                        Navigator.pop(dialogContext);
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Could not save interaction: $e'),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  } finally {
+    nameController.dispose();
+    notesController.dispose();
+  }
+}
+
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
