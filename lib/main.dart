@@ -3773,7 +3773,10 @@ class _TaskPageState extends State<TaskPage> {
       await updateLonelinessStats(
         answeredYes,
       );
-
+		await showFriendInteractionDialog(
+  context,
+  currentStage,
+);
       final currentIndex =
       stages.indexOf(currentStage);
 
