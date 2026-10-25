@@ -6838,3 +6838,232 @@ class ReviewService {
     );
   }
 }
+
+
+class FriendsPage extends StatefulWidget {
+  const FriendsPage({super.key});
+
+  @override
+  State<FriendsPage> createState() => _FriendsPageState();
+}
+
+class _FriendsPageState extends State<FriendsPage> {
+  final supabase = Supabase.instance.client;
+
+  bool loading = true;
+  List<Map<String, dynamic>> friends = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadFriends();
+  }
+
+  Future<void> loadFriends() async {
+    try {
+      final result = await supabase
+          .from('friends')
+          .select()
+          .eq('username', Session.username)
+          .order('last_interaction_at', ascending: false);
+
+      if (!mounted) return;
+
+      setState(() {
+        friends = List<Map<String, dynamic>>.from(result);
+        loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => loading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not load friends: $e')),
+      );
+    }
+  }
+
+  String nextStage(String highestStage) {
+    final index = lcStages.indexOf(highestStage);
+
+    if (index < 0) return 'smalltalk';
+
+    if (index >= lcStages.length - 1) {
+      return 'hygge';
+    }
+
+    return lcStages[index + 1];
+  }
+
+  Future<void> showApproachChooser() async {
+    String selectedStage = 'smalltalk';
+
+    final stage = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Who should I approach?'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Choose the kind of interaction you want.',
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: selectedStage,
+                    decoration: const InputDecoration(
+                      labelText: 'Interaction type',
+                    ),
+                    items: lcStages.map((stage) {
+                      return DropdownMenuItem(
+                        value: stage,
+                        child: Text(lcStageLabel(stage)),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setDialogState(() {
+                          selectedStage = value;
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext, selectedStage);
+                  },
+                  child: const Text('Find someone'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (stage == null || !mounted) return;
+
+    final matching = friends.where((friend) {
+      final highest = lcStages.indexOf(
+        friend['highest_stage'] as String? ?? 'smalltalk',
+      );
+      final requested = lcStages.indexOf(stage);
+
+      // Prefer friends whose next suggested stage matches
+      // what the user wants to practice.
+      return highest == requested - 1 ||
+          (requested == 0 && highest == 0);
+    }).toList();
+
+    if (matching.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No friends are currently suggested for '
+            '${lcStageLabel(stage)}. You can still start a new task.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final chosen = matching.first;
+
+    if (!mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TaskPage(
+          forcedStage: stage,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF24B65E),
+      appBar: AppBar(
+        title: const Text('My Friends'),
+        backgroundColor: const Color(0xFF388E3C),
+        foregroundColor: Colors.white,
+      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: loadFriends,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: showApproachChooser,
+                    icon: const Icon(Icons.people_alt_outlined),
+                    label: const Text('Who should I approach?'),
+                  ),
+                  const SizedBox(height: 12),
+                  if (friends.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Your friend list will appear here after '
+                        'you record your first interaction.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ...friends.map((friend) {
+                    final highest =
+                        friend['highest_stage'] as String? ??
+                        'smalltalk';
+                    final next = nextStage(highest);
+
+                    return Card(
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.green.shade100,
+                          child: const Icon(
+                            Icons.person,
+                            color: Colors.green,
+                          ),
+                        ),
+                        title: Text(
+                          friend['display_name'] as String? ??
+                          'Friend',
+                        ),
+                        subtitle: Text(
+                          'Last stage: ${lcStageLabel(highest)}\n'
+                          'Suggested next: ${lcStageLabel(next)}',
+                        ),
+                        isThreeLine: true,
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TaskPage(
+                                forcedStage: next,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+    );
+  }
+}
