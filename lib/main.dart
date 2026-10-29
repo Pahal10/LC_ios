@@ -42,6 +42,7 @@ const List<String> lcStages = [
   'smalltalk',
   'mediumtalk',
   'bigtalk',
+  'voicecall',
   'playdate',
   'hygge',
 ];
@@ -54,6 +55,8 @@ String lcStageLabel(String stage) {
       return 'Medium Talk';
     case 'bigtalk':
       return 'Big Talk';
+	case 'voicecall':
+      return 'Voice Call';
     case 'playdate':
       return 'Play Date';
     case 'hygge':
