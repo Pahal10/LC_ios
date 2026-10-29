@@ -3899,83 +3899,57 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   
-Future<void> completeTask() async {
-  // Capture the stage for THIS task before progress can advance it.
-  final String completedStage = currentStage;
-
-  final int? comfortAnswer = await showDialog<int>(
-    context: context,
-    barrierDismissible: false,
-    builder: (dialogContext) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        title: const Text(
-          'How did it feel?',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF176B3A),
-          ),
-        ),
-        content: const Text(
-          'How comfortable did you feel completing this task?',
-          style: TextStyle(fontSize: 15, height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, 0),
-            child: const Text('Not comfortable'),
-          ),
-          OutlinedButton(
-            onPressed: () => Navigator.pop(dialogContext, 1),
-            child: const Text('Somewhat'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF24B65E),
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () => Navigator.pop(dialogContext, 2),
-            child: const Text('Comfortable'),
-          ),
-        ],
-      );
-    },
-  );
-
-  // If the dialog was dismissed, don't mark the task complete.
-  if (comfortAnswer == null || !mounted) return;
-
-  try {
-    // Ask about the person immediately after this individual task.
-    // This runs before stage advancement and reward navigation.
-    await showFriendInteractionDialog(context, completedStage);
-
-    if (!mounted) return;
-
-    // Preserve the existing progress rules.
-    if (comfortAnswer > 0) {
-      await increaseProgress(comfortAnswer);
-
-      await ReviewService.registerComfortableTask();
-    }
-
-    if (!mounted) return;
-
-    // Keep the existing reward/verification flow.
-    await handleRewardFlow();
-  } catch (e) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Could not complete task: $e'),
-      ),
-    );
+  int comfortToProgress(int comfort) {
+    if (comfort <= 1) return 0;   // 1   -> 0
+    if (comfort <= 3) return 1;   // 2-3 -> 1
+    return 2;                     // 4-5 -> 2
   }
-}
+
+  Future<void> completeTask() async {
+    final String completedStage = currentStage;
+
+    final int? comfort = await showFriendInteractionDialog(
+      context,
+      completedStage,
+      preselectedFriendId: widget.friendId,
+    );
+
+    // Backed out of the dialog: task is not marked complete.
+    if (comfort == null || !mounted) return;
+
+    // Doing a stage that isn't the user's own journey stage
+    // (e.g. a friend who is further along, or a graduated user)
+    // is practice: it must not overwrite users.current_stage.
+    final bool practiceOnly = userGraduated ||
+        (widget.forcedStage != null && widget.forcedStage != userStage);
+
+    try {
+      final int progressScore = comfortToProgress(comfort);
+
+      if (progressScore > 0) {
+        if (practiceOnly) {
+          await supabase.from('users').update({
+            'intro_completed': true,
+            'verifyshow': true,
+          }).eq('username', Session.username);
+        } else {
+          await increaseProgress(progressScore);
+        }
+
+        await ReviewService.registerComfortableTask();
+      }
+
+      if (!mounted) return;
+
+      await handleRewardFlow();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not complete task: $e')),
+      );
+    }
+  }
 
 Future<void> showFriendInteractionDialog(
   BuildContext context,
