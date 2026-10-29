@@ -6387,6 +6387,9 @@ ListTile(
                                                   },
                                                 );
                                               }
+												else {
+												 await _startConnection();
+												}
                                             },
                                             child: Container(
                                               padding: const EdgeInsets.symmetric(
