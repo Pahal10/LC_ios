@@ -4326,10 +4326,6 @@ Future<void> showFriendInteractionDialog(
       await updateLonelinessStats(
         answeredYes,
       );
-		await showFriendInteractionDialog(
-  context,
-  currentStage,
-);
       final currentIndex =
       stages.indexOf(currentStage);
 
