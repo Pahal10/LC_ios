@@ -7684,6 +7684,65 @@ class ReviewService {
 }
 
 
+class _RankedFriend {
+  final Map<String, dynamic> row;
+  final String nextStage;
+  final double score;
+  final String reason;
+
+  _RankedFriend(this.row, this.nextStage, this.score, this.reason);
+}
+
+String nextStageFor(String highestStage) {
+  final index = lcStages.indexOf(highestStage);
+  if (index < 0) return 'smalltalk';
+  if (index >= lcStages.length - 1) return 'hygge';
+  return lcStages[index + 1];
+}
+
+_RankedFriend rankFriend(Map<String, dynamic> f) {
+  final highest = f['highest_stage'] as String? ?? 'smalltalk';
+  final next = nextStageFor(highest);
+
+  final comfort = (f['comfort_rating'] as num?)?.toDouble() ?? 3;
+  final happiness = (f['happiness_rating'] as num?)?.toDouble() ?? 3;
+
+  // Weight on happiness; the rest goes to comfort.
+  double wHappy;
+  switch (next) {
+    case 'bigtalk':
+    case 'hygge':
+      wHappy = 0.3;   // comfort matters more
+      break;
+    case 'voicecall':
+      wHappy = 0.5;   // transition: equal
+      break;
+    default:          // smalltalk, mediumtalk, playdate
+      wHappy = 0.7;   // happiness matters more
+  }
+
+  final score = happiness * wHappy + comfort * (1 - wHappy);
+
+  final String metric =
+      wHappy > 0.5 ? 'happy' : (wHappy < 0.5 ? 'comfortable' : 'good');
+  final double keyValue =
+      wHappy > 0.5 ? happiness : (wHappy < 0.5 ? comfort : score);
+
+  final label = lcStageLabel(next);
+  final shown = '$metric ${keyValue.round()}/5';
+
+  String reason;
+  if (keyValue >= 4) {
+    reason = 'Went well last time ($shown). Ready for $label.';
+  } else if (keyValue >= 3) {
+    reason = 'Went okay last time ($shown). $label is a fair next step.';
+  } else {
+    reason = 'Last time was a bit tough ($shown). Take it easy with $label.';
+  }
+
+  return _RankedFriend(f, next, score, reason);
+}
+
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
 
@@ -7695,7 +7754,7 @@ class _FriendsPageState extends State<FriendsPage> {
   final supabase = Supabase.instance.client;
 
   bool loading = true;
-  List<Map<String, dynamic>> friends = [];
+  List<_RankedFriend> ranked = [];
 
   @override
   void initState() {
@@ -7708,13 +7767,24 @@ class _FriendsPageState extends State<FriendsPage> {
       final result = await supabase
           .from('friends')
           .select()
-          .eq('username', Session.username)
-          .order('last_interaction_at', ascending: false);
+          .eq('username', Session.username);
+
+      final list = List<Map<String, dynamic>>.from(result)
+          .map(rankFriend)
+          .toList();
+
+      list.sort((a, b) {
+        final c = b.score.compareTo(a.score);
+        if (c != 0) return c;
+        return (a.row['display_name'] ?? '')
+            .toString()
+            .compareTo((b.row['display_name'] ?? '').toString());
+      });
 
       if (!mounted) return;
 
       setState(() {
-        friends = List<Map<String, dynamic>>.from(result);
+        ranked = list;
         loading = false;
       });
     } catch (e) {
@@ -7726,114 +7796,6 @@ class _FriendsPageState extends State<FriendsPage> {
         SnackBar(content: Text('Could not load friends: $e')),
       );
     }
-  }
-
-  String nextStage(String highestStage) {
-    final index = lcStages.indexOf(highestStage);
-
-    if (index < 0) return 'smalltalk';
-
-    if (index >= lcStages.length - 1) {
-      return 'hygge';
-    }
-
-    return lcStages[index + 1];
-  }
-
-  Future<void> showApproachChooser() async {
-    String selectedStage = 'smalltalk';
-
-    final stage = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text('Who should I approach?'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Choose the kind of interaction you want.',
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: selectedStage,
-                    decoration: const InputDecoration(
-                      labelText: 'Interaction type',
-                    ),
-                    items: lcStages.map((stage) {
-                      return DropdownMenuItem(
-                        value: stage,
-                        child: Text(lcStageLabel(stage)),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setDialogState(() {
-                          selectedStage = value;
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(dialogContext, selectedStage);
-                  },
-                  child: const Text('Find someone'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-
-    if (stage == null || !mounted) return;
-
-    final matching = friends.where((friend) {
-      final highest = lcStages.indexOf(
-        friend['highest_stage'] as String? ?? 'smalltalk',
-      );
-      final requested = lcStages.indexOf(stage);
-
-      // Prefer friends whose next suggested stage matches
-      // what the user wants to practice.
-      return highest == requested - 1 ||
-          (requested == 0 && highest == 0);
-    }).toList();
-
-    if (matching.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'No friends are currently suggested for '
-            '${lcStageLabel(stage)}. You can still start a new task.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    final chosen = matching.first;
-
-    if (!mounted) return;
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => TaskPage(
-          forcedStage: stage,
-        ),
-      ),
-    );
   }
 
   @override
@@ -7852,13 +7814,7 @@ class _FriendsPageState extends State<FriendsPage> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: showApproachChooser,
-                    icon: const Icon(Icons.people_alt_outlined),
-                    label: const Text('Who should I approach?'),
-                  ),
-                  const SizedBox(height: 12),
-                  if (friends.isEmpty)
+                  if (ranked.isEmpty)
                     const Padding(
                       padding: EdgeInsets.all(24),
                       child: Text(
@@ -7866,29 +7822,57 @@ class _FriendsPageState extends State<FriendsPage> {
                         'you record your first interaction.',
                         textAlign: TextAlign.center,
                       ),
+                    )
+                  else
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        'Best people to talk to next are at the top.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ...friends.map((friend) {
-                    final highest =
-                        friend['highest_stage'] as String? ??
-                        'smalltalk';
-                    final next = nextStage(highest);
+                  ...List.generate(ranked.length, (i) {
+                    final r = ranked[i];
 
                     return Card(
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.green.shade100,
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.green,
-                          ),
+                          child: const Icon(Icons.person, color: Colors.green),
                         ),
-                        title: Text(
-                          friend['display_name'] as String? ??
-                          'Friend',
+                        title: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                r.row['display_name'] as String? ?? 'Friend',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (i == 0) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  'Top pick',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         subtitle: Text(
-                          'Last stage: ${lcStageLabel(highest)}\n'
-                          'Suggested next: ${lcStageLabel(next)}',
+                          'Next: ${lcStageLabel(r.nextStage)}\n${r.reason}',
                         ),
                         isThreeLine: true,
                         trailing: const Icon(Icons.arrow_forward_ios),
@@ -7897,7 +7881,8 @@ class _FriendsPageState extends State<FriendsPage> {
                             context,
                             MaterialPageRoute(
                               builder: (_) => TaskPage(
-                                forcedStage: next,
+                                forcedStage: r.nextStage,
+                                friendId: r.row['id'] as int,
                               ),
                             ),
                           );
