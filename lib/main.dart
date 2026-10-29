@@ -3791,8 +3791,9 @@ class _TaskPageState extends State<TaskPage> {
           .eq('username', Session.username)
           .single();
 
-      currentStage =
-          widget.forcedStage ?? (data['current_stage'] ?? 'smalltalk');
+      userStage = data['current_stage'] ?? 'smalltalk';
+      userGraduated = data['graduated'] ?? false;
+      currentStage = widget.forcedStage ?? userStage;
       bool bigTalkSeen = data['bigtalk_intro_seen'] ?? false;
       bool playDateSeen = data['playdate_intro_seen'] ?? false;
       bool hyggeSeen = data['hygge_intro_seen'] ?? false;
