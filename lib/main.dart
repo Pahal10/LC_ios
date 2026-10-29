@@ -3272,12 +3272,14 @@ class LossPage extends StatelessWidget {
 class TaskPage extends StatefulWidget {
 
   final String? forcedStage;
+  final int? friendId;
 
   const TaskPage({
 
     super.key,
 
     this.forcedStage,
+	this.friendId,
 
   });
   @override
@@ -3296,6 +3298,8 @@ class _TaskPageState extends State<TaskPage> {
   bool hoverAnother = false;
 
   bool loading = true;
+  String userStage = 'smalltalk';
+  bool userGraduated = false;
 
   @override
   void initState() {
