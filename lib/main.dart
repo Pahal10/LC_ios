@@ -5572,11 +5572,9 @@ class _MainPageState extends State<MainPage> {
 ListTile(
   leading: const Icon(
     Icons.people_alt_outlined,
-    color: Colors.white,
   ),
   title: const Text(
     'My Friends',
-    style: TextStyle(color: Colors.white),
   ),
   onTap: () {
     Navigator.pop(context);
