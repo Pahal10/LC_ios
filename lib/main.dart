@@ -5036,7 +5036,64 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+    Future<void> _startConnection() async {
+    bool hasFriends = false;
 
+    try {
+      final rows = await supabase
+          .from('friends')
+          .select('id')
+          .eq('username', Session.username)
+          .limit(1);
+      hasFriends = rows.isNotEmpty;
+    } catch (_) {
+      hasFriends = false;
+    }
+
+    if (!mounted) return;
+
+    // First time: go straight to the task.
+    if (!hasFriends) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const TaskPage()),
+      );
+      return;
+    }
+
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Who are you connecting with?'),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, 'new'),
+              child: const Text('New connection'),
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, 'existing'),
+              child: const Text('Existing connection'),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || choice == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            choice == 'existing' ? const FriendsPage() : const TaskPage(),
+      ),
+    );
+  }
   Future<void> showAccountSettingsDialog() async {
 
     showDialog(
