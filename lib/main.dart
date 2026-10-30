@@ -3953,19 +3953,6 @@ class _MainPageState extends State<MainPage> {
     super.dispose();
   }
 
-  final List<Map<String, dynamic>> pages = [
-    {
-      "title": "Next task",
-      "button": "Let's connect",
-      "icon": Icons.people_alt_rounded,
-    },
-    {
-      "title": "UCLA loneliness\nscore test",
-      "icon": Icons.psychology_rounded,
-      "link": "https://uclalonelinessscore.lovable.app",
-    },
-  ];
-
 
   Future<void> openLink(String url) async {
     final uri = Uri.parse(url);
