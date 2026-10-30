@@ -5876,6 +5876,682 @@ class _TaskHomeTabState extends State<_TaskHomeTab> {
   }
 }
 
+class _ConnectChoiceSheet extends StatelessWidget {
+  final VoidCallback onNew;
+  final VoidCallback onExisting;
+
+  const _ConnectChoiceSheet({
+    required this.onNew,
+    required this.onExisting,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 30),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF7F8F1),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 25),
+            const Text(
+              'Who would you like to connect with?',
+              style: TextStyle(
+                color: Color(0xFF183D2B),
+                fontSize: 25,
+                height: 1.15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Every connection starts somewhere.',
+              style: TextStyle(color: Color(0xFF718074), fontSize: 14),
+            ),
+            const SizedBox(height: 24),
+            _ChoiceTile(
+              icon: Icons.person_add_alt_1_rounded,
+              title: 'Someone new',
+              subtitle: 'Start with a simple Small Talk prompt.',
+              onTap: onNew,
+            ),
+            const SizedBox(height: 13),
+            _ChoiceTile(
+              icon: Icons.people_alt_rounded,
+              title: 'Someone I know',
+              subtitle: 'Choose a friend and continue where you left off.',
+              onTap: onExisting,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChoiceTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _ChoiceTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5F1E5),
+                  borderRadius: BorderRadius.circular(17),
+                ),
+                child: Icon(
+                  icon,
+                  color: const Color(0xFF287347),
+                  size: 27,
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Color(0xFF203C2A),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF718074),
+                        height: 1.35,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Color(0xFF64806B),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FriendsPage extends StatefulWidget {
+  final bool embedded;
+  final ValueChanged<Map<String, dynamic>>? onSelectFriend;
+
+  const FriendsPage({
+    super.key,
+    this.embedded = false,
+    this.onSelectFriend,
+  });
+
+  @override
+  State<FriendsPage> createState() => _FriendsPageState();
+}
+
+class _FriendsPageState extends State<FriendsPage> {
+  final supabase = Supabase.instance.client;
+
+  List<Map<String, dynamic>> friends = [];
+  bool loading = true;
+  String? error;
+
+  static const Map<String, String> stageLabels = {
+    'smalltalk': 'Small Talk',
+    'mediumtalk': 'Medium Talk',
+    'bigtalk': 'Big Talk',
+    'playdate': 'Play Time',
+    'hygge': 'Hygge',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    loadFriends();
+  }
+
+  Future<void> loadFriends() async {
+    try {
+      final response = await supabase
+          .from('friends')
+          .select(
+            'id, display_name, comfort_rating, happiness_rating, '
+            'highest_stage, last_interaction_at',
+          )
+          .eq('username', Session.username);
+
+      final loaded = List<Map<String, dynamic>>.from(response);
+
+      // Recommend the person with the strongest recent connection signals.
+      loaded.sort((a, b) {
+        final aScore =
+            ((a['comfort_rating'] ?? 3) as num).toDouble() +
+            ((a['happiness_rating'] ?? 3) as num).toDouble();
+        final bScore =
+            ((b['comfort_rating'] ?? 3) as num).toDouble() +
+            ((b['happiness_rating'] ?? 3) as num).toDouble();
+        return bScore.compareTo(aScore);
+      });
+
+      if (!mounted) return;
+      setState(() {
+        friends = loaded;
+        loading = false;
+        error = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        loading = false;
+        error = e.toString();
+      });
+    }
+  }
+
+  String _lastSeen(dynamic value) {
+    if (value == null) return 'Not yet recorded';
+
+    try {
+      final date = DateTime.parse(value.toString()).toLocal();
+      final days = DateTime.now().difference(date).inDays;
+
+      if (days <= 0) return 'Connected today';
+      if (days == 1) return 'Connected yesterday';
+      if (days < 7) return 'Connected $days days ago';
+      if (days < 30) return 'Connected ${days ~/ 7} weeks ago';
+      return 'Last connected ${days ~/ 30} months ago';
+    } catch (_) {
+      return 'Connection saved';
+    }
+  }
+
+  void _openFriend(Map<String, dynamic> friend) {
+    if (widget.onSelectFriend != null) {
+      widget.onSelectFriend!(friend);
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FriendDetailPage(friend: friend),
+      ),
+    ).then((_) => loadFriends());
+  }
+
+  Widget _recommendationCard() {
+    if (friends.isEmpty) return const SizedBox.shrink();
+
+    final friend = friends.first;
+    final name = (friend['display_name'] ?? 'Your friend').toString();
+    final stage = (friend['highest_stage'] ?? 'smalltalk').toString();
+    final comfort = (friend['comfort_rating'] ?? 3) as num;
+    final happiness = (friend['happiness_rating'] ?? 3) as num;
+
+    final suggestion = comfort >= 4 && happiness >= 4
+        ? 'You seem to enjoy your conversations. Maybe try taking things a little deeper.'
+        : 'A small check-in could be a lovely way to keep this connection going.';
+
+    return Container(
+      padding: const EdgeInsets.all(21),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFDFF0DF), Color(0xFFBFDDBF)],
+        ),
+        borderRadius: BorderRadius.circular(27),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.auto_awesome_rounded,
+                  color: Color(0xFF39754B), size: 18),
+              SizedBox(width: 7),
+              Text(
+                'A SUGGESTION FOR TODAY',
+                style: TextStyle(
+                  color: Color(0xFF39754B),
+                  fontSize: 10,
+                  letterSpacing: 1.2,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 17),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 26,
+                backgroundColor: Colors.white.withOpacity(.8),
+                child: Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    color: Color(0xFF286B42),
+                    fontSize: 21,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: Color(0xFF1D432B),
+                        fontSize: 19,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      stageLabels[stage] ?? stage,
+                      style: const TextStyle(
+                        color: Color(0xFF54735A),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          Text(
+            suggestion,
+            style: const TextStyle(
+              color: Color(0xFF34583D),
+              fontSize: 14,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 17),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _openFriend(friend),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF286B42),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: Text('Connect with $name'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _friendCard(Map<String, dynamic> friend) {
+    final name = (friend['display_name'] ?? 'Friend').toString();
+    final stage = (friend['highest_stage'] ?? 'smalltalk').toString();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(21),
+        child: InkWell(
+          onTap: () => _openFriend(friend),
+          borderRadius: BorderRadius.circular(21),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: const Color(0xFFE5F0E4),
+                  child: Text(
+                    name.isNotEmpty ? name[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      color: Color(0xFF286B42),
+                      fontSize: 19,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          color: Color(0xFF203B29),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${stageLabels[stage] ?? stage}  ·  '
+                        '${_lastSeen(friend['last_interaction_at'])}',
+                        style: const TextStyle(
+                          color: Color(0xFF718074),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 15,
+                  color: Color(0xFF809184),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _content() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1B8A4C),
+            Color(0xFF115C34),
+            Color(0xFF082A1B),
+          ],
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: loadFriends,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(22, 22, 22, 35),
+            children: [
+              const Text(
+                'Your people.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                'Good connections grow a little at a time.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(.72),
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 27),
+              if (loading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(35),
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                )
+              else if (error != null)
+                _LCGlassCard(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.cloud_off_rounded,
+                          color: Colors.white, size: 30),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Could not load your connections.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        error!,
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 11),
+                      ),
+                      TextButton(
+                        onPressed: loadFriends,
+                        child: const Text('Try again'),
+                      ),
+                    ],
+                  ),
+                )
+              else if (friends.isEmpty)
+                _LCGlassCard(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.spa_rounded,
+                          color: Color(0xFFB8F4CE), size: 38),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Your connections will find a home here.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Start with one person. We’ll help you take it from there.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else ...[
+                _recommendationCard(),
+                const SizedBox(height: 27),
+                const Text(
+                  'YOUR CONNECTIONS',
+                  style: TextStyle(
+                    color: Color(0xFFB8F4CE),
+                    fontSize: 11,
+                    letterSpacing: 1.4,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 13),
+                ...friends.map(_friendCard),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.embedded) return _content();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF115C34),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF115C34),
+        foregroundColor: Colors.white,
+        title: const Text('Your connections'),
+      ),
+      body: _content(),
+    );
+  }
+}
+
+class FriendDetailPage extends StatelessWidget {
+  final Map<String, dynamic> friend;
+
+  const FriendDetailPage({
+    super.key,
+    required this.friend,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final name = (friend['display_name'] ?? 'Friend').toString();
+    final stage = (friend['highest_stage'] ?? 'smalltalk').toString();
+
+    const labels = {
+      'smalltalk': 'Small Talk',
+      'mediumtalk': 'Medium Talk',
+      'bigtalk': 'Big Talk',
+      'playdate': 'Play Time',
+      'hygge': 'Hygge',
+    };
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7F0),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF5F7F0),
+        foregroundColor: const Color(0xFF1D432B),
+        elevation: 0,
+        title: const Text('Your connection'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(22),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFDFF0DF), Color(0xFFBFDDBF)],
+              ),
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 39,
+                  backgroundColor: Colors.white,
+                  child: Text(
+                    name.isNotEmpty ? name[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      color: Color(0xFF286B42),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: Color(0xFF1D432B),
+                    fontSize: 27,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Text(
+                  labels[stage] ?? stage,
+                  style: const TextStyle(color: Color(0xFF54735A)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+          const Text(
+            'Keep this connection growing.',
+            style: TextStyle(
+              color: Color(0xFF203B29),
+              fontSize: 21,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'You do not need to rush a friendship. A small conversation, a thoughtful question, or a shared activity can all be meaningful next steps.',
+            style: TextStyle(
+              color: Color(0xFF718074),
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 22),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TaskPage(forcedStage: stage),
+                ),
+              );
+            },
+            icon: const Icon(Icons.chat_bubble_outline_rounded),
+            label: const Text('Continue this connection'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF286B42),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 17),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Staggered entrance animation
 class _FadeSlide extends StatelessWidget {
   final Widget child;
