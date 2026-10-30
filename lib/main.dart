@@ -3371,13 +3371,27 @@ class _TaskPageState extends State<TaskPage> {
           .select()
           .eq('username', Session.username)
           .single();
+	  if (widget.friendId != null) {
+  final friend = await supabase
+      .from('friends')
+      .select('current_stage, stage_progress')
+      .eq('id', widget.friendId!)
+      .eq('username', Session.username)
+      .single();
 
-      currentStage =
-          widget.forcedStage ?? (data['current_stage'] ?? 'smalltalk');
+  currentStage =
+      widget.forcedStage ?? (friend['current_stage'] ?? 'smalltalk');
+
+  progress = friend['stage_progress'] ?? 0;
+} else {
+  currentStage =
+      widget.forcedStage ?? (data['current_stage'] ?? 'smalltalk');
+
+  progress = data['stage_progress'] ?? 0;
+}
       bool bigTalkSeen = data['bigtalk_intro_seen'] ?? false;
       bool playDateSeen = data['playdate_intro_seen'] ?? false;
       bool hyggeSeen = data['hygge_intro_seen'] ?? false;
-      progress = data['stage_progress'] ?? 0;
       final bool introCompleted = data['intro_completed'] ?? false;
 
       if (
