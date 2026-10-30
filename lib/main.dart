@@ -4855,415 +4855,112 @@ Widget buildDrawer() {
           ),
         ],*/
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // UCLA FULL PAGE BACKGROUND
-            if (currentPage == 1)
-              Positioned.fill(
-                child: Opacity(
-                  opacity: 0.35,
-                  child: Image.asset(
-                    "asset/ucla2.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-            // optional dark overlay
-            if (currentPage == 1)
-              Positioned.fill(
-                child: Container(
-                  color: Colors.black.withOpacity(0.15),
-                ),
-              ),
-
-            /// PAGE VIEW
-            PageView.builder(
-              controller: controller,
-              itemCount: pages.length,
-              itemBuilder: (context, index) {
-                final item = pages[index];
-
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: GestureDetector(
-                      onTap: () async {
-                        if (index == 1) {
-                          if (item["link"] != null) {
-                            Navigator.push(
-
-                              context,
-
-                              MaterialPageRoute(
-
-                                builder: (_) =>
-                                const UCLAPage(),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(42),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: 25,
-                            sigmaY: 25,
-                          ),
-                          child: Container(
-                            width: double.infinity,
-                            height: 280,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(42),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.white.withOpacity(0.20),
-                                  Colors.white.withOpacity(0.07),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.18),
-                                width: 1.2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.10),
-                                  blurRadius: 30,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-
-                            child: Stack(
-                              children: [
-                                /// UCLA IMAGE BACKGROUND INSIDE GLASS
-                                /*if (index == 1)
-                                  Positioned.fill(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(42),
-                                      child: Opacity(
-                                        opacity: 0.5, // increase visibility
-                                        child: ColorFiltered(
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.white.withOpacity(0.35),
-                                            BlendMode.lighten,
-                                          ),
-                                          child: Image.asset(
-                                            "asset/ucla2.png",
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                /// DARK OVERLAY FOR READABILITY
-                                if (index == 1)
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(42),
-                                        color: Colors.black.withOpacity(0.18),
-                                      ),
-                                    ),
-                                  ),*/
-
-                                /// LIGHT REFLECTION
-                                Positioned(
-                                  top: -30,
-                                  left: -20,
-                                  child: Container(
-                                    width: 220,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                      BorderRadius.circular(50),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.white.withOpacity(0.20),
-                                          Colors.white.withOpacity(0.01),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                /// PRO FEATURE TAG
-                                if (item["pro"] == true)
-                                  Positioned(
-                                    top: 20,
-                                    right: 20,
-                                    child: Container(
-                                      padding:
-                                      const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.yellow,
-                                        borderRadius:
-                                        BorderRadius.circular(14),
-                                      ),
-                                      child: const Text(
-                                        "PRO FEATURE",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                /// MAIN CONTENT
-                                Center(
-                                  child: Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-
-                                        /// ICON
-                                        Container(
-                                          width: 90,
-                                          height: 90,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color:
-                                            Colors.white.withOpacity(
-                                                0.10),
-                                            border: Border.all(
-                                              color: Colors.white
-                                                  .withOpacity(0.15),
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            item["icon"],
-                                            size: 42,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-
-                                        const SizedBox(height: 24),
-
-                                        /// TITLE
-                                        FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            item["title"],
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontSize: 30,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-
-                                        const SizedBox(height: 24),
-
-                                        /// BUTTON
-                                        if (item["button"] != null)
-                                          GestureDetector(
-                                            onTap: () async {
-                                              if (index == 0) {
-                                                final data = await supabase
-                                                    .from('users')
-                                                    .select('graduated')
-                                                    .eq(
-                                                  'username',
-                                                  Session.username,
-                                                )
-                                                    .single();
-
-                                                bool graduated =
-                                                    data['graduated'] ?? false;
-
-                                                if (graduated) {
-
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                      const StageSelectionPage(),
-                                                    ),
-                                                  );
-
-                                                } else {
-
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                      const TaskPage(),
-                                                    ),
-                                                  );
-
-                                                }
-                                              }
-                                              else if (index == 2) {
-                                                  showAccountSettingsDialog();
-                                                }
-                                              else if (index == 4) {
-                                                showLogoutDialog();
-                                              }
-
-
-
-                                              else if (index == 3) {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    bool isHovered = false;
-
-                                                    return StatefulBuilder(
-                                                      builder: (context, setState) {
-                                                        return AlertDialog(
-                                                          backgroundColor: const Color(0xFFFFFFFF),
-
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(24),
-                                                          ),
-
-                                                          title: const Text(
-                                                            "You are not alone.\nWe are here for you",
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 22,
-                                                            ),
-                                                          ),
-
-                                                          content: const Text(
-                                                            "Got a question for us?\n"
-                                                                "Or craving for some social connection?\n\n"
-                                                                "Email at:\n"
-                                                                "pahal.bhatti11@gmail.com",
-                                                            style: TextStyle(
-                                                              color: Colors.white70,
-                                                              fontSize: 16,
-                                                              height: 1.5,
-                                                            ),
-                                                          ),
-
-                                                          actions: [
-                                                            MouseRegion(
-                                                              onEnter: (_) {
-                                                                setState(() {
-                                                                  isHovered = true;
-                                                                });
-                                                              },
-                                                              onExit: (_) {
-                                                                setState(() {
-                                                                  isHovered = false;
-                                                                });
-                                                              },
-                                                              child: AnimatedContainer(
-                                                                duration: const Duration(milliseconds: 200),
-
-                                                                decoration: BoxDecoration(
-                                                                  color: isHovered
-                                                                      ? Colors.blue
-                                                                      : Colors.white.withOpacity(0.12),
-
-                                                                  borderRadius: BorderRadius.circular(14),
-                                                                ),
-
-                                                                child: TextButton(
-                                                                  onPressed: () {
-                                                                    Navigator.pop(context);
-                                                                  },
-
-                                                                  child: const Padding(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                      horizontal: 14,
-                                                                      vertical: 6,
-                                                                    ),
-
-                                                                    child: Text(
-                                                                      "OK",
-                                                                      style: TextStyle(
-                                                                        color: Colors.white,
-                                                                        fontWeight: FontWeight.w600,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                );
-                                              }
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 28,
-                                                vertical: 22,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(18),
-                                                color: Colors.white.withOpacity(0.10),
-                                                border: Border.all(
-                                                  color: Colors.white.withOpacity(0.12),
-                                                ),
-                                              ),
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Text(
-                                                  item["button"],
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              )
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            /// PAGE INDICATOR
-            Positioned(
-              bottom: 40,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: SmoothPageIndicator(
-                  controller: controller,
-                  count: pages.length,
-                  effect: ExpandingDotsEffect(
-                    dotHeight: 8,
-                    dotWidth: 8,
-                    expansionFactor: 3,
-                    spacing: 8,
-                    activeDotColor: Colors.white,
-                    dotColor: Colors.white.withOpacity(0.25),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+      
+body: SafeArea(
+  bottom: false,
+  child: PageView(
+    controller: controller,
+    onPageChanged: (index) {
+      setState(() {
+        currentPage = index;
+      });
+    },
+    children: [
+      // 0 — TASK
+      _TaskHomeTab(
+        onStart: openTask,
       ),
+
+      // 1 — FRIENDS
+      _FriendsHomeTab(
+        onNewConnection: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const TaskPage(),
+            ),
+          );
+        },
+        onExistingConnection: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const StageSelectionPage(),
+            ),
+          );
+        },
+      ),
+
+      // 2 — EXERCISES
+      const ExercisesPage(),
+
+      // 3 — PROFILE
+      _ProfileTab(
+        username: Session.username,
+
+        onLonelinessTest: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const UCLAPage(),
+            ),
+          );
+        },
+
+        onAccountSettings: showAccountSettingsDialog,
+        onReason: showReasonDialog,
+
+        onPromoCode: () {
+          showPromoCodeDialog(context);
+        },
+
+        onContact: showContactDialog,
+
+        onLocation: () async {
+          try {
+            await updateCurrentLocation();
+
+            if (!mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Location updated successfully.'),
+              ),
+            );
+          } catch (e) {
+            if (!mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(e.toString())),
+            );
+          }
+        },
+
+        onRate: () {
+          ReviewService.openStoreListing();
+        },
+
+        onDelete: deleteAccount,
+        onLogout: showLogoutDialog,
+      ),
+    ],
+  ),
+),
+
+bottomNavigationBar: SafeArea(
+  top: false,
+  child: _GlassBottomNavigation(
+    currentIndex: currentPage,
+    onSelected: (index) {
+      controller.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+      );
+    },
+  ),
+),
+
     );
   }
 }
