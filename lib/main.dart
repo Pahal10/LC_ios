@@ -6459,8 +6459,10 @@ class FriendDetailPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => TaskPage(forcedStage: stage),
-                ),
+builder: (_) => TaskPage(
+  forcedStage: stage,
+  friendId: friend['id'] as int,
+),                ),
               );
             },
             icon: const Icon(Icons.chat_bubble_outline_rounded),
