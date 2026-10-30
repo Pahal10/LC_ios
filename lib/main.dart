@@ -5097,16 +5097,6 @@ class _TaskHomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-	  if (progressLoading) {
-  return const Scaffold(
-    backgroundColor: Color(0xFF103D27),
-    body: Center(
-      child: CircularProgressIndicator(
-        color: Color(0xFFB8F4CE),
-      ),
-    ),
-  );
-}
     return _LCPageBackground(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(23, 30, 23, 35),
