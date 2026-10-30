@@ -3479,60 +3479,412 @@ class _TaskPageState extends State<TaskPage> {
 
     setState(() {});
   }
+  
+Future<void> showFriendInteractionDialog(
+  BuildContext context,
+  String completedStage,
+) async {
+  final username = Session.username;
 
-  Future<void> completeTask() async {
+  List<Map<String, dynamic>> friends = [];
+  int? selectedFriendId;
+  bool addNewFriend = false;
+  bool loadingFriends = true;
+  bool saving = false;
 
-    showDialog(
-      context: context,
+  int comfort = 3;
+  int happiness = 3;
 
-      builder: (context) {
+  final nameController = TextEditingController();
+  final notesController = TextEditingController();
 
-        return AlertDialog(
+  try {
+    final response = await supabase
+        .from('friends')
+        .select('id, display_name')
+        .eq('username', username)
+        .order('display_name');
 
-          title: const Text(
-            "Were you comfortable doing it?",
-          ),
+    friends = List<Map<String, dynamic>>.from(response);
+    loadingFriends = false;
 
-          actions: [
+    if (friends.isEmpty) {
+      addNewFriend = true;
+    }
+  } catch (e) {
+    debugPrint('Could not load friends: $e');
+    loadingFriends = false;
+    addNewFriend = true;
+  }
 
-            /// NO
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await handleRewardFlow();
-              },
-              child: const Text("No"),
+  if (!mounted) return;
+
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) {
+      return StatefulBuilder(
+        builder: (context, updateDialog) {
+          Widget ratingSection({
+            required String title,
+            required String description,
+            required int value,
+            required ValueChanged<int> onChanged,
+            required IconData icon,
+          }) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, color: const Color(0xFF176B3A)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF263C2C),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '$value/5',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF176B3A),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 12,
+                  ),
+                ),
+                Slider(
+                  value: value.toDouble(),
+                  min: 1,
+                  max: 5,
+                  divisions: 4,
+                  activeColor: const Color(0xFF176B3A),
+                  label: '$value',
+                  onChanged: onChanged,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text('1 · Low', style: TextStyle(fontSize: 11)),
+                    Text('5 · High', style: TextStyle(fontSize: 11)),
+                  ],
+                ),
+              ],
+            );
+          }
+
+          Future<void> saveInteraction() async {
+            if (saving) return;
+
+            final name = nameController.text.trim();
+
+            if (addNewFriend && name.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please enter your friend’s name.'),
+                ),
+              );
+              return;
+            }
+
+            if (!addNewFriend && selectedFriendId == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please select a friend.'),
+                ),
+              );
+              return;
+            }
+
+            updateDialog(() => saving = true);
+
+            try {
+              dynamic friendId = selectedFriendId;
+
+              if (addNewFriend) {
+                final newFriend = await supabase
+                    .from('friends')
+                    .insert({
+                      'username': username,
+                      'display_name': name,
+                      'comfort_rating': comfort,
+                      'happiness_rating': happiness,
+                      'highest_stage': completedStage,
+                      'last_interaction_at':
+                          DateTime.now().toIso8601String(),
+                    })
+                    .select('id')
+                    .single();
+
+                friendId = newFriend['id'];
+              }
+
+              await supabase.from('friend_interactions').insert({
+                'username': username,
+                'friend_id': friendId,
+                'stage': completedStage,
+                'comfort_rating': comfort,
+                'happiness_rating': happiness,
+                'notes': notesController.text.trim().isEmpty
+                    ? null
+                    : notesController.text.trim(),
+              });
+
+              if (!addNewFriend) {
+                final existingFriend = friends.firstWhere(
+                  (friend) => friend['id'] == selectedFriendId,
+                );
+
+                final oldStage =
+                    existingFriend['highest_stage'] as String? ??
+                    'smalltalk';
+
+                final oldOrder = stageOrder[oldStage] ?? 1;
+                final newOrder = stageOrder[completedStage] ?? 1;
+
+                final update = <String, dynamic>{
+                  'comfort_rating': comfort,
+                  'happiness_rating': happiness,
+                  'last_interaction_at':
+                      DateTime.now().toIso8601String(),
+                };
+
+                if (newOrder > oldOrder) {
+                  update['highest_stage'] = completedStage;
+                }
+
+                await supabase
+                    .from('friends')
+                    .update(update)
+                    .eq('id', friendId)
+                    .eq('username', username);
+              }
+
+              if (!dialogContext.mounted) return;
+
+              Navigator.pop(dialogContext);
+            } catch (e) {
+              debugPrint('Error saving friend interaction: $e');
+
+              updateDialog(() => saving = false);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Could not save interaction: $e'),
+                ),
+              );
+            }
+          }
+
+          return AlertDialog(
+            backgroundColor: const Color(0xFFF8FCF8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-
-            /// SOMEWHAT
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await increaseProgress(1);
-				await ReviewService.registerComfortableTask();
-                await handleRewardFlow();
-              },
-
-              child: const Text("Somewhat"),
+            title: const Text(
+              'How did it go?',
+              style: TextStyle(
+                color: Color(0xFF176B3A),
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            content: SizedBox(
+              width: 420,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Who did you interact with?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF263C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
 
-            /// YES
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await increaseProgress(2);
-                await ReviewService.registerComfortableTask();
-                await handleRewardFlow();
+                    if (loadingFriends)
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    else ...[
+                      if (friends.isNotEmpty)
+                        SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text(
+                            'Add a new friend',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          value: addNewFriend,
+                          activeColor: const Color(0xFF176B3A),
+                          onChanged: (value) {
+                            updateDialog(() {
+                              addNewFriend = value;
+                              if (!value && friends.isNotEmpty) {
+                                selectedFriendId ??= friends.first['id'] as int;
+                              }
+                            });
+                          },
+                        ),
 
-              },
+                      if (addNewFriend)
+                        TextField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            labelText: 'Friend’s name',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        )
+                      else
+                        DropdownButtonFormField<int>(
+                          value: selectedFriendId,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: 'Select a friend',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          items: friends.map((friend) {
+                            return DropdownMenuItem<int>(
+                              value: friend['id'] as int,
+                              child: Text(
+                                friend['display_name'] ?? 'Friend',
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            updateDialog(() {
+                              selectedFriendId = value;
+                            });
+                          },
+                        ),
+                    ],
 
-              child: const Text("Yes"),
+                    const SizedBox(height: 22),
+
+                    ratingSection(
+                      title: 'How comfortable did you feel?',
+                      description:
+                          'Think about how natural and relaxed the interaction felt.',
+                      value: comfort,
+                      icon: Icons.favorite_outline,
+                      onChanged: (value) {
+                        updateDialog(() => comfort = value);
+                      },
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    ratingSection(
+                      title: 'How happy did you feel afterwards?',
+                      description:
+                          'Did the interaction leave you feeling positive?',
+                      value: happiness,
+                      icon: Icons.sentiment_satisfied_alt,
+                      onChanged: (value) {
+                        updateDialog(() => happiness = value);
+                      },
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    const Text(
+                      'Anything you want to remember? (Optional)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF263C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: notesController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'A little about how it went...',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        );
-      },
+            actions: [
+              ElevatedButton(
+                onPressed: saving ? null : saveInteraction,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF176B3A),
+                  foregroundColor: Colors.white,
+                ),
+                child: saving
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Save interaction'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+
+  nameController.dispose();
+  notesController.dispose();
+}
+
+  
+Future<void> completeTask() async {
+  try {
+    await showFriendInteractionDialog(
+      context,
+      currentStage,
+    );
+
+    if (!mounted) return;
+
+    await handleRewardFlow();
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Something went wrong: $e'),
+      ),
     );
   }
+}
+
 
   Future<void> increaseProgress(
       int amount,
