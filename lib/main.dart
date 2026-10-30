@@ -4420,34 +4420,107 @@ class _MainPageState extends State<MainPage> {
     controller.dispose();
     super.dispose();
   }
-  Future<void> openTask() async {
-  try {
-    final data = await supabase
-        .from('users')
-        .select('graduated')
-        .eq('username', Session.username)
-        .single();
+  
+Future<void> openTask() async {
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) {
+      return _ConnectChoiceSheet(
+        onNew: () {
+          Navigator.pop(sheetContext);
+          _startNewConnection();
+        },
+        onExisting: () {
+          Navigator.pop(sheetContext);
+          _openFriendsPage();
+        },
+      );
+    },
+  );
+}
 
-    final graduated = data['graduated'] ?? false;
+Future<void> _startNewConnection() async {
+  final nameController = TextEditingController();
+
+  final name = await showDialog<String>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      title: const Text('A new connection'),
+      content: TextField(
+        controller: nameController,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        decoration: InputDecoration(
+          hintText: 'What should we call them?',
+          filled: true,
+          fillColor: const Color(0xFFF2F7F1),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: const Text('Not now'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final value = nameController.text.trim();
+            if (value.isNotEmpty) {
+              Navigator.pop(dialogContext, value);
+            }
+          },
+          child: const Text('Start connecting'),
+        ),
+      ],
+    ),
+  );
+
+  nameController.dispose();
+
+  if (name == null || name.trim().isEmpty || !mounted) return;
+
+  try {
+    await supabase.from('friends').insert({
+      'username': Session.username,
+      'display_name': name.trim(),
+      'comfort_rating': 3,
+      'happiness_rating': 3,
+      'highest_stage': 'smalltalk',
+    });
 
     if (!mounted) return;
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => graduated
-            ? const StageSelectionPage()
-            : const TaskPage(),
+        builder: (_) => const TaskPage(forcedStage: 'smalltalk'),
       ),
     );
   } catch (e) {
     if (!mounted) return;
-
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Unable to open task: $e')),
+      SnackBar(content: Text('Could not create connection: $e')),
     );
   }
 }
+
+void _openFriendsPage() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const FriendsPage(),
+    ),
+  );
+}
+
 
 
   Future<void> openLink(String url) async {
