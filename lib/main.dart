@@ -3584,8 +3584,9 @@ Future<void> showFriendInteractionDialog(
                   divisions: 4,
                   activeColor: const Color(0xFF176B3A),
                   label: '$value',
-                  onChanged: onChanged,
-                ),
+onChanged: (double value) {
+  onChanged(value.round());
+},                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
