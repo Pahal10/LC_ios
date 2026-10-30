@@ -783,6 +783,106 @@ class Session {
   static String deviceId = "";
   static bool verifyShow = true;
 }
+class _ConnectionsTab extends StatelessWidget {
+  final VoidCallback onNewConnection;
+  final VoidCallback onExistingConnection;
+  const _ConnectionsTab({required this.onNewConnection, required this.onExistingConnection});
+
+  @override
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
+    children: [
+      const Text('Your connections', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 8),
+      Text('Choose whether you are meeting someone new or growing a relationship you already have.',
+          style: TextStyle(color: Colors.white.withOpacity(.78), fontSize: 15, height: 1.4)),
+      const SizedBox(height: 25),
+      _FeaturePanel(
+        icon: Icons.person_add_alt_1_rounded,
+        eyebrow: 'START SOMETHING NEW',
+        title: 'A new connection',
+        description: 'Get help starting a conversation and finding a natural way to keep it going.',
+        buttonText: 'Meet someone new',
+        onTap: onNewConnection,
+      ),
+      const SizedBox(height: 16),
+      _FeaturePanel(
+        icon: Icons.people_alt_rounded,
+        eyebrow: 'KEEP BUILDING',
+        title: 'An existing connection',
+        description: 'Work on familiarity, shared interests, follow-ups and spending time together.',
+        buttonText: 'Build a friendship',
+        onTap: onExistingConnection,
+      ),
+      const SizedBox(height: 18),
+      const _TipCard(
+        title: 'A note about friendships',
+        body: 'A connection grows through repeated, mutual interactions. You do not have to rush intimacy or force every conversation to become deep.',
+      ),
+    ],
+  );
+}
+
+class _FeaturePanel extends StatelessWidget {
+  final IconData icon;
+  final String eyebrow, title, description, buttonText;
+  final VoidCallback onTap;
+  const _FeaturePanel({required this.icon, required this.eyebrow, required this.title, required this.description, required this.buttonText, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(22),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF2C9858), Color(0xFF176B3A)]),
+      borderRadius: BorderRadius.circular(26),
+      border: Border.all(color: Colors.white.withOpacity(.2)),
+      boxShadow: [BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 20, offset: const Offset(0, 9))],
+    ),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Icon(icon, color: const Color(0xFFB8F4CE), size: 32),
+      const SizedBox(height: 20),
+      Text(eyebrow, style: const TextStyle(color: Color(0xFFB8F4CE), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+      const SizedBox(height: 6),
+      Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 8),
+      Text(description, style: TextStyle(color: Colors.white.withOpacity(.84), fontSize: 14, height: 1.4)),
+      const SizedBox(height: 20),
+      SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: const Color(0xFF176B3A),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
+          child: Text(buttonText, style: const TextStyle(fontWeight: FontWeight.w800)),
+        ),
+      ),
+    ]),
+  );
+}
+
+class _TipCard extends StatelessWidget {
+  final String title, body;
+  const _TipCard({required this.title, required this.body});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(.09),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white.withOpacity(.12)),
+    ),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+      const SizedBox(height: 7),
+      Text(body, style: TextStyle(color: Colors.white.withOpacity(.76), height: 1.45)),
+    ]),
+  );
+}
 
 
 class RegisterPage extends StatefulWidget {
