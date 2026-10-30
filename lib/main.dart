@@ -5361,26 +5361,17 @@ body: SafeArea(
       ),
 
       // 1 — FRIENDS
-      _ConnectionsTab(
-        onNewConnection: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const TaskPage(
-        forcedStage: 'smalltalk',
+FriendsPage(
+  embedded: true,
+  onSelectFriend: (friend) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FriendDetailPage(friend: friend),
       ),
-    ),
-  );
-},
-        onExistingConnection: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const StageSelectionPage(),
-            ),
-          );
-        },
-      ),
+    );
+  },
+),
 
       // 2 — EXERCISES
       const ExercisesPage(),
