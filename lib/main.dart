@@ -4829,9 +4829,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: buildDrawer(),
-      backgroundColor: currentPage == 1
-          ? Colors.black
-          : const Color(0xFF24B65E),
+      backgroundColor: const Color(0xFF24B65E),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF388E3C),
