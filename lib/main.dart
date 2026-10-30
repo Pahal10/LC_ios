@@ -5013,8 +5013,8 @@ class _GlassBottomNavigation extends StatelessWidget {
           child: Container(
             height: 76,
             decoration: BoxDecoration(
-              color: const Color(0xFF092D1C).withOpacity(0.91),
-              borderRadius: BorderRadius.circular(35),
+				color: Colors.white.withOpacity(0.10),
+				borderRadius: BorderRadius.circular(35),
               border: Border.all(
                 color: Colors.white.withOpacity(0.19),
               ),
