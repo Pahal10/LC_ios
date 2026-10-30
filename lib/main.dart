@@ -6069,24 +6069,8 @@ class _ProfileTab extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        'One connection at a time.',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
-                        ),
-                      ),
                     ],
                   ),
-                ),
-
-                const Icon(
-                  Icons.spa_rounded,
-                  color: Color(0xFF8DE9AB),
-                  size: 27,
                 ),
               ],
             ),
