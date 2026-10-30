@@ -6379,7 +6379,8 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 }
 
-class FriendDetailPage extends StatelessWidget {
+
+class FriendDetailPage extends StatefulWidget {
   final Map<String, dynamic> friend;
 
   const FriendDetailPage({
@@ -6388,17 +6389,183 @@ class FriendDetailPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final name = (friend['display_name'] ?? 'Friend').toString();
-    final stage = (friend['highest_stage'] ?? 'smalltalk').toString();
+  State<FriendDetailPage> createState() => _FriendDetailPageState();
+}
 
-    const labels = {
-      'smalltalk': 'Small Talk',
-      'mediumtalk': 'Medium Talk',
-      'bigtalk': 'Big Talk',
-      'playdate': 'Play Time',
-      'hygge': 'Hygge',
-    };
+class _FriendDetailPageState extends State<FriendDetailPage> {
+  final supabase = Supabase.instance.client;
+
+  List<Map<String, dynamic>> interactions = [];
+  bool loading = true;
+  String? error;
+
+  static const labels = {
+    'smalltalk': 'Small Talk',
+    'mediumtalk': 'Medium Talk',
+    'bigtalk': 'Big Talk',
+    'voicecall': 'Voice Call',
+    'playdate': 'Play Time',
+    'hygge': 'Hygge',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    loadInteractions();
+  }
+
+  Future<void> loadInteractions() async {
+    try {
+      final response = await supabase
+          .from('friend_interactions')
+          .select()
+          .eq('username', Session.username)
+          .eq('friend_id', widget.friend['id'])
+          .order('created_at', ascending: false);
+
+      if (!mounted) return;
+
+      setState(() {
+        interactions = List<Map<String, dynamic>>.from(response);
+        loading = false;
+        error = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        loading = false;
+        error = e.toString();
+      });
+    }
+  }
+
+  String formatDate(dynamic value) {
+    if (value == null) return 'Date not recorded';
+
+    try {
+      final date = DateTime.parse(value.toString()).toLocal();
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (_) {
+      return 'Date not recorded';
+    }
+  }
+
+  Widget ratingPill(IconData icon, String label, dynamic value) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEAF2E8),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: const Color(0xFF39764D), size: 19),
+            const SizedBox(height: 5),
+            Text(
+              '${value ?? '—'}/5',
+              style: const TextStyle(
+                color: Color(0xFF24452E),
+                fontWeight: FontWeight.w900,
+                fontSize: 15,
+              ),
+            ),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF718074),
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget interactionCard(Map<String, dynamic> item) {
+    final stage = (item['stage'] ?? 'smalltalk').toString();
+    final notes = (item['notes'] ?? '').toString();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 13),
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE7EDE5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.chat_bubble_outline_rounded,
+                color: Color(0xFF39764D),
+                size: 19,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  labels[stage] ?? stage,
+                  style: const TextStyle(
+                    color: Color(0xFF24452E),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              Text(
+                formatDate(item['created_at']),
+                style: const TextStyle(
+                  color: Color(0xFF879287),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              ratingPill(
+                Icons.favorite_outline_rounded,
+                'Comfort',
+                item['comfort_rating'],
+              ),
+              const SizedBox(width: 10),
+              ratingPill(
+                Icons.sentiment_satisfied_alt_rounded,
+                'Happiness',
+                item['happiness_rating'],
+              ),
+            ],
+          ),
+          if (notes.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              notes,
+              style: const TextStyle(
+                color: Color(0xFF58685B),
+                height: 1.45,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final name =
+        (widget.friend['display_name'] ?? 'Friend').toString();
+
+    final stage =
+        (widget.friend['current_stage'] ??
+         widget.friend['highest_stage'] ??
+         'smalltalk').toString();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F0),
@@ -6415,7 +6582,10 @@ class FriendDetailPage extends StatelessWidget {
             padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFDFF0DF), Color(0xFFBFDDBF)],
+                colors: [
+                  Color(0xFFDFF0DF),
+                  Color(0xFFBFDDBF),
+                ],
               ),
               borderRadius: BorderRadius.circular(28),
             ),
@@ -6445,39 +6615,29 @@ class FriendDetailPage extends StatelessWidget {
                 const SizedBox(height: 7),
                 Text(
                   labels[stage] ?? stage,
-                  style: const TextStyle(color: Color(0xFF54735A)),
+                  style: const TextStyle(
+                    color: Color(0xFF54735A),
+                  ),
                 ),
               ],
             ),
           ),
+
           const SizedBox(height: 22),
-          const Text(
-            'Keep this connection growing.',
-            style: TextStyle(
-              color: Color(0xFF203B29),
-              fontSize: 21,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'You do not need to rush a friendship. A small conversation, a thoughtful question, or a shared activity can all be meaningful next steps.',
-            style: TextStyle(
-              color: Color(0xFF718074),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 22),
+
           ElevatedButton.icon(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-builder: (_) => TaskPage(
-  forcedStage: stage,
-  friendId: friend['id'] as int,
-),                ),
-              );
+                  builder: (_) => TaskPage(
+                    forcedStage: stage,
+                    friendId: widget.friend['id'] as int,
+                  ),
+                ),
+              ).then((_) {
+                loadInteractions();
+              });
             },
             icon: const Icon(Icons.chat_bubble_outline_rounded),
             label: const Text('Continue this connection'),
@@ -6490,11 +6650,60 @@ builder: (_) => TaskPage(
               ),
             ),
           ),
+
+          const SizedBox(height: 29),
+
+          const Text(
+            'Your story so far',
+            style: TextStyle(
+              color: Color(0xFF203B29),
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          const Text(
+            'Little moments that helped this connection grow.',
+            style: TextStyle(
+              color: Color(0xFF718074),
+              fontSize: 13,
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          if (loading)
+            const Center(child: CircularProgressIndicator())
+          else if (error != null)
+            Text(
+              'Could not load interaction history: $error',
+              style: const TextStyle(color: Colors.red),
+            )
+          else if (interactions.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Text(
+                'Your first interaction with this person will appear here.',
+                style: TextStyle(
+                  color: Color(0xFF718074),
+                  height: 1.4,
+                ),
+              ),
+            )
+          else
+            ...interactions.map(interactionCard),
         ],
       ),
     );
   }
 }
+
 
 /// Staggered entrance animation
 class _FadeSlide extends StatelessWidget {
