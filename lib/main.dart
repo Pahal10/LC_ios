@@ -5088,127 +5088,261 @@ class _GlassBottomNavigation extends StatelessWidget {
   }
 }
 
-class _TaskHomeTab extends StatelessWidget {
+class _TaskHomeTab extends StatefulWidget {
   final VoidCallback onStart;
+  const _TaskHomeTab({required this.onStart});
+  @override
+  State<_TaskHomeTab> createState() => _TaskHomeTabState();
+}
 
-  const _TaskHomeTab({
-    required this.onStart,
-  });
+class _TaskHomeTabState extends State<_TaskHomeTab> {
+  String stage = 'smalltalk';
+  int progress = 0;
+  late final String tip =
+      realityChecks[Random().nextInt(realityChecks.length)];
+
+  static const labels = {
+    'smalltalk': 'Small Talk',
+    'mediumtalk': 'Medium Talk',
+    'bigtalk': 'Big Talk',
+    'voicecall': 'Voice Call',
+    'playdate': 'Play Time',
+    'hygge': 'Hygge',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final d = await Supabase.instance.client
+          .from('users')
+          .select('current_stage, stage_progress')
+          .eq('username', Session.username)
+          .single();
+      if (!mounted) return;
+      setState(() {
+        stage = d['current_stage'] ?? 'smalltalk';
+        progress = d['stage_progress'] ?? 0;
+      });
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
-    return _LCPageBackground(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(23, 30, 23, 35),
-        children: [
-          const Text(
-            'A little progress\nstarts here.',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 34,
-              height: 1.12,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
+    final idx = stages.indexOf(stage).clamp(0, stages.length - 1);
+    final overall = ((idx * 6) + progress) / (stages.length * 6);
 
-          const SizedBox(height: 12),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 70, 22, 120),
+      children: [
+        _FadeSlide(
+          delay: 0,
+          child: Text('Hey, ${Session.username} 👋',
+              style: TextStyle(
+                  color: Colors.white.withOpacity(0.75), fontSize: 15)),
+        ),
+        const SizedBox(height: 6),
+        const _FadeSlide(
+          delay: 80,
+          child: Text('One small step\ntoday.',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 38,
+                  height: 1.1,
+                  fontWeight: FontWeight.w900)),
+        ),
+        const SizedBox(height: 28),
 
-          Text(
-            'You don’t need to change overnight. '
-            'Just take one small step.',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.72),
-              fontSize: 15,
-              height: 1.5,
-            ),
-          ),
-
-          const SizedBox(height: 35),
-
-          _LCGlassCard(
+        // HERO CARD
+        _FadeSlide(
+          delay: 160,
+          child: _LCGlassCard(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.waving_hand_rounded,
-                  size: 42,
-                  color: Color(0xFFB8F4CE),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 84,
+                      height: 84,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox.expand(
+                            child: CircularProgressIndicator(
+                              value: overall,
+                              strokeWidth: 7,
+                              backgroundColor: Colors.white12,
+                              valueColor: const AlwaysStoppedAnimation(
+                                  Color(0xFFB8F4CE)),
+                              strokeCap: StrokeCap.round,
+                            ),
+                          ),
+                          Text('${(overall * 100).round()}%',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 18)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('CURRENT STAGE',
+                              style: TextStyle(
+                                  color: Color(0xFFB8F4CE),
+                                  fontSize: 10,
+                                  letterSpacing: 1.5,
+                                  fontWeight: FontWeight.w900)),
+                          const SizedBox(height: 6),
+                          Text(labels[stage] ?? stage,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900)),
+                          const SizedBox(height: 4),
+                          Text('${progress.clamp(0, 6)} of 6 points',
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-
                 const SizedBox(height: 22),
-
-                const Text(
-                  'Your next connection',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  'Get a simple, practical task that helps '
-                  'you start or strengthen a conversation.',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
                 _LCPrimaryButton(
                   text: 'Let’s connect',
                   icon: Icons.arrow_forward_rounded,
-                  onTap: onStart,
+                  onTap: widget.onStart,
                 ),
               ],
             ),
           ),
+        ),
 
-          const SizedBox(height: 22),
+        const SizedBox(height: 18),
 
-          _LCGlassCard(
-            child: Row(
+        // JOURNEY STEPPER
+        _FadeSlide(
+          delay: 240,
+          child: _LCGlassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.favorite_outline_rounded,
-                  color: Color(0xFFB8F4CE),
-                  size: 30,
+                const Text('YOUR JOURNEY',
+                    style: TextStyle(
+                        color: Color(0xFFB8F4CE),
+                        fontSize: 10,
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w900)),
+                const SizedBox(height: 16),
+                Row(
+                  children: List.generate(stages.length, (i) {
+                    final done = i < idx;
+                    final current = i == idx;
+                    return Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: current ? 16 : 12,
+                            height: current ? 16 : 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: done || current
+                                  ? const Color(0xFFB8F4CE)
+                                  : Colors.white24,
+                              boxShadow: current
+                                  ? [
+                                      BoxShadow(
+                                          color: const Color(0xFFB8F4CE)
+                                              .withOpacity(0.6),
+                                          blurRadius: 12)
+                                    ]
+                                  : null,
+                            ),
+                          ),
+                          if (i < stages.length - 1)
+                            Expanded(
+                              child: Container(
+                                height: 2,
+                                color: done
+                                    ? const Color(0xFFB8F4CE)
+                                    : Colors.white24,
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
-                const SizedBox(width: 15),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 18),
+
+        // REALITY CHECK
+        _FadeSlide(
+          delay: 320,
+          child: _LCGlassCard(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.lightbulb_outline_rounded,
+                    color: Color(0xFFB8F4CE), size: 28),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Remember',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 17,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        'You are not expected to be perfect '
-                        'at conversations.',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.72),
-                          fontSize: 13,
-                        ),
-                      ),
+                      const Text('Shh: insider info',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16)),
+                      const SizedBox(height: 6),
+                      Text(tip,
+                          style: TextStyle(
+                              color: Colors.white.withOpacity(0.75),
+                              height: 1.45,
+                              fontSize: 13)),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Staggered entrance animation
+class _FadeSlide extends StatelessWidget {
+  final Widget child;
+  final int delay;
+  const _FadeSlide({required this.child, required this.delay});
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 500 + delay),
+      curve: Curves.easeOutCubic,
+      builder: (_, t, c) => Opacity(
+        opacity: t,
+        child: Transform.translate(offset: Offset(0, 24 * (1 - t)), child: c),
       ),
+      child: child,
     );
   }
 }
