@@ -5751,15 +5751,7 @@ ListTile(
                                                   );
 
                                                 } else {
-
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                      const TaskPage(),
-                                                    ),
-                                                  );
-
+													await _startConnection();
                                                 }
                                               }
                                               else if (index == 2) {
@@ -5859,9 +5851,6 @@ ListTile(
                                                   },
                                                 );
                                               }
-												else {
-												 await _startConnection();
-												}
                                             },
                                             child: Container(
                                               padding: const EdgeInsets.symmetric(
