@@ -4874,13 +4874,15 @@ body: SafeArea(
       // 1 — FRIENDS
       _FriendsHomeTab(
         onNewConnection: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const TaskPage(),
-            ),
-          );
-        },
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const TaskPage(
+        forcedStage: 'smalltalk',
+      ),
+    ),
+  );
+},
         onExistingConnection: () {
           Navigator.push(
             context,
