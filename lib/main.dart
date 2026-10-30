@@ -4653,176 +4653,117 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget buildDrawer() {
-    return Drawer(
-      child: SafeArea(
-        child: SingleChildScrollView(
-        child: Column(
-          children: [
+  
+Widget buildDrawer() {
+  return Drawer(
+    backgroundColor: const Color(0xFFF5FAF6),
+    child: SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 30),
 
-            const SizedBox(height: 20),
+          const CircleAvatar(
+            radius: 38,
+            backgroundImage: AssetImage('asset/LCicon.png'),
+          ),
 
-            CircleAvatar(
-              radius: 40,
-              backgroundColor:
-              isPremium
-                  ? Colors.amber
-                  : Colors.white,
-              backgroundImage:
-              AssetImage("asset/LCicon.png"),
+          const SizedBox(height: 15),
+
+          Text(
+            'Welcome, ${Session.username}',
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF104D2C),
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 6),
 
-            Padding(
-              padding:
-              const EdgeInsets.symmetric(
-                horizontal: 20,
+          const Text(
+            'One connection at a time.',
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 12,
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          const Divider(),
+
+          ListTile(
+            leading: const Icon(
+              Icons.person_outline_rounded,
+              color: Color(0xFF176B3A),
+            ),
+            title: const Text('My Profile'),
+            subtitle: const Text('Account and preferences'),
+            onTap: () {
+              Navigator.pop(context);
+
+              controller.animateToPage(
+                3,
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.task_alt_rounded,
+              color: Color(0xFF176B3A),
+            ),
+            title: const Text('My Tasks'),
+            onTap: () {
+              Navigator.pop(context);
+
+              controller.animateToPage(
+                0,
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.psychology_alt_rounded,
+              color: Color(0xFF176B3A),
+            ),
+            title: const Text('Conversation Gym'),
+            onTap: () {
+              Navigator.pop(context);
+
+              controller.animateToPage(
+                2,
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+              );
+            },
+          ),
+
+          const Spacer(),
+
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Text(
+              'LC • LET’S CONNECT',
+              style: TextStyle(
+                color: Colors.black38,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w900,
+                fontSize: 10,
               ),
-              child: Text(
-                "Welcome ${Session.username},\nWhat would you like to do today?",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
-
-            const SizedBox(height: 30),
-
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text(
-                "Change Username",
-              ),
-              onTap: () {
-                showChangeUsernameDialog();
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.lock),
-              title: const Text(
-                "Change Password",
-              ),
-              onTap: () {
-                showChangePasswordDialog();
-              },
-            ),
-
-            ListTile(
-              leading:
-              const Icon(Icons.psychology),
-              title: const Text(
-                "Choose Different Reason",
-              ),
-              onTap: () {
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                    const LonelyPage(),
-                  ),
-                );
-              },
-            ),
-
-            ListTile(
-              leading:
-              const Icon(Icons.email),
-              title:
-              const Text("Contact Us"),
-              onTap: () {
-                showContactDialog();
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.location_on),
-              title: const Text("Update Location"),
-              subtitle: const Text(
-                "Needed only for reward verification",
-              ),
-              onTap: () async {
-
-                Navigator.pop(context);
-
-                try {
-
-                  await updateCurrentLocation();
-
-                  if (!mounted) return;
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        "Location updated successfully. You can turn off Location Services now.",
-                      ),
-                    ),
-                  );
-
-                } catch (e) {
-
-                  if (!mounted) return;
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.toString()),
-                    ),
-                  );
-
-                }
-              },
-            ),
-
-			            ListTile(
-              leading: const Icon(Icons.star_rate_rounded),
-              title: const Text("Rate this app"),
-              onTap: () async {
-                Navigator.pop(context);
-                await ReviewService.openStoreListing();
-              },
-            ),
-			
-
-            ListTile(
-              leading:
-              const Icon(Icons.email),
-              title: const Text("My promo code"),
-              onTap: () {
-                Navigator.pop(context);
-
-              showPromoCodeDialog(context);
-              },
-            ),
-            ListTile(
-              leading:
-              const Icon(Icons.logout),
-              title:
-              const Text("Logout"),
-              onTap: () {
-                showLogoutDialog();
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.delete_forever,
-                color: Colors.red,
-              ),
-              title: const Text(
-                "Delete account",
-                style: TextStyle(color: Colors.red),
-              ),
-              onTap: deleteAccount,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-      ),
-    );
-  }
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
