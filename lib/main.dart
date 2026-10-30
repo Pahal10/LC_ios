@@ -4988,7 +4988,7 @@ body: SafeArea(
       ),
 
       // 1 — FRIENDS
-      _FriendsHomeTab(
+      _ConnectionsTab(
         onNewConnection: () {
   Navigator.push(
     context,
