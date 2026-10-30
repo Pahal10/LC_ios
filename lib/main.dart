@@ -5327,6 +5327,2383 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+class _GlassBottomNavigation extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onSelected;
+
+  const _GlassBottomNavigation({
+    required this.currentIndex,
+    required this.onSelected,
+  });
+
+  static const items = [
+    (Icons.task_alt_rounded, 'Task'),
+    (Icons.people_alt_rounded, 'Friends'),
+    (Icons.psychology_alt_rounded, 'Exercise'),
+    (Icons.person_rounded, 'Profile'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 5, 14, 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(35),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 25,
+            sigmaY: 25,
+          ),
+          child: Container(
+            height: 76,
+            decoration: BoxDecoration(
+              color: const Color(0xFF092D1C).withOpacity(0.91),
+              borderRadius: BorderRadius.circular(35),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.19),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.22),
+                  blurRadius: 25,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth = constraints.maxWidth / 4;
+
+                return Stack(
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeOutCubic,
+                      left: currentIndex * itemWidth + 5,
+                      top: 5,
+                      bottom: 5,
+                      width: itemWidth - 10,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFB8F4CE)
+                              .withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: const Color(0xFFB8F4CE)
+                                .withOpacity(0.25),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Row(
+                      children: List.generate(4, (index) {
+                        final selected = currentIndex == index;
+
+                        return Expanded(
+                          child: InkWell(
+                            onTap: () => onSelected(index),
+                            borderRadius: BorderRadius.circular(30),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  duration: const Duration(milliseconds: 250),
+                                  scale: selected ? 1.12 : 1,
+                                  child: Icon(
+                                    items[index].$1,
+                                    size: 25,
+                                    color: selected
+                                        ? const Color(0xFF86EBAA)
+                                        : Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  items[index].$2,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: selected
+                                        ? FontWeight.w900
+                                        : FontWeight.w600,
+                                    color: selected
+                                        ? const Color(0xFF86EBAA)
+                                        : Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TaskHomeTab extends StatelessWidget {
+  final VoidCallback onStart;
+
+  const _TaskHomeTab({
+    required this.onStart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _LCPageBackground(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(23, 30, 23, 35),
+        children: [
+          const Text(
+            'A little progress\nstarts here.',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 34,
+              height: 1.12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Text(
+            'You don’t need to change overnight. '
+            'Just take one small step.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.72),
+              fontSize: 15,
+              height: 1.5,
+            ),
+          ),
+
+          const SizedBox(height: 35),
+
+          _LCGlassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.waving_hand_rounded,
+                  size: 42,
+                  color: Color(0xFFB8F4CE),
+                ),
+
+                const SizedBox(height: 22),
+
+                const Text(
+                  'Your next connection',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  'Get a simple, practical task that helps '
+                  'you start or strengthen a conversation.',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.75),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                _LCPrimaryButton(
+                  text: 'Let’s connect',
+                  icon: Icons.arrow_forward_rounded,
+                  onTap: onStart,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 22),
+
+          _LCGlassCard(
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.favorite_outline_rounded,
+                  color: Color(0xFFB8F4CE),
+                  size: 30,
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Remember',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 17,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'You are not expected to be perfect '
+                        'at conversations.',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.72),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FriendsHomeTab extends StatelessWidget {
+  final VoidCallback onNewConnection;
+  final VoidCallback onExistingConnection;
+
+  const _FriendsHomeTab({
+    required this.onNewConnection,
+    required this.onExistingConnection,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _LCPageBackground(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(23, 30, 23, 35),
+        children: [
+          const Text(
+            'Your connections.',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 9),
+
+          Text(
+            'Every friendship begins somewhere.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.72),
+              fontSize: 15,
+            ),
+          ),
+
+          const SizedBox(height: 35),
+
+          _LCConnectionCard(
+            icon: Icons.person_add_alt_1_rounded,
+            title: 'Someone new',
+            subtitle:
+                'Practice starting a conversation with someone you just met.',
+            button: 'Start a new connection',
+            onTap: onNewConnection,
+          ),
+
+          const SizedBox(height: 18),
+
+          _LCConnectionCard(
+            icon: Icons.people_alt_rounded,
+            title: 'Someone you know',
+            subtitle:
+                'Continue building a connection with an existing friend.',
+            button: 'Continue a connection',
+            onTap: onExistingConnection,
+          ),
+
+          const SizedBox(height: 28),
+
+          Text(
+            'A good connection doesn’t happen in one conversation. '
+            'Give it time.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.65),
+              fontSize: 13,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LCConnectionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String button;
+  final VoidCallback onTap;
+
+  const _LCConnectionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.button,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _LCGlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: const Color(0xFFB8F4CE).withOpacity(0.14),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFFB8F4CE),
+              size: 29,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 23,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 9),
+
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.73),
+              height: 1.5,
+              fontSize: 14,
+            ),
+          ),
+
+          const SizedBox(height: 23),
+
+          _LCPrimaryButton(
+            text: button,
+            icon: Icons.arrow_forward_rounded,
+            onTap: onTap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileTab extends StatelessWidget {
+  final String username;
+
+  final VoidCallback onLonelinessTest;
+  final VoidCallback onAccountSettings;
+  final VoidCallback onReason;
+  final VoidCallback onPromoCode;
+  final VoidCallback onContact;
+  final VoidCallback onLocation;
+  final VoidCallback onRate;
+  final VoidCallback onDelete;
+  final VoidCallback onLogout;
+
+  const _ProfileTab({
+    required this.username,
+    required this.onLonelinessTest,
+    required this.onAccountSettings,
+    required this.onReason,
+    required this.onPromoCode,
+    required this.onContact,
+    required this.onLocation,
+    required this.onRate,
+    required this.onDelete,
+    required this.onLogout,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _LCPageBackground(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(22, 27, 22, 35),
+        children: [
+          const Text(
+            'Your space.',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 33,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 7),
+
+          Text(
+            'Your account, your journey.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 14,
+            ),
+          ),
+
+          const SizedBox(height: 27),
+
+          // IDENTITY CARD
+          _LCGlassCard(
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF8DE9AB),
+                      width: 2,
+                    ),
+                  ),
+                  child: const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Color(0xFF1B7541),
+                    backgroundImage: AssetImage(
+                      'asset/LCicon.png',
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'YOUR LC ACCOUNT',
+                        style: TextStyle(
+                          color: Color(0xFFB8F4CE),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+
+                      const SizedBox(height: 7),
+
+                      Text(
+                        username,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Text(
+                        'One connection at a time.',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Icon(
+                  Icons.spa_rounded,
+                  color: Color(0xFF8DE9AB),
+                  size: 27,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 29),
+
+          _profileHeading('WELLBEING'),
+
+          _ProfileAction(
+            icon: Icons.psychology_alt_rounded,
+            title: 'UCLA Loneliness Scale',
+            subtitle: 'Reflect on your social connection',
+            onTap: onLonelinessTest,
+          ),
+
+          _ProfileAction(
+            icon: Icons.favorite_outline_rounded,
+            title: 'My reason',
+            subtitle: 'Update why you want to connect',
+            onTap: onReason,
+          ),
+
+          const SizedBox(height: 22),
+
+          _profileHeading('ACCOUNT'),
+
+          _ProfileAction(
+            icon: Icons.manage_accounts_rounded,
+            title: 'Account settings',
+            subtitle: 'Change username and password',
+            onTap: onAccountSettings,
+          ),
+
+          _ProfileAction(
+            icon: Icons.location_on_outlined,
+            title: 'Update location',
+            subtitle: 'Used for reward verification',
+            onTap: onLocation,
+          ),
+
+          _ProfileAction(
+            icon: Icons.card_giftcard_rounded,
+            title: 'My promo code',
+            subtitle: 'View and share your code',
+            onTap: onPromoCode,
+          ),
+
+          const SizedBox(height: 22),
+
+          _profileHeading('SUPPORT'),
+
+          _ProfileAction(
+            icon: Icons.mail_outline_rounded,
+            title: 'Contact LC',
+            subtitle: 'Questions, feedback and support',
+            onTap: onContact,
+          ),
+
+          _ProfileAction(
+            icon: Icons.star_outline_rounded,
+            title: 'Rate LC',
+            subtitle: 'Help others discover LC',
+            onTap: onRate,
+          ),
+
+          const SizedBox(height: 24),
+
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.07),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.12),
+              ),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Icons.logout_rounded,
+                    color: Colors.white70,
+                  ),
+                  title: const Text(
+                    'Log out',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  onTap: onLogout,
+                ),
+
+                Divider(
+                  height: 1,
+                  color: Colors.white.withOpacity(0.12),
+                ),
+
+                ListTile(
+                  leading: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: Colors.redAccent,
+                  ),
+                  title: const Text(
+                    'Delete account',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  onTap: onDelete,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          Center(
+            child: Text(
+              'LC • LET’S CONNECT',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.4),
+                fontSize: 10,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _profileHeading(String value) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5, bottom: 12),
+      child: Text(
+        value,
+        style: const TextStyle(
+          color: Color(0xFFB8F4CE),
+          fontSize: 11,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 1.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileAction extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _ProfileAction({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.09),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.12),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 13,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  height: 44,
+                  width: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFB8F4CE).withOpacity(0.13),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: const Color(0xFFB8F4CE),
+                    size: 23,
+                  ),
+                ),
+
+                const SizedBox(width: 14),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.62),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Colors.white54,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LCPageBackground extends StatelessWidget {
+  final Widget child;
+
+  const _LCPageBackground({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF176B3A),
+            Color(0xFF104D2C),
+            Color(0xFF092F20),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -110,
+            right: -100,
+            child: Container(
+              width: 270,
+              height: 270,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF76D99B).withOpacity(0.08),
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 100,
+            left: -130,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.035),
+              ),
+            ),
+          ),
+
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _LCGlassCard extends StatelessWidget {
+  final Widget child;
+
+  const _LCGlassCard({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 20,
+          sigmaY: 20,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(21),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.105),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.19),
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _LCPrimaryButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _LCPrimaryButton({
+    required this.text,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFB8F4CE),
+          foregroundColor: const Color(0xFF104D2C),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(17),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              text,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(width: 9),
+            Icon(icon, size: 19),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LCExercise {
+  final int id;
+  final String category;
+  final String title;
+  final String scenario;
+  final String question;
+  final List<String> options;
+  final int bestAnswer;
+  final String explanation;
+
+  const LCExercise({
+    required this.id,
+    required this.category,
+    required this.title,
+    required this.scenario,
+    required this.question,
+    required this.options,
+    required this.bestAnswer,
+    required this.explanation,
+  });
+}
+
+const List<LCExercise> lcExercises = [
+  // STARTING
+  LCExercise(
+    id: 1,
+    category: 'Starting',
+    title: 'The First Hello',
+    scenario: 'You are sitting next to someone before class begins.',
+    question: 'What is a natural way to start?',
+    options: [
+      'Hey, is this seat taken?',
+      'Tell me everything about yourself.',
+      'Why are you sitting here?',
+      'Stay silent and wait.',
+    ],
+    bestAnswer: 0,
+    explanation: 'A simple situational question creates an easy opening.',
+  ),
+
+  LCExercise(
+    id: 2,
+    category: 'Starting',
+    title: 'At a Campus Event',
+    scenario: 'You arrive at an event where you recognize nobody.',
+    question: 'What could you say?',
+    options: [
+      'I hate coming to these events.',
+      'Have you been to one of these before?',
+      'Can you introduce me to everyone?',
+      'Nothing. Leave immediately.',
+    ],
+    bestAnswer: 1,
+    explanation: 'The shared environment gives both people something to talk about.',
+  ),
+
+  LCExercise(
+    id: 3,
+    category: 'Starting',
+    title: 'The Compliment',
+    scenario: 'Someone has a book you have always wanted to read.',
+    question: 'How do you approach them?',
+    options: [
+      'That book is terrible.',
+      'Give me that book.',
+      'I've been meaning to read that. How are you finding it?',
+      'Ignore the book.',
+    ],
+    bestAnswer: 2,
+    explanation: 'A genuine observation followed by a question opens conversation.',
+  ),
+
+  LCExercise(
+    id: 4,
+    category: 'Starting',
+    title: 'The Dining Hall',
+    scenario: 'You notice someone sitting alone at lunch.',
+    question: 'What is a respectful approach?',
+    options: [
+      'Why are you alone?',
+      'Mind if I join you?',
+      'You look lonely.',
+      'Sit down without asking.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Asking gives them the freedom to accept or decline.',
+  ),
+
+  LCExercise(
+    id: 5,
+    category: 'Starting',
+    title: 'The Introduction',
+    scenario: 'A mutual friend introduces you to someone.',
+    question: 'What should you do next?',
+    options: [
+      'Say nothing.',
+      'Ask for their phone number immediately.',
+      'Say hello and ask how they know your mutual friend.',
+      'Talk only to your mutual friend.',
+    ],
+    bestAnswer: 2,
+    explanation: 'A shared connection is an easy conversational starting point.',
+  ),
+
+  LCExercise(
+    id: 6,
+    category: 'Starting',
+    title: 'The Classmate',
+    scenario: 'You see the same person in class every week.',
+    question: 'What is a good opener?',
+    options: [
+      'Did you understand today's lecture?',
+      'Why do you always come here?',
+      'You should talk more.',
+      'I know everything about this class.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Shared routines make excellent low-pressure conversation starters.',
+  ),
+
+  LCExercise(
+    id: 7,
+    category: 'Starting',
+    title: 'The Long Queue',
+    scenario: 'You are waiting in a long queue with someone.',
+    question: 'What could you say?',
+    options: [
+      'This is taking forever. Have you been here before?',
+      'Move faster.',
+      'I hate everyone here.',
+      'Tell me your life story.',
+    ],
+    bestAnswer: 0,
+    explanation: 'A shared observation can naturally lead to a conversation.',
+  ),
+
+  LCExercise(
+    id: 8,
+    category: 'Starting',
+    title: 'The Club Meeting',
+    scenario: 'You attend your first club meeting.',
+    question: 'How could you connect?',
+    options: [
+      'I am better than everyone here.',
+      'What made you join this club?',
+      'Give me your position.',
+      'Leave without speaking.',
+    ],
+    bestAnswer: 1,
+    explanation: 'People often enjoy talking about their interests and motivations.',
+  ),
+
+  LCExercise(
+    id: 9,
+    category: 'Starting',
+    title: 'The Group Project',
+    scenario: 'You have just been assigned a group project.',
+    question: 'What is a friendly opener?',
+    options: [
+      'I will do everything myself.',
+      'Let's divide everything without talking.',
+      'Hey, what do you think we should start with?',
+      'I don't want to work with you.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Collaborative questions create a shared purpose.',
+  ),
+
+  LCExercise(
+    id: 10,
+    category: 'Starting',
+    title: 'The Awkward Silence',
+    scenario: 'You are introduced to someone and neither of you speaks.',
+    question: 'What is a useful next step?',
+    options: [
+      'Panic and leave.',
+      'Make a small observation about where you are.',
+      'Apologize repeatedly.',
+      'Ask ten questions at once.',
+    ],
+    bestAnswer: 1,
+    explanation: 'You can restart with something simple and relevant to the moment.',
+  ),
+
+  // KEEPING IT GOING
+  LCExercise(
+    id: 11,
+    category: 'Keeping it going',
+    title: 'The Follow-up',
+    scenario: 'Someone says they spent their weekend hiking.',
+    question: 'What is a good follow-up?',
+    options: [
+      'Okay.',
+      'Why?',
+      'That sounds fun. Where did you go?',
+      'I hate hiking.',
+    ],
+    bestAnswer: 2,
+    explanation: 'A specific follow-up shows that you are listening.',
+  ),
+
+  LCExercise(
+    id: 12,
+    category: 'Keeping it going',
+    title: 'The Short Answer',
+    scenario: 'You ask someone how their day was. They say, "Good."',
+    question: 'What could you try?',
+    options: [
+      'Why are you so boring?',
+      'Nice! Anything interesting happen?',
+      'Goodbye.',
+      'Ask the exact same question again.',
+    ],
+    bestAnswer: 1,
+    explanation: 'A gentle follow-up gives them another opportunity to share.',
+  ),
+
+  LCExercise(
+    id: 13,
+    category: 'Keeping it going',
+    title: 'Show Interest',
+    scenario: 'Someone tells you they have started learning guitar.',
+    question: 'What response encourages conversation?',
+    options: [
+      'That's interesting. What made you start?',
+      'Guitar is easy.',
+      'I don't care.',
+      'You should learn piano instead.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Curiosity encourages the other person to expand on their experience.',
+  ),
+
+  LCExercise(
+    id: 14,
+    category: 'Keeping it going',
+    title: 'The Shared Experience',
+    scenario: 'Someone mentions that they are nervous about an exam.',
+    question: 'What is a supportive response?',
+    options: [
+      'That's nothing.',
+      'You'll probably fail.',
+      'I get that. Which part are you most worried about?',
+      'Stop worrying.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Acknowledging their feeling before asking a question helps them feel heard.',
+  ),
+
+  LCExercise(
+    id: 15,
+    category: 'Keeping it going',
+    title: 'The Story',
+    scenario: 'Someone starts telling you about a funny incident.',
+    question: 'What should you do?',
+    options: [
+      'Interrupt with your own story.',
+      'Listen and let them finish.',
+      'Look at your phone.',
+      'Change the subject immediately.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Listening without interrupting helps build conversational comfort.',
+  ),
+
+  LCExercise(
+    id: 16,
+    category: 'Keeping it going',
+    title: 'The Detail',
+    scenario: 'Someone says they recently visited Japan.',
+    question: 'Which question is most engaging?',
+    options: [
+      'Was it expensive?',
+      'Did you enjoy it?',
+      'What was your favorite part of the trip?',
+      'Why Japan?',
+    ],
+    bestAnswer: 2,
+    explanation: 'Open-ended questions invite stories rather than one-word answers.',
+  ),
+
+  LCExercise(
+    id: 17,
+    category: 'Keeping it going',
+    title: 'The Conversation Loop',
+    scenario: 'Someone says they enjoy cooking.',
+    question: 'What is a natural response?',
+    options: [
+      'What do you usually like making?',
+      'Cooking is boring.',
+      'Okay.',
+      'I never cook.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Following the topic they introduced keeps the conversation flowing.',
+  ),
+
+  LCExercise(
+    id: 18,
+    category: 'Keeping it going',
+    title: 'Avoiding Interrogation',
+    scenario: 'You have asked someone three questions in a row.',
+    question: 'What should you do next?',
+    options: [
+      'Ask five more questions.',
+      'Share something about yourself too.',
+      'Leave immediately.',
+      'Ask why they are not asking questions.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Good conversations involve both asking and sharing.',
+  ),
+
+  LCExercise(
+    id: 19,
+    category: 'Keeping it going',
+    title: 'The Different Opinion',
+    scenario: 'Someone disagrees with your opinion about a movie.',
+    question: 'How should you respond?',
+    options: [
+      'You're wrong.',
+      'That's interesting. What did you like about it?',
+      'Stop talking.',
+      'Make fun of their taste.',
+    ],
+    bestAnswer: 1,
+    explanation: 'You can explore a different opinion without turning it into an argument.',
+  ),
+
+  LCExercise(
+    id: 20,
+    category: 'Keeping it going',
+    title: 'The Natural Pause',
+    scenario: 'There is a brief silence during a conversation.',
+    question: 'What is the healthiest response?',
+    options: [
+      'Panic.',
+      'Apologize for being awkward.',
+      'Allow the pause and introduce another topic when appropriate.',
+      'Talk continuously.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Silence is normal. Conversations do not need constant talking.',
+  ),
+
+  // COMMON GROUND
+  LCExercise(
+    id: 21,
+    category: 'Common ground',
+    title: 'Finding Interests',
+    scenario: 'You discover someone enjoys watching movies.',
+    question: 'What could you ask?',
+    options: [
+      'What genres do you usually enjoy?',
+      'Movies are a waste of time.',
+      'You must watch my favorite movie.',
+      'Why do you watch movies?',
+    ],
+    bestAnswer: 0,
+    explanation: 'Exploring interests helps you discover shared preferences.',
+  ),
+
+  LCExercise(
+    id: 22,
+    category: 'Common ground',
+    title: 'The Music Connection',
+    scenario: 'Someone mentions their favorite artist.',
+    question: 'How could you build on that?',
+    options: [
+      'That artist is terrible.',
+      'Have you seen them perform live?',
+      'Stop listening to them.',
+      'Only my music is good.',
+    ],
+    bestAnswer: 1,
+    explanation: 'A related question can reveal experiences and shared interests.',
+  ),
+
+  LCExercise(
+    id: 23,
+    category: 'Common ground',
+    title: 'The Hobby',
+    scenario: 'You discover that both of you enjoy photography.',
+    question: 'What could you say?',
+    options: [
+      'You are probably better than me.',
+      'What do you usually like taking pictures of?',
+      'Photography is expensive.',
+      'Let's compete.',
+    ],
+    bestAnswer: 1,
+    explanation: 'A shared hobby gives you an opportunity to exchange experiences.',
+  ),
+
+  LCExercise(
+    id: 24,
+    category: 'Common ground',
+    title: 'The Favorite Place',
+    scenario: 'Someone tells you they love visiting coffee shops.',
+    question: 'What is a useful follow-up?',
+    options: [
+      'Which places do you recommend around here?',
+      'Coffee is unhealthy.',
+      'Why don't you stay home?',
+      'I never go outside.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Local recommendations can create opportunities for future interactions.',
+  ),
+
+  LCExercise(
+    id: 25,
+    category: 'Common ground',
+    title: 'The Unexpected Similarity',
+    scenario: 'Someone mentions they grew up in a different country, just like you.',
+    question: 'What could you ask?',
+    options: [
+      'Which country is better?',
+      'What was it like growing up there?',
+      'You must have had a difficult life.',
+      'Let's stop talking about that.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Shared experiences can create a meaningful point of connection.',
+  ),
+
+  LCExercise(
+    id: 26,
+    category: 'Common ground',
+    title: 'The Food Debate',
+    scenario: 'You discover you both love trying new food.',
+    question: 'What is a natural continuation?',
+    options: [
+      'What is the best thing you have tried recently?',
+      'My food choices are better.',
+      'Food is not interesting.',
+      'Why eat new things?',
+    ],
+    bestAnswer: 0,
+    explanation: 'Experiences and recommendations are easy topics to exchange.',
+  ),
+
+  LCExercise(
+    id: 27,
+    category: 'Common ground',
+    title: 'The Weekend Plan',
+    scenario: 'Someone says they enjoy exploring the city.',
+    question: 'What might you ask?',
+    options: [
+      'Why do you waste time outside?',
+      'Have you found any interesting places lately?',
+      'You should stay home.',
+      'I already know everything.',
+    ],
+    bestAnswer: 1,
+    explanation: 'You can discover shared activities and potential plans.',
+  ),
+
+  LCExercise(
+    id: 28,
+    category: 'Common ground',
+    title: 'The Sports Connection',
+    scenario: 'Someone says they follow basketball.',
+    question: 'What is a good question?',
+    options: [
+      'Which team do you support?',
+      'Basketball is pointless.',
+      'You should watch football.',
+      'I don't understand sports.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Specific questions make it easier to find common ground.',
+  ),
+
+  LCExercise(
+    id: 29,
+    category: 'Common ground',
+    title: 'The Learning Journey',
+    scenario: 'Someone is learning a new language.',
+    question: 'What could you ask?',
+    options: [
+      'Why bother?',
+      'How did you decide to learn it?',
+      'You probably won't become fluent.',
+      'Languages are useless.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Understanding someone's motivation can lead to a more interesting discussion.',
+  ),
+
+  LCExercise(
+    id: 30,
+    category: 'Common ground',
+    title: 'Planning Together',
+    scenario: 'You both discover you enjoy visiting museums.',
+    question: 'What could you suggest?',
+    options: [
+      'We should visit one sometime if you're interested.',
+      'You must come with me tomorrow.',
+      'I will decide everything.',
+      'Never mind.',
+    ],
+    bestAnswer: 0,
+    explanation: 'A low-pressure invitation creates an opportunity without demanding agreement.',
+  ),
+
+  // DEEPER CONNECTION
+  LCExercise(
+    id: 31,
+    category: 'Deeper connection',
+    title: 'Beyond Small Talk',
+    scenario: 'You have spoken to someone several times and feel comfortable.',
+    question: 'What is a suitable question?',
+    options: [
+      'What is something you've been looking forward to lately?',
+      'Tell me your biggest secret.',
+      'Why are you still talking to me?',
+      'How much money do you have?',
+    ],
+    bestAnswer: 0,
+    explanation: 'Personal but approachable questions help conversations become more meaningful.',
+  ),
+
+  LCExercise(
+    id: 32,
+    category: 'Deeper connection',
+    title: 'Showing Empathy',
+    scenario: 'Someone says they have been having a difficult week.',
+    question: 'What should you say?',
+    options: [
+      'Everyone has problems.',
+      'That sounds difficult. Do you want to talk about it?',
+      'Forget about it.',
+      'My week was worse.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Offering space to talk is often more helpful than immediately giving advice.',
+  ),
+
+  LCExercise(
+    id: 33,
+    category: 'Deeper connection',
+    title: 'Sharing Something Personal',
+    scenario: 'Someone shares a personal challenge with you.',
+    question: 'How can you respond?',
+    options: [
+      'Judge them.',
+      'Dismiss their feelings.',
+      'Thank them for trusting you and listen.',
+      'Immediately tell everyone else.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Respect and trust are essential to deeper connections.',
+  ),
+
+  LCExercise(
+    id: 34,
+    category: 'Deeper connection',
+    title: 'The Future',
+    scenario: 'You are discussing life beyond college.',
+    question: 'What could you ask?',
+    options: [
+      'What kind of life are you hoping to build?',
+      'How much will you earn?',
+      'You should follow my plan.',
+      'Why think about the future?',
+    ],
+    bestAnswer: 0,
+    explanation: 'A thoughtful question can invite someone to share their aspirations.',
+  ),
+
+  LCExercise(
+    id: 35,
+    category: 'Deeper connection',
+    title: 'A Meaningful Memory',
+    scenario: 'You are having a relaxed conversation with a friend.',
+    question: 'What could you ask?',
+    options: [
+      'What is one memory that always makes you smile?',
+      'What is your most embarrassing secret?',
+      'Why are you so quiet?',
+      'Can we talk about something else?',
+    ],
+    bestAnswer: 0,
+    explanation: 'Positive memories can help people connect through personal stories.',
+  ),
+
+  LCExercise(
+    id: 36,
+    category: 'Deeper connection',
+    title: 'The Vulnerability',
+    scenario: 'You want to share something you have struggled with.',
+    question: 'What is a healthy approach?',
+    options: [
+      'Share gradually when you feel comfortable.',
+      'Tell everything immediately.',
+      'Pretend you have never struggled.',
+      'Force the other person to share too.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Vulnerability should be mutual, voluntary and appropriate to the relationship.',
+  ),
+
+  LCExercise(
+    id: 37,
+    category: 'Deeper connection',
+    title: 'Celebrating Others',
+    scenario: 'Someone tells you they achieved a personal goal.',
+    question: 'How should you respond?',
+    options: [
+      'That is not impressive.',
+      'Nice! What did it take to get there?',
+      'I achieved something better.',
+      'Change the subject.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Genuine enthusiasm shows that you value the other person's experiences.',
+  ),
+
+  LCExercise(
+    id: 38,
+    category: 'Deeper connection',
+    title: 'Understanding Feelings',
+    scenario: 'A friend says they feel out of place at college.',
+    question: 'What is a thoughtful response?',
+    options: [
+      'You'll get over it.',
+      'Why are you so sensitive?',
+      'That can feel isolating. What has been making it difficult?',
+      'Just make friends.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Understanding their experience is more useful than minimizing it.',
+  ),
+
+  LCExercise(
+    id: 39,
+    category: 'Deeper connection',
+    title: 'The Different Perspective',
+    scenario: 'A friend explains a decision you would not personally make.',
+    question: 'What could you ask?',
+    options: [
+      'How did you arrive at that decision?',
+      'That makes no sense.',
+      'You should think like me.',
+      'I refuse to understand.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Curiosity helps you understand someone without needing to agree.',
+  ),
+
+  LCExercise(
+    id: 40,
+    category: 'Deeper connection',
+    title: 'Being Present',
+    scenario: 'A friend is talking about something important to them.',
+    question: 'What is the best approach?',
+    options: [
+      'Think about your next response.',
+      'Listen carefully and respond to what they actually say.',
+      'Interrupt frequently.',
+      'Check your notifications.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Being present is a social skill that makes others feel valued.',
+  ),
+
+  // FRIENDSHIP
+  LCExercise(
+    id: 41,
+    category: 'Friendship',
+    title: 'The Follow-up Message',
+    scenario: 'You had a nice conversation with someone yesterday.',
+    question: 'What could you send?',
+    options: [
+      'Hey, enjoyed talking yesterday. How did the rest of your day go?',
+      'Why haven't you messaged me?',
+      'We need to talk every day.',
+      'Nothing. Never speak again.',
+    ],
+    bestAnswer: 0,
+    explanation: 'A friendly follow-up helps turn a one-time interaction into an ongoing connection.',
+  ),
+
+  LCExercise(
+    id: 42,
+    category: 'Friendship',
+    title: 'Making Plans',
+    scenario: 'You and someone have discussed visiting a new restaurant.',
+    question: 'What could you suggest?',
+    options: [
+      'Let's go sometime if you're free this week.',
+      'You have to come tomorrow.',
+      'I will book everything without asking.',
+      'Forget it.',
+    ],
+    bestAnswer: 0,
+    explanation: 'A specific but flexible invitation makes plans easier.',
+  ),
+
+  LCExercise(
+    id: 43,
+    category: 'Friendship',
+    title: 'Remembering Details',
+    scenario: 'Your friend mentioned an important presentation next week.',
+    question: 'How can you show you remember?',
+    options: [
+      'Ask how their presentation went.',
+      'Ignore it.',
+      'Ask what they are doing next month.',
+      'Tell them presentations are easy.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Remembering small details communicates genuine interest.',
+  ),
+
+  LCExercise(
+    id: 44,
+    category: 'Friendship',
+    title: 'The Invitation',
+    scenario: 'You want to invite a new friend to an activity.',
+    question: 'What is a considerate invitation?',
+    options: [
+      'You must come.',
+      'A few of us are going bowling. Would you like to join?',
+      'Why don't you ever come out?',
+      'I already decided for you.',
+    ],
+    bestAnswer: 1,
+    explanation: 'A clear invitation with room to decline respects the other person's choice.',
+  ),
+
+  LCExercise(
+    id: 45,
+    category: 'Friendship',
+    title: 'The Cancelled Plan',
+    scenario: 'A friend cancels your plans at the last minute.',
+    question: 'What is a reasonable response?',
+    options: [
+      'You clearly don't care about me.',
+      'No worries. Is everything okay?',
+      'Never speak to me again.',
+      'Tell everyone they are unreliable.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Responding calmly allows room for circumstances you may not know about.',
+  ),
+
+  LCExercise(
+    id: 46,
+    category: 'Friendship',
+    title: 'Reconnecting',
+    scenario: 'You have not spoken to an old friend in several months.',
+    question: 'How could you reconnect?',
+    options: [
+      'Hey, it's been a while! How have you been?',
+      'Why did you abandon me?',
+      'You forgot about me.',
+      'Wait another year.',
+    ],
+    bestAnswer: 0,
+    explanation: 'A warm, simple message can reopen a connection without pressure.',
+  ),
+
+  LCExercise(
+    id: 47,
+    category: 'Friendship',
+    title: 'The Boundary',
+    scenario: 'A friend says they cannot meet because they need time alone.',
+    question: 'How should you respond?',
+    options: [
+      'You are a bad friend.',
+      'Respect that and suggest another time.',
+      'Keep insisting.',
+      'Make them feel guilty.',
+    ],
+    bestAnswer: 1,
+    explanation: 'Respecting boundaries is part of building healthy friendships.',
+  ),
+
+  LCExercise(
+    id: 48,
+    category: 'Friendship',
+    title: 'The Misunderstanding',
+    scenario: 'You realize something you said may have upset a friend.',
+    question: 'What should you do?',
+    options: [
+      'Pretend nothing happened.',
+      'Blame them.',
+      'Check in, acknowledge it and listen.',
+      'Stop speaking to them.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Healthy friendships involve communication and accountability.',
+  ),
+
+  LCExercise(
+    id: 49,
+    category: 'Friendship',
+    title: 'Being Supportive',
+    scenario: 'A friend is going through an important life change.',
+    question: 'What is a supportive response?',
+    options: [
+      'Ask how you can support them.',
+      'Tell them exactly what to do.',
+      'Make the situation about yourself.',
+      'Ignore the change.',
+    ],
+    bestAnswer: 0,
+    explanation: 'Offering support while respecting their autonomy strengthens trust.',
+  ),
+
+  LCExercise(
+    id: 50,
+    category: 'Friendship',
+    title: 'Maintaining Connection',
+    scenario: 'You have developed a friendship and want it to continue.',
+    question: 'What matters most?',
+    options: [
+      'Only contact them when you need something.',
+      'Expect constant communication.',
+      'Make consistent, genuine efforts to stay connected.',
+      'Never disagree.',
+    ],
+    bestAnswer: 2,
+    explanation: 'Friendships grow through mutual effort, trust and respect over time.',
+  ),
+];
+
+class ExercisesPage extends StatefulWidget {
+  const ExercisesPage({super.key});
+
+  @override
+  State<ExercisesPage> createState() => _ExercisesPageState();
+}
+
+class _ExercisesPageState extends State<ExercisesPage> {
+  String selectedCategory = 'All';
+
+  final Set<int> completed = {};
+  final Set<int> attempted = {};
+
+  final categories = const [
+    'All',
+    'Starting',
+    'Keeping it going',
+    'Common ground',
+    'Deeper connection',
+    'Friendship',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = lcExercises.where((exercise) {
+      return selectedCategory == 'All' ||
+          exercise.category == selectedCategory;
+    }).toList();
+
+    final progress = completed.length / lcExercises.length;
+
+    return _LCPageBackground(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // HEADER
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Conversation Gym',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(height: 7),
+                      Text(
+                        'Build your social muscle.',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 53,
+                  width: 53,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.psychology_alt_rounded,
+                    color: Color(0xFFB8F4CE),
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // PROGRESS
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(23),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 18,
+                  sigmaY: 18,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(19),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF42B977).withOpacity(0.55),
+                        Colors.white.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(23),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'YOUR JOURNEY',
+                            style: TextStyle(
+                              color: Color(0xFFB8F4CE),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          Text(
+                            '${completed.length}/50',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 17,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 9,
+                          backgroundColor: Colors.white24,
+                          valueColor:
+                              const AlwaysStoppedAnimation(
+                            Color(0xFF9CF2BA),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Text(
+                        completed.isEmpty
+                            ? 'Start with your first exercise.'
+                            : completed.length == 50
+                                ? 'All 50 exercises completed!'
+                                : '${50 - completed.length} exercises left. Keep going!',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 22),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 22),
+            child: Text(
+              'Explore skills',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // FILTERS
+          SizedBox(
+            height: 43,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                final selected =
+                    selectedCategory == category;
+
+                return ChoiceChip(
+                  label: Text(category),
+                  selected: selected,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedCategory = category;
+                    });
+                  },
+                  backgroundColor:
+                      Colors.white.withOpacity(0.10),
+                  selectedColor: const Color(0xFFB8F4CE),
+                  side: BorderSide(
+                    color: Colors.white.withOpacity(0.15),
+                  ),
+                  labelStyle: TextStyle(
+                    color: selected
+                        ? const Color(0xFF104D2C)
+                        : Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // EXERCISES
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(18, 3, 18, 25),
+              itemCount: filtered.length,
+              itemBuilder: (context, index) {
+                final exercise = filtered[index];
+
+                final isCompleted =
+                    completed.contains(exercise.id);
+
+                final wasAttempted =
+                    attempted.contains(exercise.id);
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 11),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.095),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isCompleted
+                          ? const Color(0xFF8DE9AB)
+                          : Colors.white.withOpacity(0.13),
+                    ),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => _openExercise(exercise),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 47,
+                              height: 47,
+                              decoration: BoxDecoration(
+                                color: isCompleted
+                                    ? const Color(0xFFB8F4CE)
+                                    : Colors.white.withOpacity(0.12),
+                                borderRadius:
+                                    BorderRadius.circular(15),
+                              ),
+                              child: Center(
+                                child: isCompleted
+                                    ? const Icon(
+                                        Icons.check_rounded,
+                                        color: Color(0xFF104D2C),
+                                      )
+                                    : Text(
+                                        exercise.id
+                                            .toString()
+                                            .padLeft(2, '0'),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 14),
+
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    exercise.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 5),
+
+                                  Text(
+                                    exercise.category,
+                                    style: const TextStyle(
+                                      color: Color(0xFFB8F4CE),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+
+                                  if (wasAttempted)
+                                    const Padding(
+                                      padding: EdgeInsets.only(top: 4),
+                                      child: Text(
+                                        'Practiced',
+                                        style: TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+
+                            Icon(
+                              isCompleted
+                                  ? Icons.check_circle_rounded
+                                  : Icons.arrow_forward_ios_rounded,
+                              color: isCompleted
+                                  ? const Color(0xFF8DE9AB)
+                                  : Colors.white54,
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openExercise(LCExercise exercise) async {
+    int? selectedAnswer;
+    bool checked = false;
+
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, updateSheet) {
+            final correct =
+                selectedAnswer == exercise.bestAnswer;
+
+            return DraggableScrollableSheet(
+              initialChildSize: 0.85,
+              minChildSize: 0.65,
+              maxChildSize: 0.96,
+              expand: false,
+              builder: (context, scrollController) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF4F9F5),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30),
+                    ),
+                  ),
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.fromLTRB(
+                      22, 14, 22, 35,
+                    ),
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 42,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      Text(
+                        'EXERCISE ${exercise.id} OF 50',
+                        style: const TextStyle(
+                          color: Color(0xFF176B3A),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 10,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+
+                      const SizedBox(height: 9),
+
+                      Text(
+                        exercise.title,
+                        style: const TextStyle(
+                          color: Color(0xFF153B24),
+                          fontSize: 27,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE2F3E7),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'THE SITUATION',
+                              style: TextStyle(
+                                color: Color(0xFF176B3A),
+                                fontSize: 10,
+                                letterSpacing: 1.3,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              exercise.scenario,
+                              style: const TextStyle(
+                                color: Color(0xFF294B34),
+                                fontSize: 15,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Text(
+                        exercise.question,
+                        style: const TextStyle(
+                          color: Color(0xFF153B24),
+                          fontSize: 19,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      ...List.generate(
+                        exercise.options.length,
+                        (index) {
+                          final isSelected =
+                              selectedAnswer == index;
+
+                          final isCorrect =
+                              index == exercise.bestAnswer;
+
+                          final showCorrect =
+                              checked && isCorrect;
+
+                          final showWrong =
+                              checked && isSelected && !isCorrect;
+
+                          Color background = Colors.white;
+                          Color border =
+                              const Color(0xFFDCE8DF);
+
+                          if (showCorrect) {
+                            background =
+                                const Color(0xFFE1F5E8);
+                            border = const Color(0xFF239653);
+                          } else if (showWrong) {
+                            background =
+                                const Color(0xFFFFEBE7);
+                            border = Colors.redAccent;
+                          } else if (isSelected) {
+                            background =
+                                const Color(0xFFEAF3EC);
+                            border = const Color(0xFF176B3A);
+                          }
+
+                          return Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: 11),
+                            child: InkWell(
+                              borderRadius:
+                                  BorderRadius.circular(17),
+                              onTap: checked
+                                  ? null
+                                  : () {
+                                      updateSheet(() {
+                                        selectedAnswer = index;
+                                      });
+                                    },
+                              child: AnimatedContainer(
+                                duration: const Duration(
+                                  milliseconds: 180,
+                                ),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: background,
+                                  borderRadius:
+                                      BorderRadius.circular(17),
+                                  border: Border.all(
+                                    color: border,
+                                    width: isSelected || showCorrect
+                                        ? 1.7
+                                        : 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '${String.fromCharCode(65 + index)}. ${exercise.options[index]}',
+                                        style: const TextStyle(
+                                          color: Color(0xFF263C2C),
+                                          fontSize: 14,
+                                          height: 1.45,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+
+                                    if (showCorrect)
+                                      const Icon(
+                                        Icons.check_circle_rounded,
+                                        color: Color(0xFF176B3A),
+                                      )
+                                    else if (showWrong)
+                                      const Icon(
+                                        Icons.cancel_rounded,
+                                        color: Colors.redAccent,
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      if (checked) ...[
+                        const SizedBox(height: 8),
+
+                        Container(
+                          padding: const EdgeInsets.all(17),
+                          decoration: BoxDecoration(
+                            color: correct
+                                ? const Color(0xFFE1F5E8)
+                                : const Color(0xFFFFF1E3),
+                            borderRadius: BorderRadius.circular(19),
+                          ),
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                correct
+                                    ? 'Great instinct!'
+                                    : 'Here is another perspective',
+                                style: TextStyle(
+                                  color: correct
+                                      ? const Color(0xFF176B3A)
+                                      : Colors.brown.shade800,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 15,
+                                ),
+                              ),
+
+                              const SizedBox(height: 9),
+
+                              Text(
+                                exercise.explanation,
+                                style: const TextStyle(
+                                  color: Color(0xFF35513D),
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 22),
+
+                      SizedBox(
+                        height: 55,
+                        child: ElevatedButton(
+                          onPressed: selectedAnswer == null
+                              ? null
+                              : () {
+                                  if (!checked) {
+                                    updateSheet(() {
+                                      checked = true;
+                                    });
+                                  } else {
+                                    Navigator.pop(
+                                      sheetContext,
+                                      true,
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color(0xFF176B3A),
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor:
+                                Colors.black12,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(17),
+                            ),
+                          ),
+                          child: Text(
+                            checked
+                                ? 'Finish exercise'
+                                : 'Check my answer',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+
+    if (!mounted) return;
+
+    if (result == true) {
+      setState(() {
+        attempted.add(exercise.id);
+        completed.add(exercise.id);
+      });
+    }
+  }
+}
+
 class StageSelectionPage extends StatelessWidget {
 
   const StageSelectionPage({super.key});
