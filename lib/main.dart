@@ -3379,8 +3379,7 @@ class _TaskPageState extends State<TaskPage> {
       .eq('username', Session.username)
       .single();
 
-  currentStage =
-      widget.forcedStage ?? (friend['current_stage'] ?? 'smalltalk');
+  currentStage = friend['current_stage'] ?? 'smalltalk';
 
   progress = friend['stage_progress'] ?? 0;
 } else {
