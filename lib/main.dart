@@ -4899,7 +4899,7 @@ Widget buildDrawer() {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-		scrollUnderElevation: 0,
+		scrolledUnderElevation: 0,
 
         
         title: const CircleAvatar(
@@ -5087,7 +5087,7 @@ bottomNavigationBar: SafeArea(
     },
   ),
 ),
-
+),
     );
   }
 }
