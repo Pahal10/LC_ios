@@ -4883,14 +4883,23 @@ Widget buildDrawer() {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+        return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1B8A4C), Color(0xFF115C34), Color(0xFF082A1B)],
+        ),
+      ),
+      child: Scaffold(
       key: _scaffoldKey,
       drawer: buildDrawer(),
-      backgroundColor: const Color(0xFF24B65E),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF388E3C),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+		scrollUnderElevation: 0,
 
         
         title: const CircleAvatar(
