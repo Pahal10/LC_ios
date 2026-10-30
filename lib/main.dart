@@ -6795,7 +6795,11 @@ class _ExercisesPageState extends State<ExercisesPage> {
     }).toList();
 
     final progress = completed.length / lcExercises.length;
-
+	if (progressLoading) {
+    	return const Center(
+      		child: CircularProgressIndicator(),
+    	);
+  	}
     return _LCPageBackground(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
