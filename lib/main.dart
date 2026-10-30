@@ -5977,58 +5977,9 @@ class _ProfileAction extends StatelessWidget {
 
 class _LCPageBackground extends StatelessWidget {
   final Widget child;
-
-  const _LCPageBackground({
-    required this.child,
-  });
-
+  const _LCPageBackground({required this.child});
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF176B3A),
-            Color(0xFF104D2C),
-            Color(0xFF092F20),
-          ],
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -110,
-            right: -100,
-            child: Container(
-              width: 270,
-              height: 270,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF76D99B).withOpacity(0.08),
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 100,
-            left: -130,
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.035),
-              ),
-            ),
-          ),
-
-          child,
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => child;
 }
 
 class _LCGlassCard extends StatelessWidget {
