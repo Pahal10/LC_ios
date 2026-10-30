@@ -4441,75 +4441,14 @@ Future<void> openTask() async {
   );
 }
 
-Future<void> _startNewConnection() async {
-  final nameController = TextEditingController();
 
-  final name = await showDialog<String>(
-    context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      title: const Text('A new connection'),
-      content: TextField(
-        controller: nameController,
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
-        decoration: InputDecoration(
-          hintText: 'What should we call them?',
-          filled: true,
-          fillColor: const Color(0xFFF2F7F1),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('Not now'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            final value = nameController.text.trim();
-            if (value.isNotEmpty) {
-              Navigator.pop(dialogContext, value);
-            }
-          },
-          child: const Text('Start connecting'),
-        ),
-      ],
+Future<void> _startNewConnection() async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const TaskPage(forcedStage: 'smalltalk'),
     ),
   );
-
-  nameController.dispose();
-
-  if (name == null || name.trim().isEmpty || !mounted) return;
-
-  try {
-    await supabase.from('friends').insert({
-      'username': Session.username,
-      'display_name': name.trim(),
-      'comfort_rating': 3,
-      'happiness_rating': 3,
-      'highest_stage': 'smalltalk',
-    });
-
-    if (!mounted) return;
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const TaskPage(forcedStage: 'smalltalk'),
-      ),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Could not create connection: $e')),
-    );
-  }
 }
 
 void _openFriendsPage() {
