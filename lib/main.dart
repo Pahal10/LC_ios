@@ -3952,6 +3952,34 @@ class _MainPageState extends State<MainPage> {
     controller.dispose();
     super.dispose();
   }
+  Future<void> openTask() async {
+  try {
+    final data = await supabase
+        .from('users')
+        .select('graduated')
+        .eq('username', Session.username)
+        .single();
+
+    final graduated = data['graduated'] ?? false;
+
+    if (!mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => graduated
+            ? const StageSelectionPage()
+            : const TaskPage(),
+      ),
+    );
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Unable to open task: $e')),
+    );
+  }
+}
 
 
   Future<void> openLink(String url) async {
