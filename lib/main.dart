@@ -6972,9 +6972,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
                     color: Colors.white.withOpacity(0.15),
                   ),
                   labelStyle: TextStyle(
-                    color: selected
-                        ? const Color(0xFF104D2C)
-                        : Colors.white,
+                    color: const Color(0xFF104D2C),
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
