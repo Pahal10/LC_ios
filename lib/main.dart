@@ -6989,8 +6989,85 @@ class ExercisesPage extends StatefulWidget {
 class _ExercisesPageState extends State<ExercisesPage> {
   String selectedCategory = 'All';
 
-  final Set<int> completed = {};
-  final Set<int> attempted = {};
+  final supabase = Supabase.instance.client;
+
+  Set<int> completed = {};
+  Set<int> attempted = {};
+
+  bool progressLoading = true;
+  bool savingProgress = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadExerciseProgress();
+  }
+
+  Future<void> loadExerciseProgress() async {
+    try {
+      final data = await supabase
+          .from('users')
+          .select('exercise_completed, exercise_attempted')
+          .eq('username', Session.username)
+          .single();
+
+      if (!mounted) return;
+
+      setState(() {
+        completed = Set<int>.from(
+          (data['exercise_completed'] ?? []).map(
+            (value) => (value as num).toInt(),
+          ),
+        );
+
+        attempted = Set<int>.from(
+          (data['exercise_attempted'] ?? []).map(
+            (value) => (value as num).toInt(),
+          ),
+        );
+
+        progressLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        progressLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not load exercise progress: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> saveExerciseProgress() async {
+    if (savingProgress) return;
+
+    savingProgress = true;
+
+    try {
+      await supabase
+          .from('users')
+          .update({
+            'exercise_completed': completed.toList(),
+            'exercise_attempted': attempted.toList(),
+          })
+          .eq('username', Session.username);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not save exercise progress: $e'),
+          ),
+        );
+      }
+    } finally {
+      savingProgress = false;
+    }
+  }
 
   final categories = const [
     'All',
@@ -7641,6 +7718,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
         attempted.add(exercise.id);
         completed.add(exercise.id);
       });
+	    await saveExerciseProgress();
     }
   }
 }
