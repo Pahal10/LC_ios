@@ -21,6 +21,7 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:flutter/material.dart';
 import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:video_player/video_player.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,92 +67,107 @@ localizationsDelegates: [
   }
 }
 
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
-  State<SplashScreen> createState() =>
-      _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState
-    extends State<SplashScreen> {
-
-  final supabase = Supabase.instance.client;
+class _SplashScreenState extends State<SplashScreen> {
+  late final VideoPlayerController _video;
+  bool _ready = false;
+  bool _navigated = false;
 
   @override
   void initState() {
     super.initState();
+    _video = VideoPlayerController.asset('asset/intro.mp4');
 
-    checkLogin();
-}
+    _video.initialize().then((_) {
+      if (!mounted) return;
+      setState(() => _ready = true);
+      _video.play();
+    }).catchError((_) => _goNext());
 
-  Future<void> checkLogin() async {
+    _video.addListener(() {
+      final v = _video.value;
+      if (v.isInitialized && v.position >= v.duration) _goNext();
+    });
 
-    await Future.delayed(
-      const Duration(seconds: 3),
-    );
+    // Safety net: never get stuck on the splash
+    Future.delayed(const Duration(seconds: 10), _goNext);
+  }
 
-    final prefs =
-    await SharedPreferences.getInstance();
+  Future<void> _goNext() async {
+    if (_navigated || !mounted) return;
+    _navigated = true;
+    _video.pause();
 
-    final loggedIn =
-        prefs.getBool("loggedIn") ?? false;
-
+    final prefs = await SharedPreferences.getInstance();
+    final loggedIn = prefs.getBool("loggedIn") ?? false;
     if (!mounted) return;
 
     if (loggedIn) {
-
-      Session.username =
-          prefs.getString("username") ?? "";
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const MainPage(),
-        ),
-      );
-
-    } else {
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const LoginPage(),
-        ),
-      );
+      Session.username = prefs.getString("username") ?? "";
     }
+
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 500),
+        pageBuilder: (_, __, ___) =>
+            loggedIn ? const MainPage() : const LoginPage(),
+        transitionsBuilder: (_, anim, __, child) =>
+            FadeTransition(opacity: anim, child: child),
+      ),
+    );
   }
+
+  @override
+  void dispose() {
+    _video.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor:
-      const Color(0xFF24B65E),
-
-      body: Center(
-
-        child: Column(
-          mainAxisAlignment:
-          MainAxisAlignment.center,
-
-          children: [
-
-            /// IMAGE
-            Image.asset(
-              "asset/splashimg.jpg",
-              height: 250,
+      backgroundColor: Colors.black, // match your video's background color
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (_ready)
+            FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: _video.value.size.width,
+                height: _video.value.size.height,
+                child: VideoPlayer(_video),
+              ),
             ),
-
-            const SizedBox(height: 40),
-
-            /// LOADING CIRCLE
-            const CircularProgressIndicator(
-              color: Colors.white,
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: TextButton(
+                  onPressed: _goNext,
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.15),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 8),
+                  ),
+                  child: const Text('Skip intro'),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
