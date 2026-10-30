@@ -3898,106 +3898,103 @@ Future<void> completeTask() async {
 }
 
 
-  Future<void> increaseProgress(
-      int amount,
-      ) async {
+  Future<void> increaseProgress(int amount) async {
+  // Keep this user-level flag, regardless of whether the task is
+  // associated with a particular friend.
+  await supabase
+      .from('users')
+      .update({
+        'intro_completed': true,
+      })
+      .eq('username', Session.username);
 
-    await supabase
-        .from('users')
-        .update({
-      'intro_completed': true,
-    })
-        .eq(
-      'username',
-      Session.username,
-    );
+  progress += amount;
 
-    progress += amount;
-
-    /// STAGE ADVANCEMENT
+  // A friend has their own independent stage and progress.
+  if (widget.friendId != null) {
     if (progress >= 6) {
-      if (currentStage == "hygge") {
-        await supabase
-            .from('users')
-            .update({
+      final currentIndex = stages.indexOf(currentStage);
 
-          'graduated': true,
-          'graduation_seen': true,
-
-        })
-            .eq(
-          'username',
-          Session.username,
-        );
-
-        await showGraduationDialog();
-      }
-      if (currentStage == "mediumtalk") {
-        final user = await supabase
-            .from("users")
-            .select("email")
-            .eq("username", Session.username)
-            .single();
-
-        final email = user["email"];
-
-          final response =
-          await Supabase.instance.client.functions.invoke(
-            'PMF-feedback',
-            body: {
-              'email': email,
-            },
-          );
-
-          if (response.status != 200) {
-            throw Exception("Couldn't send email");
-          }
-      }
-
-      final answeredYes =
-      await askConnectionQuestion();
-
-      await updateLonelinessStats(
-        answeredYes,
-      );
-
-      final currentIndex =
-      stages.indexOf(currentStage);
-
-      if (currentIndex <
-          stages.length - 1) {
-
-        currentStage =
-        stages[currentIndex + 1];
-
+      if (currentIndex < stages.length - 1) {
+        currentStage = stages[currentIndex + 1];
         progress = 0;
-
-
+      } else {
+        // This friend has completed the final stage.
+        // Keep them at hygge with completed progress.
+        progress = 6;
       }
     }
 
-    /// UPDATE DATABASE
     await supabase
-        .from('users')
+        .from('friends')
         .update({
+          'current_stage': currentStage,
+          'stage_progress': progress,
+        })
+        .eq('id', widget.friendId!)
+        .eq('username', Session.username);
 
-      'current_stage': currentStage,
-      'stage_progress': progress,
-      'verifyshow': true
-
-    })
-        .eq(
-      'username',
-      Session.username,
-    );
-    /*Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-        const MainPage(),
-      ),
-    );*/
+    return;
   }
+
+  // Original user-wide progression for tasks not associated with a friend.
+  if (progress >= 6) {
+    if (currentStage == 'hygge') {
+      await supabase
+          .from('users')
+          .update({
+            'graduated': true,
+            'graduation_seen': true,
+          })
+          .eq('username', Session.username);
+
+      await showGraduationDialog();
+    }
+
+    if (currentStage == 'mediumtalk') {
+      final user = await supabase
+          .from('users')
+          .select('email')
+          .eq('username', Session.username)
+          .single();
+
+      final email = user['email'];
+
+      final response =
+          await Supabase.instance.client.functions.invoke(
+        'PMF-feedback',
+        body: {
+          'email': email,
+        },
+      );
+
+      if (response.status != 200) {
+        throw Exception("Couldn't send email");
+      }
+    }
+
+    final answeredYes = await askConnectionQuestion();
+
+    await updateLonelinessStats(answeredYes);
+
+    final currentIndex = stages.indexOf(currentStage);
+
+    if (currentIndex < stages.length - 1) {
+      currentStage = stages[currentIndex + 1];
+      progress = 0;
+    }
+  }
+
+  // Save the original user-wide progress.
+  await supabase
+      .from('users')
+      .update({
+        'current_stage': currentStage,
+        'stage_progress': progress,
+        'verifyshow': true,
+      })
+      .eq('username', Session.username);
+}
 
   @override
   Widget build(BuildContext context) {
