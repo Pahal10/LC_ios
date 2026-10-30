@@ -5262,7 +5262,7 @@ class _TaskHomeTabState extends State<_TaskHomeTab> {
     final overall = ((idx * 6) + progress) / (stages.length * 6);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(22, 70, 22, 120),
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
       children: [
         _FadeSlide(
           delay: 0,
