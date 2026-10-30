@@ -2857,15 +2857,13 @@ class LossPage extends StatelessWidget {
 
 
 class TaskPage extends StatefulWidget {
-
   final String? forcedStage;
+  final int? friendId;
 
   const TaskPage({
-
     super.key,
-
     this.forcedStage,
-
+	this.friendId,
   });
   @override
   State<TaskPage> createState() => _TaskPageState();
