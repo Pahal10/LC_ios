@@ -5914,7 +5914,7 @@ const List<LCExercise> lcExercises = [
     options: [
       'That book is terrible.',
       'Give me that book.',
-      'I've been meaning to read that. How are you finding it?',
+      "I've been meaning to read that. How are you finding it?",
       'Ignore the book.',
     ],
     bestAnswer: 2,
@@ -5960,7 +5960,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'You see the same person in class every week.',
     question: 'What is a good opener?',
     options: [
-      'Did you understand today's lecture?',
+      "Did you understand today's lecture?",
       'Why do you always come here?',
       'You should talk more.',
       'I know everything about this class.',
@@ -6009,9 +6009,9 @@ const List<LCExercise> lcExercises = [
     question: 'What is a friendly opener?',
     options: [
       'I will do everything myself.',
-      'Let's divide everything without talking.',
+      "Let's divide everything without talking.",
       'Hey, what do you think we should start with?',
-      'I don't want to work with you.',
+      "I don't want to work with you.",
     ],
     bestAnswer: 2,
     explanation: 'Collaborative questions create a shared purpose.',
@@ -6073,9 +6073,9 @@ const List<LCExercise> lcExercises = [
     scenario: 'Someone tells you they have started learning guitar.',
     question: 'What response encourages conversation?',
     options: [
-      'That's interesting. What made you start?',
+      "That's interesting. What made you start?",
       'Guitar is easy.',
-      'I don't care.',
+      "I don't care.",
       'You should learn piano instead.',
     ],
     bestAnswer: 0,
@@ -6089,8 +6089,8 @@ const List<LCExercise> lcExercises = [
     scenario: 'Someone mentions that they are nervous about an exam.',
     question: 'What is a supportive response?',
     options: [
-      'That's nothing.',
-      'You'll probably fail.',
+      "That's nothing.",
+      "You'll probably fail.",
       'I get that. Which part are you most worried about?',
       'Stop worrying.',
     ],
@@ -6169,8 +6169,8 @@ const List<LCExercise> lcExercises = [
     scenario: 'Someone disagrees with your opinion about a movie.',
     question: 'How should you respond?',
     options: [
-      'You're wrong.',
-      'That's interesting. What did you like about it?',
+      "You're wrong.",
+      "That's interesting. What did you like about it?",
       'Stop talking.',
       'Make fun of their taste.',
     ],
@@ -6237,7 +6237,7 @@ const List<LCExercise> lcExercises = [
       'You are probably better than me.',
       'What do you usually like taking pictures of?',
       'Photography is expensive.',
-      'Let's compete.',
+      "Let's compete.",
     ],
     bestAnswer: 1,
     explanation: 'A shared hobby gives you an opportunity to exchange experiences.',
@@ -6252,7 +6252,7 @@ const List<LCExercise> lcExercises = [
     options: [
       'Which places do you recommend around here?',
       'Coffee is unhealthy.',
-      'Why don't you stay home?',
+      "Why don't you stay home?",
       'I never go outside.',
     ],
     bestAnswer: 0,
@@ -6269,7 +6269,7 @@ const List<LCExercise> lcExercises = [
       'Which country is better?',
       'What was it like growing up there?',
       'You must have had a difficult life.',
-      'Let's stop talking about that.',
+      "Let's stop talking about that.",
     ],
     bestAnswer: 1,
     explanation: 'Shared experiences can create a meaningful point of connection.',
@@ -6317,7 +6317,7 @@ const List<LCExercise> lcExercises = [
       'Which team do you support?',
       'Basketball is pointless.',
       'You should watch football.',
-      'I don't understand sports.',
+      "I don't understand sports.",
     ],
     bestAnswer: 0,
     explanation: 'Specific questions make it easier to find common ground.',
@@ -6332,11 +6332,11 @@ const List<LCExercise> lcExercises = [
     options: [
       'Why bother?',
       'How did you decide to learn it?',
-      'You probably won't become fluent.',
+      "You probably won't become fluent.",
       'Languages are useless.',
     ],
     bestAnswer: 1,
-    explanation: 'Understanding someone's motivation can lead to a more interesting discussion.',
+    explanation: 'Understanding someone\'s motivation can lead to a more interesting discussion.',
   ),
 
   LCExercise(
@@ -6346,7 +6346,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'You both discover you enjoy visiting museums.',
     question: 'What could you suggest?',
     options: [
-      'We should visit one sometime if you're interested.',
+      "We should visit one sometime if you're interested.",
       'You must come with me tomorrow.',
       'I will decide everything.',
       'Never mind.',
@@ -6363,7 +6363,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'You have spoken to someone several times and feel comfortable.',
     question: 'What is a suitable question?',
     options: [
-      'What is something you've been looking forward to lately?',
+      "What is something you've been looking forward to lately?",
       'Tell me your biggest secret.',
       'Why are you still talking to me?',
       'How much money do you have?',
@@ -6465,7 +6465,7 @@ const List<LCExercise> lcExercises = [
       'Change the subject.',
     ],
     bestAnswer: 1,
-    explanation: 'Genuine enthusiasm shows that you value the other person's experiences.',
+    explanation: "Genuine enthusiasm shows that you value the other person's experiences.",
   ),
 
   LCExercise(
@@ -6475,7 +6475,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'A friend says they feel out of place at college.',
     question: 'What is a thoughtful response?',
     options: [
-      'You'll get over it.',
+      "You'll get over it.",
       'Why are you so sensitive?',
       'That can feel isolating. What has been making it difficult?',
       'Just make friends.',
@@ -6525,7 +6525,7 @@ const List<LCExercise> lcExercises = [
     question: 'What could you send?',
     options: [
       'Hey, enjoyed talking yesterday. How did the rest of your day go?',
-      'Why haven't you messaged me?',
+      "Why haven't you messaged me?",
       'We need to talk every day.',
       'Nothing. Never speak again.',
     ],
@@ -6540,7 +6540,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'You and someone have discussed visiting a new restaurant.',
     question: 'What could you suggest?',
     options: [
-      'Let's go sometime if you're free this week.',
+      "Let's go sometime if you're free this week.",
       'You have to come tomorrow.',
       'I will book everything without asking.',
       'Forget it.',
@@ -6574,11 +6574,11 @@ const List<LCExercise> lcExercises = [
     options: [
       'You must come.',
       'A few of us are going bowling. Would you like to join?',
-      'Why don't you ever come out?',
+      "Why don't you ever come out?",
       'I already decided for you.',
     ],
     bestAnswer: 1,
-    explanation: 'A clear invitation with room to decline respects the other person's choice.',
+    explanation: 'A clear invitation with room to decline respects the other person\'s choice.',
   ),
 
   LCExercise(
@@ -6588,7 +6588,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'A friend cancels your plans at the last minute.',
     question: 'What is a reasonable response?',
     options: [
-      'You clearly don't care about me.',
+      "You clearly don't care about me.",
       'No worries. Is everything okay?',
       'Never speak to me again.',
       'Tell everyone they are unreliable.',
@@ -6604,7 +6604,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'You have not spoken to an old friend in several months.',
     question: 'How could you reconnect?',
     options: [
-      'Hey, it's been a while! How have you been?',
+      "Hey, it's been a while! How have you been?",
       'Why did you abandon me?',
       'You forgot about me.',
       'Wait another year.',
@@ -6677,7 +6677,6 @@ const List<LCExercise> lcExercises = [
     explanation: 'Friendships grow through mutual effort, trust and respect over time.',
   ),
 ];
-
 class ExercisesPage extends StatefulWidget {
   const ExercisesPage({super.key});
 
