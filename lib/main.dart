@@ -5481,6 +5481,7 @@ class _GlassBottomNavigation extends StatelessWidget {
   static const items = [
     (Icons.task_alt_rounded, 'Task'),
     (Icons.people_alt_rounded, 'Friends'),
+	(Icons.lightbulb_outline_rounded, 'Help'),
     (Icons.psychology_alt_rounded, 'Exercise'),
     (Icons.person_rounded, 'Profile'),
   ];
