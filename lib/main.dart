@@ -23,6 +23,9 @@ import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:video_player/video_player.dart';
 
+/// 1.0 on a ~390pt-wide phone (iPhone 14/15). Smaller phones shrink a bit, bigger ones grow a bit.
+double lcScale(BuildContext context) =>
+    (MediaQuery.of(context).size.width / 390).clamp(0.85, 1.15).toDouble();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
@@ -62,6 +65,15 @@ localizationsDelegates: [
         Locale('pt'), // Portuguese
         Locale('es'), // Spanish
       ],
+	  builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: mq.textScaler.clamp(minScaleFactor: 0.9, maxScaleFactor: 1.1),
+          ),
+          child: child!,
+        );
+      },
       home: const SplashScreen(),
     );
   }
