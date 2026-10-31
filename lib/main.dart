@@ -5204,7 +5204,7 @@ Widget buildDrawer() {
               Navigator.pop(context);
 
               controller.animateToPage(
-                3,
+                4,
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
               );
@@ -5238,7 +5238,7 @@ Widget buildDrawer() {
               Navigator.pop(context);
 
               controller.animateToPage(
-                2,
+                3,
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
               );
