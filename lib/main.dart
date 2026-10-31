@@ -5720,8 +5720,7 @@ class _TaskHomeTabState extends State<_TaskHomeTab> {
             ),
           ),
         ),
-      ),
-    );
+      );
     });
   }
 }
