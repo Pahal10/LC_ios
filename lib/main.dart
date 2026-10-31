@@ -5515,8 +5515,7 @@ class _GlassBottomNavigation extends StatelessWidget {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final itemWidth = constraints.maxWidth / 4;
-
+			  final itemWidth = constraints.maxWidth / items.length;
                 return Stack(
                   children: [
                     AnimatedPositioned(
