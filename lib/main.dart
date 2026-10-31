@@ -5588,19 +5588,15 @@ class _GlassBottomNavigation extends StatelessWidget {
     );
   }
 }
-
 class _TaskHomeTab extends StatefulWidget {
   final VoidCallback onStart;
-
   const _TaskHomeTab({required this.onStart});
-
   @override
   State<_TaskHomeTab> createState() => _TaskHomeTabState();
 }
 
 class _TaskHomeTabState extends State<_TaskHomeTab> {
   String stage = 'smalltalk';
-  int progress = 0;
 
   static const labels = {
     'smalltalk': 'Small Talk',
@@ -5621,253 +5617,113 @@ class _TaskHomeTabState extends State<_TaskHomeTab> {
     try {
       final d = await Supabase.instance.client
           .from('users')
-          .select('current_stage, stage_progress')
+          .select('current_stage')
           .eq('username', Session.username)
           .single();
-
       if (!mounted) return;
-
-      setState(() {
-        stage = d['current_stage'] ?? 'smalltalk';
-        progress = d['stage_progress'] ?? 0;
-      });
+      setState(() => stage = d['current_stage'] ?? 'smalltalk');
     } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
-    final stageName = labels[stage] ?? stage;
+    final s = lcScale(context);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
-          children: [
-            // Background decorative glass shapes
-            Positioned(
-              top: -100,
-              right: -110,
-              child: _backgroundOrb(310, Colors.white.withOpacity(0.055)),
-            ),
-            Positioned(
-              top: 230,
-              left: -170,
-              child: _backgroundOrb(330, const Color(0xFF7CF0B0).withOpacity(0.08)),
-            ),
-            Positioned(
-              bottom: -170,
-              right: -80,
-              child: _backgroundOrb(390, Colors.white.withOpacity(0.045)),
-            ),
+    return LayoutBuilder(builder: (context, c) {
+      // card never wider than 420, never touches the screen edges
+      final cardW = (c.maxWidth - 44).clamp(0.0, 420.0).toDouble();
 
-            // Main content
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 24, 22, 35),
-                    child: _taskHeroCard(stageName),
+      return Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(22, 10, 22, 24),
+          child: SizedBox(
+            width: cardW,
+            child: _LCGlassCard(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 8 * s),
+                  CircleAvatar(
+                    radius: cardW * 0.16,
+                    backgroundColor: const Color(0xFF3FA55F),
+                    backgroundImage: const AssetImage('asset/LCicon.png'),
                   ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _backgroundOrb(double size, Color color) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withOpacity(0.10),
-          width: 1.2,
-        ),
-        gradient: RadialGradient(
-          colors: [
-            color,
-            color.withOpacity(0.01),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _taskHeroCard(String stageName) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(48),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-        child: Container(
-          width: double.infinity,
-          constraints: const BoxConstraints(maxWidth: 520),
-          padding: const EdgeInsets.fromLTRB(28, 48, 28, 42),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(48),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.17),
-                Colors.white.withOpacity(0.075),
-                const Color(0xFFB8F4CE).withOpacity(0.07),
-              ],
-            ),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.30),
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.13),
-                blurRadius: 35,
-                offset: const Offset(0, 18),
-              ),
-              BoxShadow(
-                color: const Color(0xFFB8F4CE).withOpacity(0.07),
-                blurRadius: 25,
-                spreadRadius: -5,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // LC LOGO
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF13A968).withOpacity(0.82),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.16),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00C878).withOpacity(0.16),
-                      blurRadius: 24,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'asset/LCicon.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.people_alt_rounded,
-                        size: 65,
-                        color: Colors.white,
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 44),
-
-              // JOURNEY MESSAGE
-              const Text(
-                'continue your journey of becoming close friends with people around you!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFC6F8D9),
-                  fontSize: 23,
-                  height: 1.45,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.1,
-                ),
-              ),
-
-              const SizedBox(height: 42),
-
-              // MAIN BUTTON
-              SizedBox(
-                width: double.infinity,
-                height: 76,
-                child: ElevatedButton(
-                  onPressed: widget.onStart,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF9AF2B9),
-                    foregroundColor: const Color(0xFF075B35),
-                    elevation: 8,
-                    shadowColor: const Color(0xFF8EF0B4).withOpacity(0.25),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                  SizedBox(height: 26 * s),
+                  Text(
+                    'continue your journey of becoming close friends with people around you!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xFFB8F4CE),
+                      fontSize: 17 * s,
+                      height: 1.35,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                  SizedBox(height: 22 * s),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52 * s,
+                    child: ElevatedButton(
+                      onPressed: widget.onStart,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFA8EBC1),
+                        foregroundColor: const Color(0xFF104D2C),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                      ),
+                      child: FittedBox(          // shrinks text instead of cutting it
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Continue your journey',
+                                style: TextStyle(
+                                    fontSize: 17 * s,
+                                    fontWeight: FontWeight.w800)),
+                            const SizedBox(width: 8),
+                            Icon(Icons.arrow_forward_rounded, size: 20 * s),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 18 * s),
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: Colors.white.withOpacity(.25))),
+                      const SizedBox(width: 10),
                       Flexible(
-                        child: Text(
-                          'Continue your journey',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
+                        flex: 4,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '${labels[stage] ?? stage}  •  Your current stage',
+                            style: TextStyle(
+                              color: const Color(0xFFB8F4CE),
+                              fontSize: 12.5 * s,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
-                      SizedBox(width: 12),
-                      Icon(Icons.arrow_forward_rounded, size: 25),
+                      const SizedBox(width: 10),
+                      Expanded(child: Divider(color: Colors.white.withOpacity(.25))),
                     ],
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 48),
-
-              // CURRENT STAGE
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 1,
-                      color: Colors.white.withOpacity(0.25),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Flexible(
-                    child: Text(
-                      '$stageName  •  Your current stage',
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFFC6F8D9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Container(
-                      height: 1,
-                      color: Colors.white.withOpacity(0.25),
-                    ),
-                  ),
+                  SizedBox(height: 6 * s),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
+    });
   }
 }
-
 class _ConnectChoiceSheet extends StatelessWidget {
   final VoidCallback onNew;
   final VoidCallback onExisting;
@@ -10148,4 +10004,406 @@ class ReviewService {
       appStoreId: "6792295616",
     );
   }
+}
+
+const Color _mint = Color(0xFFB8F4CE);
+
+class QuickHelpGuide {
+  final String title, subtitle, situation, tip;
+  final IconData icon;
+  final List<String> say, avoid;
+  const QuickHelpGuide({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.situation,
+    required this.say,
+    required this.avoid,
+    required this.tip,
+  });
+}
+
+const List<QuickHelpGuide> quickHelpGuides = [
+  QuickHelpGuide(
+    title: 'Keep a conversation going',
+    subtitle: "When you don't know what to say next.",
+    icon: Icons.forum_rounded,
+    situation: "They answered you, and now your mind is blank. Example: they say, “I went hiking this weekend.”",
+    say: [
+      "“Oh nice! Where did you go? Was it your first time there?”",
+      "“That reminds me of a time I… Have you had something like that?”",
+      "“What do you enjoy most about it?”",
+      "“I've been wanting to try that. Any tips?”",
+    ],
+    avoid: [
+      "One-word replies like “cool” and then silence.",
+      "Firing question after question.",
+      "Changing the topic while they're mid-story.",
+    ],
+    tip: "A conversation is a two-way exchange, not an interview. Follow what they just said, then add something of your own.",
+  ),
+  QuickHelpGuide(
+    title: 'Exit gracefully',
+    subtitle: 'Leave without making it awkward.',
+    icon: Icons.waving_hand_rounded,
+    situation: "You need to go, and you want to leave on a warm note.",
+    say: [
+      "“It was really nice talking to you! I'll catch you later.”",
+      "“I should get going, but hopefully we'll talk again soon.”",
+      "“I'm going to grab something to eat. See you around!”",
+      "In a group: “I'm going to catch up with someone else. Enjoy!”",
+      "In a group: “I'm going to head out, but it was great meeting you all.”",
+    ],
+    avoid: [
+      "Disappearing mid-sentence.",
+      "Elaborate fake excuses.",
+      "Apologizing over and over.",
+    ],
+    tip: "You don't need an elaborate excuse. Being warm, clear and respectful is enough.",
+  ),
+  QuickHelpGuide(
+    title: 'Handle awkward silence',
+    subtitle: 'When neither person knows what to say.',
+    icon: Icons.pause_circle_outline_rounded,
+    situation: "The conversation stalled and you can feel the quiet.",
+    say: [
+      "“Random question: what's the best thing you've watched lately?”",
+      "“So what's been the highlight of your week?”",
+      "“I realized I don't know how you ended up here. What's the story?”",
+      "Make a small comment about where you are: the food, the music, the view.",
+    ],
+    avoid: [
+      "Panicking or saying “this is awkward”.",
+      "Apologizing for the silence.",
+      "Talking nonstop just to fill the gap.",
+    ],
+    tip: "Pauses are normal. A short silence feels much longer to you than it does to them.",
+  ),
+  QuickHelpGuide(
+    title: 'Join a group',
+    subtitle: 'When everyone seems to know each other.',
+    icon: Icons.groups_rounded,
+    situation: "A group is already talking and you want to step in.",
+    say: [
+      "Listen for 20–30 seconds to find the topic, then:",
+      "“Sorry to jump in, are you talking about ___? I loved that.”",
+      "“Hey, I'm ___. What are you all up to?”",
+      "“Mind if I join? What did I miss?”",
+    ],
+    avoid: [
+      "Interrupting to change the subject.",
+      "Hovering silently for minutes.",
+      "Trying to impress everyone at once.",
+    ],
+    tip: "You don't need a big entrance. One relevant comment is enough to be part of the group.",
+  ),
+  QuickHelpGuide(
+    title: 'Start talking to someone',
+    subtitle: 'Easy openers for different situations.',
+    icon: Icons.chat_bubble_outline_rounded,
+    situation: "You'd like to talk to someone but don't have a first line.",
+    say: [
+      "In class: “Have you had this professor before?”",
+      "At an event: “Is this your first time at one of these?”",
+      "Anywhere: “That's a cool ___. Where did you get it?”",
+      "Or simply: “Hey, I'm ___.”",
+    ],
+    avoid: [
+      "Opening with a heavy personal question.",
+      "“Why are you alone?”",
+      "Waiting for the perfect line.",
+    ],
+    tip: "Comment on something you both can see. An opener only needs to be easy to answer, not clever.",
+  ),
+  QuickHelpGuide(
+    title: 'Avoid sounding like an interviewer',
+    subtitle: 'Balance questions with sharing.',
+    icon: Icons.balance_rounded,
+    situation: "You've asked several questions in a row and it feels one-sided.",
+    say: [
+      "“Same here, I…” and then add a short detail about yourself.",
+      "Answer your own question first: “I've been getting into cooking lately. What about you?”",
+      "“That makes sense. I felt similar when…”",
+    ],
+    avoid: [
+      "Rapid-fire questions.",
+      "Never sharing anything about yourself.",
+      "A “next question” tone.",
+    ],
+    tip: "Ask one, share one. Pass the conversation back and forth.",
+  ),
+  QuickHelpGuide(
+    title: 'Show interest without overdoing it',
+    subtitle: 'Listen, remember, respond naturally.',
+    icon: Icons.hearing_rounded,
+    situation: "You want the other person to feel heard without it feeling forced.",
+    say: [
+      "“Wait, how did that turn out?”",
+      "“How did your presentation go? You mentioned it last week.”",
+      "“That sounds like it meant a lot to you.”",
+    ],
+    avoid: [
+      "Over-the-top reactions.",
+      "Interrupting to relate everything to yourself.",
+      "Checking your phone while they talk.",
+    ],
+    tip: "Listen for one detail and ask about it later. Remembering small things beats big reactions.",
+  ),
+  QuickHelpGuide(
+    title: 'Recover from an awkward moment',
+    subtitle: 'After saying something strange or going blank.',
+    icon: Icons.refresh_rounded,
+    situation: "You said something odd, or you lost your train of thought.",
+    say: [
+      "“That came out wrong! What I meant was…”",
+      "“Okay, let me start over.”",
+      "“Ha, that was random. Anyway, how's your week going?”",
+      "“Sorry, I lost my train of thought.”",
+    ],
+    avoid: [
+      "Long apologies.",
+      "Replaying the moment in your head mid-conversation.",
+      "Leaving the conversation out of embarrassment.",
+    ],
+    tip: "People forget awkward moments much faster than you do. A light laugh and moving on works.",
+  ),
+];
+
+class QuickHelpPage extends StatelessWidget {
+  const QuickHelpPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = (MediaQuery.of(context).size.width / 390).clamp(0.85, 1.15).toDouble();
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
+      children: [
+        const Text('QUICK HELP',
+            style: TextStyle(color: _mint, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+        const SizedBox(height: 8),
+        Text('Not sure what to\nsay next?',
+            style: TextStyle(color: Colors.white, fontSize: 32 * s, height: 1.1, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 10),
+        Text('A little help for the moments when conversations get awkward, quiet or difficult.',
+            style: TextStyle(color: Colors.white.withOpacity(.75), fontSize: 14.5 * s, height: 1.4)),
+        const SizedBox(height: 22),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: quickHelpGuides.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            mainAxisExtent: 172,
+          ),
+          itemBuilder: (context, i) {
+            final g = quickHelpGuides[i];
+            return _GuideCard(
+              guide: g,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => QuickHelpGuidePage(guide: g)),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _GuideCard extends StatelessWidget {
+  final QuickHelpGuide guide;
+  final VoidCallback onTap;
+  const _GuideCard({required this.guide, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(.10),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withOpacity(.16)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: _mint.withOpacity(.14),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(guide.icon, color: _mint, size: 23),
+              ),
+              const Spacer(),
+              Text(guide.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.w800, height: 1.2)),
+              const SizedBox(height: 4),
+              Text(guide.subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.white.withOpacity(.65), fontSize: 11.5, height: 1.3)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class QuickHelpGuidePage extends StatelessWidget {
+  final QuickHelpGuide guide;
+  const QuickHelpGuidePage({super.key, required this.guide});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1B8A4C), Color(0xFF115C34), Color(0xFF082A1B)],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          foregroundColor: Colors.white,
+          title: const Text('Quick Help', style: TextStyle(fontWeight: FontWeight.w800)),
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(22, 8, 22, 30),
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: _mint.withOpacity(.14),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Icon(guide.icon, color: _mint, size: 26),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(guide.title,
+                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, height: 1.15)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 22),
+
+              _label('THE SITUATION'),
+              _panel(Text(guide.situation,
+                  style: TextStyle(color: Colors.white.withOpacity(.88), fontSize: 15, height: 1.45))),
+
+              const SizedBox(height: 20),
+              _label('WHAT YOU CAN SAY  (tap to copy)'),
+              ...guide.say.map((line) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(text: line));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Copied'), duration: Duration(seconds: 1)),
+                          );
+                        },
+                        child: Ink(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: _mint.withOpacity(.12),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: _mint.withOpacity(.25)),
+                          ),
+                          child: Text(line,
+                              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4, fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    ),
+                  )),
+
+              const SizedBox(height: 10),
+              _label('WHAT TO AVOID'),
+              _panel(Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: guide.avoid
+                    .map((a) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.close_rounded, color: Color(0xFFFF9A8B), size: 19),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(a,
+                                    style: TextStyle(color: Colors.white.withOpacity(.85), fontSize: 14.5, height: 1.4)),
+                              ),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+              )),
+
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('LC TIP',
+                        style: TextStyle(color: _mint, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                    const SizedBox(height: 8),
+                    Text(guide.tip,
+                        style: const TextStyle(color: Colors.white, fontSize: 15.5, height: 1.45, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _label(String t) => Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 10),
+        child: Text(t,
+            style: const TextStyle(color: _mint, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.4)),
+      );
+
+  Widget _panel(Widget child) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.09),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withOpacity(.12)),
+        ),
+        child: child,
+      );
 }
