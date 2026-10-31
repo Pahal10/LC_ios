@@ -5539,8 +5539,8 @@ class _GlassBottomNavigation extends StatelessWidget {
                     ),
 
                     Row(
-                      children: List.generate(4, (index) {
-                        final selected = currentIndex == index;
+					children: List.generate(items.length, (index) {
+					final selected = currentIndex == index;
 
                         return Expanded(
                           child: InkWell(
