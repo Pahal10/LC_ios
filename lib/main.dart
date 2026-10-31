@@ -5393,11 +5393,12 @@ FriendsPage(
     );
   },
 ),
-
-      // 2 — EXERCISES
+	  // 2 - QUICK HELP
+	  const QuickHelpPage(),
+      // 3 — EXERCISES
       const ExercisesPage(),
 
-      // 3 — PROFILE
+      // 4 — PROFILE
       _ProfileTab(
         username: Session.username,
 
