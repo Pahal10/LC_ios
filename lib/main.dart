@@ -5579,7 +5579,9 @@ class _GlassBottomNavigation extends StatelessWidget {
 
 class _TaskHomeTab extends StatefulWidget {
   final VoidCallback onStart;
+
   const _TaskHomeTab({required this.onStart});
+
   @override
   State<_TaskHomeTab> createState() => _TaskHomeTabState();
 }
@@ -5587,8 +5589,6 @@ class _TaskHomeTab extends StatefulWidget {
 class _TaskHomeTabState extends State<_TaskHomeTab> {
   String stage = 'smalltalk';
   int progress = 0;
-  late final String tip =
-      realityChecks[Random().nextInt(realityChecks.length)];
 
   static const labels = {
     'smalltalk': 'Small Talk',
@@ -5612,7 +5612,9 @@ class _TaskHomeTabState extends State<_TaskHomeTab> {
           .select('current_stage, stage_progress')
           .eq('username', Session.username)
           .single();
+
       if (!mounted) return;
+
       setState(() {
         stage = d['current_stage'] ?? 'smalltalk';
         progress = d['stage_progress'] ?? 0;
@@ -5622,195 +5624,234 @@ class _TaskHomeTabState extends State<_TaskHomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final idx = stages.indexOf(stage).clamp(0, stages.length - 1);
-    final overall = ((idx * 6) + progress) / (stages.length * 6);
+    final stageName = labels[stage] ?? stage;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
-      children: [
-        _FadeSlide(
-          delay: 0,
-          child: Text('Hey, ${Session.username} 👋',
-              style: TextStyle(
-                  color: Colors.white.withOpacity(0.75), fontSize: 15)),
-        ),
-        const SizedBox(height: 6),
-        const _FadeSlide(
-          delay: 80,
-          child: Text('One small step\ntoday.',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 38,
-                  height: 1.1,
-                  fontWeight: FontWeight.w900)),
-        ),
-        const SizedBox(height: 28),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          children: [
+            // Background decorative glass shapes
+            Positioned(
+              top: -100,
+              right: -110,
+              child: _backgroundOrb(310, Colors.white.withOpacity(0.055)),
+            ),
+            Positioned(
+              top: 230,
+              left: -170,
+              child: _backgroundOrb(330, const Color(0xFF7CF0B0).withOpacity(0.08)),
+            ),
+            Positioned(
+              bottom: -170,
+              right: -80,
+              child: _backgroundOrb(390, Colors.white.withOpacity(0.045)),
+            ),
 
-        // HERO CARD
-        _FadeSlide(
-          delay: 160,
-          child: _LCGlassCard(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 84,
-                      height: 84,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox.expand(
-                            child: CircularProgressIndicator(
-                              value: overall,
-                              strokeWidth: 7,
-                              backgroundColor: Colors.white12,
-                              valueColor: const AlwaysStoppedAnimation(
-                                  Color(0xFFB8F4CE)),
-                              strokeCap: StrokeCap.round,
-                            ),
-                          ),
-                          Text('${(overall * 100).round()}%',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 18)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('CURRENT STAGE',
-                              style: TextStyle(
-                                  color: Color(0xFFB8F4CE),
-                                  fontSize: 10,
-                                  letterSpacing: 1.5,
-                                  fontWeight: FontWeight.w900)),
-                          const SizedBox(height: 6),
-                          Text(labels[stage] ?? stage,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w900)),
-                          const SizedBox(height: 4),
-                          Text('${progress.clamp(0, 6)} of 6 points',
-                              style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: 13)),
-                        ],
-                      ),
+            // Main content
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 24, 22, 35),
+                    child: _taskHeroCard(stageName),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _backgroundOrb(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withOpacity(0.10),
+          width: 1.2,
+        ),
+        gradient: RadialGradient(
+          colors: [
+            color,
+            color.withOpacity(0.01),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _taskHeroCard(String stageName) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(48),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(maxWidth: 520),
+          padding: const EdgeInsets.fromLTRB(28, 48, 28, 42),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(48),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.17),
+                Colors.white.withOpacity(0.075),
+                const Color(0xFFB8F4CE).withOpacity(0.07),
+              ],
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.30),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.13),
+                blurRadius: 35,
+                offset: const Offset(0, 18),
+              ),
+              BoxShadow(
+                color: const Color(0xFFB8F4CE).withOpacity(0.07),
+                blurRadius: 25,
+                spreadRadius: -5,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // LC LOGO
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF13A968).withOpacity(0.82),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.16),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00C878).withOpacity(0.16),
+                      blurRadius: 24,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
-                const SizedBox(height: 22),
-                _LCPrimaryButton(
-                  text: 'Let’s connect',
-                  icon: Icons.arrow_forward_rounded,
-                  onTap: widget.onStart,
+                child: ClipOval(
+                  child: Image.asset(
+                    'asset/LCicon.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.people_alt_rounded,
+                        size: 65,
+                        color: Colors.white,
+                      );
+                    },
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
 
-        const SizedBox(height: 18),
+              const SizedBox(height: 44),
 
-        // JOURNEY STEPPER
-        _FadeSlide(
-          delay: 240,
-          child: _LCGlassCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('YOUR JOURNEY',
-                    style: TextStyle(
-                        color: Color(0xFFB8F4CE),
-                        fontSize: 10,
-                        letterSpacing: 1.5,
-                        fontWeight: FontWeight.w900)),
-                const SizedBox(height: 16),
-                Row(
-                  children: List.generate(stages.length, (i) {
-                    final done = i < idx;
-                    final current = i == idx;
-                    return Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: current ? 16 : 12,
-                            height: current ? 16 : 12,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: done || current
-                                  ? const Color(0xFFB8F4CE)
-                                  : Colors.white24,
-                              boxShadow: current
-                                  ? [
-                                      BoxShadow(
-                                          color: const Color(0xFFB8F4CE)
-                                              .withOpacity(0.6),
-                                          blurRadius: 12)
-                                    ]
-                                  : null,
-                            ),
+              // JOURNEY MESSAGE
+              const Text(
+                'continue your journey of becoming close friends with people around you!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFC6F8D9),
+                  fontSize: 23,
+                  height: 1.45,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.1,
+                ),
+              ),
+
+              const SizedBox(height: 42),
+
+              // MAIN BUTTON
+              SizedBox(
+                width: double.infinity,
+                height: 76,
+                child: ElevatedButton(
+                  onPressed: widget.onStart,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF9AF2B9),
+                    foregroundColor: const Color(0xFF075B35),
+                    elevation: 8,
+                    shadowColor: const Color(0xFF8EF0B4).withOpacity(0.25),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Flexible(
+                        child: Text(
+                          'Continue your journey',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
                           ),
-                          if (i < stages.length - 1)
-                            Expanded(
-                              child: Container(
-                                height: 2,
-                                color: done
-                                    ? const Color(0xFFB8F4CE)
-                                    : Colors.white24,
-                              ),
-                            ),
-                        ],
+                        ),
                       ),
-                    );
-                  }),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
-        // REALITY CHECK
-        _FadeSlide(
-          delay: 320,
-          child: _LCGlassCard(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.lightbulb_outline_rounded,
-                    color: Color(0xFFB8F4CE), size: 28),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Shh: insider info',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16)),
-                      const SizedBox(height: 6),
-                      Text(tip,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.75),
-                              height: 1.45,
-                              fontSize: 13)),
+                      SizedBox(width: 12),
+                      Icon(Icons.arrow_forward_rounded, size: 25),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 48),
+
+              // CURRENT STAGE
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: Colors.white.withOpacity(0.25),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Flexible(
+                    child: Text(
+                      '$stageName  •  Your current stage',
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFFC6F8D9),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: Colors.white.withOpacity(0.25),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
