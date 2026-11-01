@@ -693,12 +693,12 @@ Widget _buildLoginField({
 	  height: double.infinity,
 	  decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(10),
       boxShadow: [
         BoxShadow(
           color: Colors.black.withOpacity(0.25),
           blurRadius: 12,
-          offset: const Offset(0, 6),
+          offset: const Offset(0, 4),
         ),
       ],
     ),
@@ -707,14 +707,14 @@ Widget _buildLoginField({
       obscureText: obscure,
       style: const TextStyle(
         color: Color(0xFF353535),
-        fontSize: 20,
+        fontSize: 17,
         fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(
           color: Color(0xFF555555),
-          fontSize: 20,
+          fontSize: 17,
           fontWeight: FontWeight.w600,
         ),
         suffixIcon: suffix,
@@ -722,7 +722,7 @@ Widget _buildLoginField({
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 23,
-          vertical: 21,
+          vertical: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
