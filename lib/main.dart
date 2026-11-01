@@ -1219,25 +1219,49 @@ if (!_agreedToCommunications) {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF24B65E),
+  backgroundColor: const Color(0xFF003F32),
 
-      appBar: AppBar(
-        centerTitle: true,
+  extendBodyBehindAppBar: true,
 
-        title: const Text(
-          'Sign Up',
+  appBar: AppBar(
+    centerTitle: true,
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    surfaceTintColor: Colors.transparent,
 
-          style: TextStyle(
-            color: Colors.amber,
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-          ),
+    iconTheme: const IconThemeData(
+      color: Colors.white,
+    ),
+
+    title: const Text(
+      'Sign Up',
+      style: TextStyle(
+        color: Colors.amber,
+        fontWeight: FontWeight.bold,
+        fontSize: 28,
+      ),
+    ),
+  ),
+
+  body: Stack(
+    children: [
+
+      // GREEN BACKGROUND IMAGE
+      Positioned.fill(
+        child: Image.asset(
+          'assets/images/emerald_background.png',
+          fit: BoxFit.cover,
         ),
-
-        backgroundColor: const Color(0xFF388E3C),
       ),
 
-        body: SafeArea(
+      SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + kToolbarHeight,
+          ),
+          child: LayoutBuilder(
           child: LayoutBuilder(
             builder: (context, constraints) {
 
