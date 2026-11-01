@@ -409,7 +409,7 @@ Widget build(BuildContext context) {
     body: Stack(
       children: [
         // FULL SCREEN CUSTOM GREEN BACKGROUND
-        const Positioned.fill(
+        Positioned.fill(
           child: CustomPaint(
             painter: EmeraldBackgroundPainter(),
           ),
