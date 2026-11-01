@@ -10419,3 +10419,273 @@ class QuickHelpGuidePage extends StatelessWidget {
         child: child,
       );
 }
+
+class EmeraldBackgroundPainter extends CustomPainter {
+
+  @override
+  void paint(Canvas canvas, Size size) {
+
+    final rect = Offset.zero & size;
+
+    // BASE EMERALD GRADIENT
+    final backgroundPaint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xFF004B3B),
+          Color(0xFF006747),
+          Color(0xFF003F35),
+          Color(0xFF002F2A),
+        ],
+        stops: [0.0, 0.35, 0.72, 1.0],
+      ).createShader(rect);
+
+    canvas.drawRect(rect, backgroundPaint);
+
+    // TOP GREEN LIGHT GLOW
+    final glowPaint = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(0.9, -0.5),
+        radius: 1.0,
+        colors: [
+          const Color(0xFF00D878).withOpacity(0.35),
+          const Color(0xFF00B76A).withOpacity(0.12),
+          Colors.transparent,
+        ],
+      ).createShader(rect);
+
+    canvas.drawRect(rect, glowPaint);
+
+    // DRAW FLOWING RIBBONS
+    _drawRibbon(
+      canvas,
+      size,
+      [
+        Offset(size.width * 0.65, -size.height * 0.05),
+        Offset(size.width * 0.05, size.height * 0.15),
+        Offset(size.width * 0.05, size.height * 0.40),
+        Offset(-size.width * 0.2, size.height * 0.55),
+      ],
+      [
+        Offset(size.width * 1.2, size.height * 0.02),
+        Offset(size.width * 0.8, size.height * 0.35),
+        Offset(size.width * 0.65, size.height * 0.50),
+        Offset(size.width * 1.1, size.height * 0.62),
+      ],
+      const Color(0xFF00E878).withOpacity(0.18),
+      const Color(0xFF00A95E).withOpacity(0.02),
+    );
+
+    _drawRibbon(
+      canvas,
+      size,
+      [
+        Offset(-size.width * 0.2, size.height * 0.38),
+        Offset(size.width * 0.3, size.height * 0.25),
+        Offset(size.width * 0.65, size.height * 0.65),
+        Offset(size.width * 1.2, size.height * 0.42),
+      ],
+      [
+        Offset(size.width * 1.2, size.height * 0.55),
+        Offset(size.width * 0.8, size.height * 0.78),
+        Offset(size.width * 0.35, size.height * 0.75),
+        Offset(-size.width * 0.2, size.height * 0.90),
+      ],
+      const Color(0xFF00E87B).withOpacity(0.20),
+      const Color(0xFF008D57).withOpacity(0.015),
+    );
+
+    _drawRibbon(
+      canvas,
+      size,
+      [
+        Offset(size.width * 1.15, size.height * 0.58),
+        Offset(size.width * 0.7, size.height * 0.75),
+        Offset(size.width * 0.55, size.height * 0.88),
+        Offset(size.width * 0.05, size.height * 1.05),
+      ],
+      [
+        Offset(size.width * 1.15, size.height * 0.82),
+        Offset(size.width * 0.7, size.height * 1.0),
+        Offset(size.width * 0.3, size.height * 1.0),
+        Offset(-size.width * 0.1, size.height * 1.05),
+      ],
+      const Color(0xFF00F18A).withOpacity(0.17),
+      const Color(0xFF006A4A).withOpacity(0.02),
+    );
+
+    // ADD DARK TRANSLUCENT GLASS WAVES
+    final darkWave = Path()
+      ..moveTo(0, size.height * 0.82)
+      ..cubicTo(
+        size.width * 0.30,
+        size.height * 0.90,
+        size.width * 0.55,
+        size.height * 0.72,
+        size.width,
+        size.height * 0.80,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    canvas.drawPath(
+      darkWave,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [
+            const Color(0xFF001F27).withOpacity(0.10),
+            const Color(0xFF001D27).withOpacity(0.55),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ).createShader(rect),
+    );
+
+    // NEON LIGHT STREAKS
+    _drawLightStreak(
+      canvas,
+      size,
+      [
+        Offset(-size.width * 0.1, size.height * 0.30),
+        Offset(size.width * 0.25, size.height * 0.18),
+        Offset(size.width * 0.65, size.height * 0.05),
+        Offset(size.width * 1.05, -size.height * 0.05),
+      ],
+    );
+
+    _drawLightStreak(
+      canvas,
+      size,
+      [
+        Offset(-size.width * 0.05, size.height * 1.0),
+        Offset(size.width * 0.45, size.height * 0.92),
+        Offset(size.width * 0.65, size.height * 0.82),
+        Offset(size.width * 1.05, size.height * 0.73),
+      ],
+    );
+
+    _drawLightStreak(
+      canvas,
+      size,
+      [
+        Offset(size.width * 0.15, size.height * 0.55),
+        Offset(size.width * 0.5, size.height * 0.52),
+        Offset(size.width * 0.75, size.height * 0.48),
+        Offset(size.width * 1.05, size.height * 0.34),
+      ],
+    );
+
+    // GLOWING PARTICLES
+    final particles = <Offset>[
+      Offset(size.width * 0.08, size.height * 0.18),
+      Offset(size.width * 0.92, size.height * 0.23),
+      Offset(size.width * 0.12, size.height * 0.43),
+      Offset(size.width * 0.82, size.height * 0.52),
+      Offset(size.width * 0.25, size.height * 0.72),
+      Offset(size.width * 0.92, size.height * 0.79),
+      Offset(size.width * 0.16, size.height * 0.91),
+      Offset(size.width * 0.70, size.height * 0.94),
+      Offset(size.width * 0.55, size.height * 0.35),
+      Offset(size.width * 0.40, size.height * 0.57),
+    ];
+
+    for (final particle in particles) {
+      canvas.drawCircle(
+        particle,
+        7,
+        Paint()
+          ..color = const Color(0xFF00FF8C).withOpacity(0.15)
+          ..maskFilter = const MaskFilter.blur(
+            BlurStyle.normal,
+            9,
+          ),
+      );
+
+      canvas.drawCircle(
+        particle,
+        2,
+        Paint()
+          ..color = const Color(0xFF42FFA1).withOpacity(0.9),
+      );
+    }
+  }
+
+  void _drawRibbon(
+    Canvas canvas,
+    Size size,
+    List<Offset> top,
+    List<Offset> bottom,
+    Color startColor,
+    Color endColor,
+  ) {
+    final path = Path()
+      ..moveTo(top[0].dx, top[0].dy)
+      ..cubicTo(
+        top[1].dx, top[1].dy,
+        top[2].dx, top[2].dy,
+        top[3].dx, top[3].dy,
+      )
+      ..lineTo(bottom[0].dx, bottom[0].dy)
+      ..cubicTo(
+        bottom[1].dx, bottom[1].dy,
+        bottom[2].dx, bottom[2].dy,
+        bottom[3].dx, bottom[3].dy,
+      )
+      ..close();
+
+    final rect = Offset.zero & size;
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [startColor, endColor],
+        ).createShader(rect),
+    );
+  }
+
+  void _drawLightStreak(
+    Canvas canvas,
+    Size size,
+    List<Offset> points,
+  ) {
+    final path = Path()
+      ..moveTo(points[0].dx, points[0].dy)
+      ..cubicTo(
+        points[1].dx, points[1].dy,
+        points[2].dx, points[2].dy,
+        points[3].dx, points[3].dy,
+      );
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xFF00FF91).withOpacity(0.20)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 12
+        ..maskFilter = const MaskFilter.blur(
+          BlurStyle.normal,
+          12,
+        ),
+    );
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xFF4DFFAE).withOpacity(0.65)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+
