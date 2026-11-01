@@ -1250,7 +1250,7 @@ if (!_agreedToCommunications) {
       // GREEN BACKGROUND IMAGE
       Positioned.fill(
         child: Image.asset(
-          'assets/images/emerald_background.png',
+          'asset/emerald.png',
           fit: BoxFit.cover,
         ),
       ),
