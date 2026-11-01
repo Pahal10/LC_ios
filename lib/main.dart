@@ -1262,7 +1262,6 @@ if (!_agreedToCommunications) {
             top: MediaQuery.of(context).padding.top + kToolbarHeight,
           ),
           child: LayoutBuilder(
-          child: LayoutBuilder(
             builder: (context, constraints) {
 
               return SingleChildScrollView(
