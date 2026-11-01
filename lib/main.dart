@@ -690,8 +690,8 @@ Widget _buildLoginField({
   Widget? suffix,
 }) {
   return Container(
-    height: 68,
-    decoration: BoxDecoration(
+	  height: double.infinity,
+	  decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
