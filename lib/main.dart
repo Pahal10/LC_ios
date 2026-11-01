@@ -1456,12 +1456,15 @@ Row(
                   ),
                 ),
               );
-            },
-          ),
-        ),
-    );
-  }
-}
+                       }, // closes builder
+          ),   // closes LayoutBuilder
+        ),     // closes Padding
+      ),       // closes SafeArea
+    ],         // closes Stack children
+  ),           // closes Stack
+);             // closes Scaffold
+  }            // closes build()
+}              // closes RegisterPage State class
 
 class GetStartedPage extends StatefulWidget {
   const GetStartedPage({super.key});
