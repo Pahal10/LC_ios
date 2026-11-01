@@ -400,6 +400,9 @@ void dispose() {
 
   
 
+// Replace BOTH of these inside _LoginPageState (build + _buildLoginField).
+// Everything above them (loginUser, signInWithGoogle, etc.) stays untouched.
+
 @override
 Widget build(BuildContext context) {
   final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
@@ -407,44 +410,42 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     backgroundColor: const Color(0xFF003F32),
-
     body: Stack(
       children: [
-        // FIXED FULL-SCREEN BACKGROUND
+        // BACKGROUND
+        // Swap to the image once you export the swirl as asset/login_bg.png
+        // (and list it in pubspec.yaml):
+        // Positioned.fill(child: Image.asset('asset/login_bg.png', fit: BoxFit.cover)),
         const Positioned.fill(
-          child: CustomPaint(
-            painter: EmeraldBackgroundPainter(),
-          ),
+          child: CustomPaint(painter: EmeraldBackgroundPainter()),
         ),
 
         SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-
               final h = constraints.maxHeight;
 
-              // RESPONSIVE SIZES
+              // FIXED SIZES (no more stretching)
               final logoHeight = (h * 0.15).clamp(80.0, 120.0);
-			  final fieldHeight = 50.0;
-			  final loginHeight = 52.0;
-			  final socialHeight = 42.0;
+              const fieldHeight = 50.0;
+              const loginHeight = 52.0;
+              const socialHeight = 42.0;
 
-              Widget content = Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 26,
-                  vertical: 12,
-                ),
-
+              final content = Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
                 child: Column(
-					mainAxisAlignment: MainAxisAlignment.start,
-					spacing: 16,                  
-					children: [
-
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  spacing: 16, // needs Flutter 3.27+
+                  children: [
                     // LOGO
                     Padding(
-  padding: const EdgeInsets.only(top: 24, bottom: 28),
-  child: Image.asset('asset/LCLogo2.png', height: logoHeight, fit: BoxFit.contain),
-),
+                      padding: const EdgeInsets.only(top: 24, bottom: 28),
+                      child: Image.asset(
+                        'asset/LCLogo2.png',
+                        height: logoHeight,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
 
                     // USERNAME
                     SizedBox(
@@ -470,9 +471,7 @@ Widget build(BuildContext context) {
                             color: const Color(0xFF444444),
                           ),
                           onPressed: () {
-                            setState(() {
-                              _hidePassword = !_hidePassword;
-                            });
+                            setState(() => _hidePassword = !_hidePassword);
                           },
                         ),
                       ),
@@ -486,8 +485,7 @@ Widget build(BuildContext context) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  const ForgotPasswordPage(),
+                              builder: (_) => const ForgotPasswordPage(),
                             ),
                           );
                         },
@@ -495,7 +493,7 @@ Widget build(BuildContext context) {
                           "Forgot Password?",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -509,18 +507,18 @@ Widget build(BuildContext context) {
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF007AFF),
-                              Color(0xFF00C6FF),
-                            ],
+                            colors: [Color(0xFF007AFF), Color(0xFF00C6FF)],
                           ),
-                          borderRadius: BorderRadius.circular(23),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.35),
+                            width: 1.2,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00C6FF)
-                                  .withOpacity(0.5),
-                              blurRadius: 20,
-                              spreadRadius: 2,
+                              color: const Color(0xFF00C6FF).withOpacity(0.45),
+                              blurRadius: 18,
+                              spreadRadius: 0,
                             ),
                           ],
                         ),
@@ -538,7 +536,7 @@ Widget build(BuildContext context) {
                             "Log in",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 21,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -550,26 +548,20 @@ Widget build(BuildContext context) {
                     const Row(
                       children: [
                         Expanded(
-                          child: Divider(
-                            color: Colors.white,
-                            thickness: 2,
-                          ),
+                          child: Divider(color: Colors.white, thickness: 1.2),
                         ),
                         SizedBox(width: 14),
                         Text(
                           "or",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 21,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         SizedBox(width: 14),
                         Expanded(
-                          child: Divider(
-                            color: Colors.white,
-                            thickness: 2,
-                          ),
+                          child: Divider(color: Colors.white, thickness: 1.2),
                         ),
                       ],
                     ),
@@ -580,24 +572,24 @@ Widget build(BuildContext context) {
                       height: socialHeight,
                       child: Material(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(21),
                         child: InkWell(
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(21),
                           onTap: signInWithGoogle,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
                                 'asset/Glogo.png',
-                                height: 25,
-                                width: 25,
+                                height: 22,
+                                width: 22,
                               ),
                               const SizedBox(width: 12),
                               const Text(
                                 "Continue with Google",
                                 style: TextStyle(
                                   color: Color(0xFF202124),
-                                  fontSize: 17,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -615,58 +607,56 @@ Widget build(BuildContext context) {
                         child: SignInWithAppleButton(
                           onPressed: signInWithApple,
                           style: SignInWithAppleButtonStyle.black,
-                          borderRadius: BorderRadius.circular(25),
+                          height: socialHeight,
+                          borderRadius: BorderRadius.circular(21),
                         ),
                       ),
 
                     // REGISTER
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterPage(),
-                          ),
-                        );
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "New here?",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RegisterPage(),
                             ),
-                          ),
-                          SizedBox(width: 9),
-                          Text(
-                            "Register",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          );
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "New here?",
+                              style: TextStyle(color: Colors.white, fontSize: 16),
                             ),
-                          ),
-                          SizedBox(width: 5),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                        ],
+                            SizedBox(width: 9),
+                            Text(
+                              "Register",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               );
 
-              // Fixed layout normally.
-              // Allow scrolling only when the keyboard opens.
+              // Scroll only when the keyboard is open.
               if (keyboardOpen) {
-                return SingleChildScrollView(
-                  child: content,
-                );
+                return SingleChildScrollView(child: content);
               }
 
               return SizedBox(
@@ -690,8 +680,8 @@ Widget _buildLoginField({
   Widget? suffix,
 }) {
   return Container(
-	  height: double.infinity,
-	  decoration: BoxDecoration(
+    height: double.infinity,
+    decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(10),
       boxShadow: [
@@ -720,33 +710,23 @@ Widget _buildLoginField({
         suffixIcon: suffix,
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 23,
-          vertical: 14,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Color(0xFFE5E5E5),
-            width: 1,
-          ),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Color(0xFF00C6A0),
-            width: 2,
-          ),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFF00C6A0), width: 2),
         ),
       ),
     ),
   );
 }
-
 }
 
 Future<void> updateCurrentLocation() async {
