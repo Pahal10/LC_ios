@@ -10444,6 +10444,7 @@ class QuickHelpGuidePage extends StatelessWidget {
 }
 
 class EmeraldBackgroundPainter extends CustomPainter {
+  const EmeraldBackgroundPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
