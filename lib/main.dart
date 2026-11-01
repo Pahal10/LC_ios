@@ -436,15 +436,15 @@ Widget build(BuildContext context) {
                 ),
 
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+					mainAxisAlignment: MainAxisAlignment.start,
+					spacing: 16,                  
+					children: [
 
                     // LOGO
-                    Image.asset(
-                      'asset/LCLogo2.png',
-                      height: logoHeight,
-                      fit: BoxFit.contain,
-                    ),
+                    Padding(
+  padding: const EdgeInsets.only(top: 24, bottom: 28),
+  child: Image.asset('asset/LCLogo2.png', height: logoHeight, fit: BoxFit.contain),
+),
 
                     // USERNAME
                     SizedBox(
@@ -531,7 +531,7 @@ Widget build(BuildContext context) {
                             shadowColor: Colors.transparent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(23),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           child: const Text(
