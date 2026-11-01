@@ -424,10 +424,10 @@ Widget build(BuildContext context) {
               final h = constraints.maxHeight;
 
               // RESPONSIVE SIZES
-              final logoHeight = (h * 0.14).clamp(65.0, 115.0);
-              final fieldHeight = (h * 0.075).clamp(48.0, 62.0);
-              final loginHeight = (h * 0.085).clamp(54.0, 68.0);
-              final socialHeight = (h * 0.075).clamp(48.0, 60.0);
+              final logoHeight = (h * 0.15).clamp(80.0, 120.0);
+			  final fieldHeight = 50.0;
+			  final loginHeight = 52.0;
+			  final socialHeight = 42.0;
 
               Widget content = Padding(
                 padding: const EdgeInsets.symmetric(
