@@ -406,8 +406,6 @@ void dispose() {
 @override
 Widget build(BuildContext context) {
   final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
-  final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
-
   return Scaffold(
     backgroundColor: const Color(0xFF003F32),
     body: Stack(
@@ -655,15 +653,12 @@ Widget build(BuildContext context) {
               );
 
               // Scroll only when the keyboard is open.
-              if (keyboardOpen) {
-                return SingleChildScrollView(child: content);
-              }
-
-              return SizedBox(
-                width: double.infinity,
-                height: constraints.maxHeight,
-                child: content,
-              );
+			  return SingleChildScrollView(
+                 child: ConstrainedBox(
+    			 constraints: BoxConstraints(minHeight: constraints.maxHeight),
+    			 child: content,
+  				),
+			  );
             },
           ),
         ),
