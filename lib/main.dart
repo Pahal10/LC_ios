@@ -414,8 +414,8 @@ Widget build(BuildContext context) {
         // Swap to the image once you export the swirl as asset/login_bg.png
         // (and list it in pubspec.yaml):
         // Positioned.fill(child: Image.asset('asset/login_bg.png', fit: BoxFit.cover)),
-        const Positioned.fill(
-          child: CustomPaint(painter: EmeraldBackgroundPainter()),
+        Positioned.fill(
+          child: Image.asset('asset/emerald.png', fit: BoxFit.cover),
         ),
 
         SafeArea(
