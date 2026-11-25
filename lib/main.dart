@@ -3671,6 +3671,8 @@ onChanged: (double value) {
                       'comfort_rating': comfort,
                       'happiness_rating': happiness,
                       'highest_stage': completedStage,
+					  'current_stage': 'smalltalk',
+					  'stage_progress': 0,
                       'last_interaction_at':
                           DateTime.now().toIso8601String(),
                     })
