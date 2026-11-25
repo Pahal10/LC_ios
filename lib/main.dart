@@ -2894,6 +2894,14 @@ class TaskPage extends StatefulWidget {
 class _TaskPageState extends State<TaskPage> {
 
   final supabase = Supabase.instance.client;
+  static const Map<String, int> friendStageThresholds = {
+  'smalltalk': 2,
+  'mediumtalk': 4,
+  'bigtalk': 6,
+  'voicecall': 6,
+  'playdate': 6,
+  'hygge': 6,
+};
 
   String currentStage = "";
   int progress = 0;
