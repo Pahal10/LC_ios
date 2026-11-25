@@ -3661,8 +3661,7 @@ onChanged: (double value) {
             updateDialog(() => saving = true);
 
             try {
-              dynamic friendId = selectedFriendId;
-
+			  dynamic friendId = widget.friendId ?? selectedFriendId;
               if (addNewFriend) {
                 final newFriend = await supabase
                     .from('friends')
