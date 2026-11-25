@@ -8399,318 +8399,357 @@ class _ExercisesPageState extends State<ExercisesPage> {
       ),
     );
   }
-
   Future<void> _openExercise(LCExercise exercise) async {
-    int? selectedAnswer;
-    bool checked = false;
+  int? selectedAnswer;
+  bool checked = false;
 
-    final result = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (context, updateSheet) {
-            final correct =
-                selectedAnswer == exercise.bestAnswer;
+  final result = await showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) {
+      return StatefulBuilder(
+        builder: (context, updateSheet) {
+          final selectedResponse = selectedAnswer == null
+              ? null
+              : exercise.options[selectedAnswer!];
 
-            return DraggableScrollableSheet(
-              initialChildSize: 0.85,
-              minChildSize: 0.65,
-              maxChildSize: 0.96,
-              expand: false,
-              builder: (context, scrollController) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF4F9F5),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(30),
-                    ),
+          return DraggableScrollableSheet(
+            initialChildSize: 0.88,
+            minChildSize: 0.65,
+            maxChildSize: 0.96,
+            expand: false,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF4F9F5),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(30),
                   ),
-                  child: ListView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.fromLTRB(
-                      22, 14, 22, 35,
+                ),
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(
+                    22, 14, 22, 35,
+                  ),
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 42,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 42,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.circular(10),
+
+                    const SizedBox(height: 25),
+
+                    Text(
+                      'EXERCISE ${exercise.id} OF 50',
+                      style: const TextStyle(
+                        color: Color(0xFF176B3A),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 10,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+
+                    const SizedBox(height: 9),
+
+                    Text(
+                      exercise.title,
+                      style: const TextStyle(
+                        color: Color(0xFF153B24),
+                        fontSize: 27,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    // SITUATION
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE2F3E7),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'THE SITUATION',
+                            style: TextStyle(
+                              color: Color(0xFF176B3A),
+                              fontSize: 10,
+                              letterSpacing: 1.3,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          Text(
+                            exercise.scenario,
+                            style: const TextStyle(
+                              color: Color(0xFF294B34),
+                              fontSize: 15,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      const SizedBox(height: 25),
+                    const SizedBox(height: 24),
 
-                      Text(
-                        'EXERCISE ${exercise.id} OF 50',
-                        style: const TextStyle(
-                          color: Color(0xFF176B3A),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 10,
-                          letterSpacing: 1.5,
-                        ),
+                    Text(
+                      exercise.question,
+                      style: const TextStyle(
+                        color: Color(0xFF153B24),
+                        fontSize: 19,
+                        fontWeight: FontWeight.w900,
                       ),
+                    ),
 
-                      const SizedBox(height: 9),
+                    const SizedBox(height: 8),
 
-                      Text(
-                        exercise.title,
-                        style: const TextStyle(
-                          color: Color(0xFF153B24),
-                          fontSize: 27,
-                          fontWeight: FontWeight.w900,
-                        ),
+                    const Text(
+                      'There is no perfect answer. Choose the response that feels most natural to you.',
+                      style: TextStyle(
+                        color: Color(0xFF66806D),
+                        fontSize: 13,
+                        height: 1.5,
                       ),
+                    ),
 
-                      const SizedBox(height: 22),
+                    const SizedBox(height: 18),
+
+                    // RESPONSE OPTIONS
+                    ...List.generate(
+                      exercise.options.length,
+                      (index) {
+                        final option = exercise.options[index];
+                        final isSelected = selectedAnswer == index;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 11),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(17),
+                            onTap: checked
+                                ? null
+                                : () {
+                                    updateSheet(() {
+                                      selectedAnswer = index;
+                                    });
+                                  },
+                            child: AnimatedContainer(
+                              duration: const Duration(
+                                milliseconds: 180,
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFFE2F3E7)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(17),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF176B3A)
+                                      : const Color(0xFFDCE8DF),
+                                  width: isSelected ? 1.7 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? const Color(0xFF176B3A)
+                                          : const Color(0xFFEAF1EB),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        String.fromCharCode(65 + index),
+                                        style: TextStyle(
+                                          color: isSelected
+                                              ? Colors.white
+                                              : const Color(0xFF42634B),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 12),
+
+                                  Expanded(
+                                    child: Text(
+                                      option.response,
+                                      style: const TextStyle(
+                                        color: Color(0xFF263C2C),
+                                        fontSize: 14,
+                                        height: 1.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+
+                                  if (isSelected)
+                                    const Icon(
+                                      Icons.check_circle_rounded,
+                                      color: Color(0xFF176B3A),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    // PERSONALIZED FEEDBACK
+                    if (checked && selectedResponse != null) ...[
+                      const SizedBox(height: 12),
 
                       Container(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(19),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE2F3E7),
+                          color: const Color(0xFFE5F2E8),
                           borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFC8E2CF),
+                          ),
                         ),
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.chat_bubble_outline_rounded,
+                                  color: Color(0xFF176B3A),
+                                  size: 19,
+                                ),
+                                const SizedBox(width: 9),
+                                const Text(
+                                  'HOW THIS MIGHT LAND',
+                                  style: TextStyle(
+                                    color: Color(0xFF176B3A),
+                                    fontSize: 10,
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 13),
+
+                            Text(
+                              selectedResponse.feedback,
+                              style: const TextStyle(
+                                color: Color(0xFF294B34),
+                                fontSize: 14,
+                                height: 1.65,
+                              ),
+                            ),
+
+                            const SizedBox(height: 17),
+
+                            const Divider(
+                              color: Color(0xFFC8E2CF),
+                            ),
+
+                            const SizedBox(height: 10),
+
                             const Text(
-                              'THE SITUATION',
+                              'REMEMBER',
                               style: TextStyle(
                                 color: Color(0xFF176B3A),
                                 fontSize: 10,
-                                letterSpacing: 1.3,
+                                letterSpacing: 1.2,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              exercise.scenario,
-                              style: const TextStyle(
-                                color: Color(0xFF294B34),
-                                fontSize: 15,
-                                height: 1.5,
+
+                            const SizedBox(height: 8),
+
+                            const Text(
+                              'The way you say something matters as much as the words themselves. Your tone, timing, body language, and the other person’s comfort all shape how a response is received.',
+                              style: TextStyle(
+                                color: Color(0xFF496452),
+                                fontSize: 13,
+                                height: 1.6,
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      const SizedBox(height: 24),
-
-                      Text(
-                        exercise.question,
-                        style: const TextStyle(
-                          color: Color(0xFF153B24),
-                          fontSize: 19,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      ...List.generate(
-                        exercise.options.length,
-                        (index) {
-                          final isSelected =
-                              selectedAnswer == index;
-
-                          final isCorrect =
-                              index == exercise.bestAnswer;
-
-                          final showCorrect =
-                              checked && isCorrect;
-
-                          final showWrong =
-                              checked && isSelected && !isCorrect;
-
-                          Color background = Colors.white;
-                          Color border =
-                              const Color(0xFFDCE8DF);
-
-                          if (showCorrect) {
-                            background =
-                                const Color(0xFFE1F5E8);
-                            border = const Color(0xFF239653);
-                          } else if (showWrong) {
-                            background =
-                                const Color(0xFFFFEBE7);
-                            border = Colors.redAccent;
-                          } else if (isSelected) {
-                            background =
-                                const Color(0xFFEAF3EC);
-                            border = const Color(0xFF176B3A);
-                          }
-
-                          return Padding(
-                            padding:
-                                const EdgeInsets.only(bottom: 11),
-                            child: InkWell(
-                              borderRadius:
-                                  BorderRadius.circular(17),
-                              onTap: checked
-                                  ? null
-                                  : () {
-                                      updateSheet(() {
-                                        selectedAnswer = index;
-                                      });
-                                    },
-                              child: AnimatedContainer(
-                                duration: const Duration(
-                                  milliseconds: 180,
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: background,
-                                  borderRadius:
-                                      BorderRadius.circular(17),
-                                  border: Border.all(
-                                    color: border,
-                                    width: isSelected || showCorrect
-                                        ? 1.7
-                                        : 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${String.fromCharCode(65 + index)}. ${exercise.options[index]}',
-                                        style: const TextStyle(
-                                          color: Color(0xFF263C2C),
-                                          fontSize: 14,
-                                          height: 1.45,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-
-                                    if (showCorrect)
-                                      const Icon(
-                                        Icons.check_circle_rounded,
-                                        color: Color(0xFF176B3A),
-                                      )
-                                    else if (showWrong)
-                                      const Icon(
-                                        Icons.cancel_rounded,
-                                        color: Colors.redAccent,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      if (checked) ...[
-                        const SizedBox(height: 8),
-
-                        Container(
-                          padding: const EdgeInsets.all(17),
-                          decoration: BoxDecoration(
-                            color: correct
-                                ? const Color(0xFFE1F5E8)
-                                : const Color(0xFFFFF1E3),
-                            borderRadius: BorderRadius.circular(19),
-                          ),
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                correct
-                                    ? 'Great instinct!'
-                                    : 'Here is another perspective',
-                                style: TextStyle(
-                                  color: correct
-                                      ? const Color(0xFF176B3A)
-                                      : Colors.brown.shade800,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 15,
-                                ),
-                              ),
-
-                              const SizedBox(height: 9),
-
-                              Text(
-                                exercise.explanation,
-                                style: const TextStyle(
-                                  color: Color(0xFF35513D),
-                                  fontSize: 14,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 22),
-
-                      SizedBox(
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: selectedAnswer == null
-                              ? null
-                              : () {
-                                  if (!checked) {
-                                    updateSheet(() {
-                                      checked = true;
-                                    });
-                                  } else {
-                                    Navigator.pop(
-                                      sheetContext,
-                                      true,
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color(0xFF176B3A),
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor:
-                                Colors.black12,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(17),
-                            ),
-                          ),
-                          child: Text(
-                            checked
-                                ? 'Finish exercise'
-                                : 'Check my answer',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
 
-    if (!mounted) return;
+                    const SizedBox(height: 22),
 
-    if (result == true) {
-      setState(() {
-        attempted.add(exercise.id);
-        completed.add(exercise.id);
-      });
-	    await saveExerciseProgress();
-    }
+                    SizedBox(
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: selectedAnswer == null
+                            ? null
+                            : () {
+                                if (!checked) {
+                                  updateSheet(() {
+                                    checked = true;
+                                  });
+                                } else {
+                                  Navigator.pop(
+                                    sheetContext,
+                                    true,
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF176B3A),
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: Colors.black12,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                        ),
+                        child: Text(
+                          checked
+                              ? 'Finish exercise'
+                              : 'See how it comes across',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+    },
+  );
+
+  if (!mounted) return;
+
+  if (result == true) {
+    setState(() {
+      attempted.add(exercise.id);
+      completed.add(exercise.id);
+    });
+
+    await saveExerciseProgress();
   }
+}
 }
 
 class StageSelectionPage extends StatelessWidget {
