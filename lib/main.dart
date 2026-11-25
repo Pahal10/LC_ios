@@ -3445,12 +3445,14 @@ class _TaskPageState extends State<TaskPage> {
         );
       }
 
-      if (!introCompleted) {
-        Future.delayed(
-          const Duration(milliseconds: 500),
-              () => showIntroDialog(),
-        );
-      }
+      if (widget.friendId == null && !introCompleted) {
+  Future.delayed(
+    const Duration(milliseconds: 500),
+    	() 		{
+      		if (mounted) showIntroDialog();
+    		},
+  		);
+	 }
 
       if (currentStage == "smalltalk") {
         generateRealityCheck();
