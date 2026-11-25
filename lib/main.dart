@@ -3758,78 +3758,82 @@ onChanged: (double value) {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Who did you interact with?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF263C2C),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                    
+if (widget.friendId == null) ...[
+  const Text(
+    'Who did you interact with?',
+    style: TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Color(0xFF263C2C),
+    ),
+  ),
+  const SizedBox(height: 10),
 
-                    if (loadingFriends)
-                      const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    else ...[
-                      if (friends.isNotEmpty)
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text(
-                            'Add a new friend',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          value: addNewFriend,
-                          activeColor: const Color(0xFF176B3A),
-                          onChanged: (value) {
-                            updateDialog(() {
-                              addNewFriend = value;
-                              if (!value && friends.isNotEmpty) {
-                                selectedFriendId ??= friends.first['id'] as int;
-                              }
-                            });
-                          },
-                        ),
+  if (loadingFriends)
+    const Center(
+      child: CircularProgressIndicator(),
+    )
+  else ...[
+    if (friends.isNotEmpty)
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: const Text(
+          'Add a new friend',
+          style: TextStyle(fontSize: 14),
+        ),
+        value: addNewFriend,
+        activeColor: const Color(0xFF176B3A),
+        onChanged: (value) {
+          updateDialog(() {
+            addNewFriend = value;
+            if (!value && friends.isNotEmpty) {
+              selectedFriendId ??= friends.first['id'] as int;
+            }
+          });
+        },
+      ),
 
-                      if (addNewFriend)
-                        TextField(
-                          controller: nameController,
-                          decoration: InputDecoration(
-                            labelText: 'Friend’s name',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        )
-                      else
-                        DropdownButtonFormField<int>(
-                          value: selectedFriendId,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: 'Select a friend',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          items: friends.map((friend) {
-                            return DropdownMenuItem<int>(
-                              value: friend['id'] as int,
-                              child: Text(
-                                friend['display_name'] ?? 'Friend',
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            updateDialog(() {
-                              selectedFriendId = value;
-                            });
-                          },
-                        ),
-                    ],
+    if (addNewFriend)
+      TextField(
+        controller: nameController,
+        decoration: InputDecoration(
+          labelText: 'Friend’s name',
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      )
+    else
+      DropdownButtonFormField<int>(
+        value: selectedFriendId,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: 'Select a friend',
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        items: friends.map((friend) {
+          return DropdownMenuItem<int>(
+            value: friend['id'] as int,
+            child: Text(
+              friend['display_name'] ?? 'Friend',
+            ),
+          );
+        }).toList(),
+        onChanged: (value) {
+          updateDialog(() {
+            selectedFriendId = value;
+          });
+        },
+      ),
+  ],
+],
+
 
                     const SizedBox(height: 22),
 
