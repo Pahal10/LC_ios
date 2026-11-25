@@ -3946,32 +3946,67 @@ Future<void> completeTask() async {
 
   progress += amount;
 
-  // A friend has their own independent stage and progress.
-  if (widget.friendId != null) {
-    if (progress >= 6) {
-      final currentIndex = stages.indexOf(currentStage);
+  // Each existing friend progresses independently.
+if (widget.friendId != null) {
+  final threshold = friendStageThresholds[currentStage] ?? 6;
 
-      if (currentIndex < stages.length - 1) {
-        currentStage = stages[currentIndex + 1];
-        progress = 0;
-      } else {
-        // This friend has completed the final stage.
-        // Keep them at hygge with completed progress.
-        progress = 6;
-      }
+  progress += amount;
+
+  if (progress >= threshold) {
+    final currentIndex = stages.indexOf(currentStage);
+
+    if (currentIndex < stages.length - 1) {
+      currentStage = stages[currentIndex + 1];
+      progress = 0;
+    } else {
+      // Keep the final stage completed.
+      progress = threshold;
     }
-
-    await supabase
-        .from('friends')
-        .update({
-          'current_stage': currentStage,
-          'stage_progress': progress,
-        })
-        .eq('id', widget.friendId!)
-        .eq('username', Session.username);
-
-    return;
   }
+
+  // Save the current stage and progress for this friend.
+  final update = <String, dynamic>{
+    'current_stage': currentStage,
+    'stage_progress': progress,
+  };
+
+  // Update the highest stage reached, without moving it backwards.
+  final stageOrder = {
+    'smalltalk': 1,
+    'mediumtalk': 2,
+    'bigtalk': 3,
+    'voicecall': 4,
+    'playdate': 5,
+    'hygge': 6,
+  };
+
+  final friendData = await supabase
+      .from('friends')
+      .select('highest_stage')
+      .eq('id', widget.friendId!)
+      .eq('username', Session.username)
+      .single();
+
+  final highestStage =
+      friendData['highest_stage'] ?? 'smalltalk';
+
+  if ((stageOrder[currentStage] ?? 1) >
+      (stageOrder[highestStage] ?? 1)) {
+    update['highest_stage'] = currentStage;
+  }
+
+  await supabase
+      .from('friends')
+      .update(update)
+      .eq('id', widget.friendId!)
+      .eq('username', Session.username);
+
+  if (!mounted) return;
+
+  setState(() {});
+
+  return;
+}
 
   // Original user-wide progression for tasks not associated with a friend.
   if (progress >= 6) {
