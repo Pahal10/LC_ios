@@ -3542,18 +3542,23 @@ Future<void> showFriendInteractionDialog(
   final notesController = TextEditingController();
 
   try {
-    final response = await supabase
-        .from('friends')
-        .select('id, display_name')
-        .eq('username', username)
-        .order('display_name');
+  final response = await supabase
+      .from('friends')
+      .select('id, display_name')
+      .eq('username', username)
+      .order('display_name');
 
-    friends = List<Map<String, dynamic>>.from(response);
-    loadingFriends = false;
+  friends = List<Map<String, dynamic>>.from(response);
+  loadingFriends = false;
 
-    if (friends.isEmpty) {
-      addNewFriend = true;
-    }
+  if (widget.friendId != null) {
+    // Continuing an existing friendship:
+    // lock the interaction to this exact friend.
+    selectedFriendId = widget.friendId;
+    addNewFriend = false;
+  } else if (friends.isEmpty) {
+    addNewFriend = true;
+  }
   } catch (e) {
     debugPrint('Could not load friends: $e');
     loadingFriends = false;
