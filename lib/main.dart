@@ -7400,8 +7400,7 @@ const List<LCExercise> lcExercises = [
     question: 'How do you help the group get comfortable?',
     options: [
       ExerciseResponse(response: 'Should we quickly introduce ourselves before we divide the work?', feedback: 'You create a simple structure that helps everyone participate without forcing instant closeness.'),
-      ExerciseResponse(response: 'What are everyone's strengths? I want to know who I should be asking for help.', feedback: 'This is practical and positive, though adding your own strengths can make it feel more mutual.'),
-      ExerciseResponse(response: 'I’m hoping we can make this one of those group projects that actually works.', feedback: 'A shared aspiration can create a friendly team atmosphere and a little optimism.'),
+	  ExerciseResponse(response: "What are everyone's strengths? I want to know who I should be asking for help.", feedback: 'This is practical and positive, though adding your own strengths can make it feel more mutual.'),      ExerciseResponse(response: 'I’m hoping we can make this one of those group projects that actually works.', feedback: 'A shared aspiration can create a friendly team atmosphere and a little optimism.'),
       ExerciseResponse(response: 'Has anyone worked on something like this before?', feedback: 'A relevant question invites people to share experience and helps the group find a starting point.'),
     ],
   ),
@@ -7909,8 +7908,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'Your group is trying to decide where to eat. Everyone keeps saying they are fine with anything.',
     question: 'How could you add some energy to the discussion?',
     options: [
-      ExerciseResponse(response: 'I see we have assembled a committee that is afraid of making decisions.', feedback: 'A humorous observation captures the group's shared indecision without targeting one person.'),
-      ExerciseResponse(response: 'I will give everyone three options, and we are legally required to choose one.', feedback: 'You introduce a playful structure that also helps the group move forward.'),
+	  ExerciseResponse(response: 'I see we have assembled a committee that is afraid of making decisions.', feedback: "A humorous observation captures the group's shared indecision without targeting one person."),      ExerciseResponse(response: 'I will give everyone three options, and we are legally required to choose one.', feedback: 'You introduce a playful structure that also helps the group move forward.'),
       ExerciseResponse(response: 'Let us each nominate one place and defend it like a courtroom case.', feedback: 'Turning a mundane decision into a game can make the group more engaged.'),
       ExerciseResponse(response: 'I am happy with anything, but I reserve the right to judge the final decision.', feedback: 'This is light banter, though pairing it with a real suggestion keeps you involved.'),
     ],
@@ -7926,8 +7924,7 @@ const List<LCExercise> lcExercises = [
       ExerciseResponse(response: 'What do you think about this? You might have a different perspective.', feedback: 'You create an opening for the quieter person without putting them on the spot too aggressively.'),
       ExerciseResponse(response: 'We have heard two strong opinions. I am curious what everyone else thinks.', feedback: 'You broaden participation and make the conversation feel more balanced.'),
       ExerciseResponse(response: 'I think we need another perspective before this debate gets out of hand.', feedback: 'A little humour can invite others in while keeping the group atmosphere relaxed.'),
-      ExerciseResponse(response: 'That reminds me of something you mentioned earlier...', feedback: 'Connecting the quieter person's earlier contribution to the current topic shows that you were listening.'),
-    ],
+	  ExerciseResponse(response: 'That reminds me of something you mentioned earlier...', feedback: "Connecting the quieter person's earlier contribution to the current topic shows that you were listening."),    ],
   ),
 
   LCExercise(
@@ -7993,8 +7990,7 @@ const List<LCExercise> lcExercises = [
     scenario: 'Your friend makes a reference to a funny moment you both experienced months ago.',
     question: 'How could you build on the shared memory?',
     options: [
-      ExerciseResponse(response: 'I cannot believe we are still living with the consequences of that day.', feedback: 'You revive the shared memory and make it feel like part of your friendship's history.'),
-      ExerciseResponse(response: 'That moment deserves its own documentary.', feedback: 'Exaggeration adds humour and invites the other person to add their version.'),
+	  ExerciseResponse(response: 'I cannot believe we are still living with the consequences of that day.', feedback: "You revive the shared memory and make it feel like part of your friendship's history."),      ExerciseResponse(response: 'That moment deserves its own documentary.', feedback: 'Exaggeration adds humour and invites the other person to add their version.'),
       ExerciseResponse(response: 'I still maintain that my decision made sense at the time.', feedback: 'You playfully defend your role in the memory and create room for friendly disagreement.'),
       ExerciseResponse(response: 'We really should recreate that sometime, preferably with fewer consequences.', feedback: 'You turn a shared memory into the possibility of another experience together.'),
     ],
