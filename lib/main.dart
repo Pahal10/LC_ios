@@ -3921,6 +3921,12 @@ Future<void> completeTask() async {
 
     if (!mounted) return;
 
+    // The interaction has been saved successfully.
+    // Now increment the appropriate progression.
+    await increaseProgress(1);
+
+    if (!mounted) return;
+
     await handleRewardFlow();
   } catch (e) {
     if (!mounted) return;
