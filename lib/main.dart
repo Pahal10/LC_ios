@@ -3523,7 +3523,7 @@ class _TaskPageState extends State<TaskPage> {
     setState(() {});
   }
   
-Future<void> showFriendInteractionDialog(
+Future<bool> showFriendInteractionDialog(
   BuildContext context,
   String completedStage,
 ) async {
