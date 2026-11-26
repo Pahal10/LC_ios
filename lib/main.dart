@@ -3567,7 +3567,7 @@ Future<bool> showFriendInteractionDialog(
 
   if (!mounted) return;
 
-  await showDialog(
+  final saved = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
     builder: (dialogContext) {
