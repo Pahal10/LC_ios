@@ -3725,7 +3725,7 @@ onChanged: (double value) {
 
               if (!dialogContext.mounted) return;
 
-              Navigator.pop(dialogContext);
+              Navigator.pop(dialogContext, true);
             } catch (e) {
               debugPrint('Error saving friend interaction: $e');
 
