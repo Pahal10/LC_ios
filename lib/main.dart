@@ -3915,6 +3915,7 @@ if (widget.friendId == null) ...[
 
   nameController.dispose();
   notesController.dispose();
+  return saved ?? false;
 }
 
   
