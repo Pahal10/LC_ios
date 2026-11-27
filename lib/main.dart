@@ -5736,6 +5736,7 @@ class RewardsPage extends StatefulWidget {
 
 class _RewardsPageState extends State<RewardsPage> {
   bool _loading = true;
+  bool _isPremium = false; // NEW
   String? _error;
   int _verifiedTasks = 0;
   int _totalTasks = 0;
