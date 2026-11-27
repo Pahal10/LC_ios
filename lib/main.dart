@@ -3918,18 +3918,195 @@ if (widget.friendId == null) ...[
   return saved ?? false;
 }
 
-  
+Future<void> maybeShowInAppRating() async {
+  try {
+    // Check whether this user has already submitted a rating.
+    final user = await supabase
+        .from('users')
+        .select('rating_prompt_completed')
+        .eq('username', Session.username)
+        .maybeSingle();
+
+    if (!mounted || user == null) return;
+
+    if (user['rating_prompt_completed'] == true) return;
+
+    final feedbackController = TextEditingController();
+    int selectedRating = 0;
+
+    try {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (context, updateDialog) {
+              return AlertDialog(
+                backgroundColor: const Color(0xFFF8FCF8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                title: const Text(
+                  'How has LC been helping you connect?',
+                  style: TextStyle(
+                    color: Color(0xFF176B3A),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'You have taken another step towards building meaningful friendships. We would love to hear how it is going.',
+                        style: TextStyle(
+                          color: Color(0xFF34483A),
+                          height: 1.4,
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      const Text(
+                        'How would you rate your experience?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF263C2C),
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: List.generate(5, (index) {
+                          final rating = index + 1;
+
+                          return IconButton(
+                            onPressed: () {
+                              updateDialog(() {
+                                selectedRating = rating;
+                              });
+                            },
+                            icon: Icon(
+                              rating <= selectedRating
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
+                              color: const Color(0xFFFFB52E),
+                              size: 34,
+                            ),
+                          );
+                        }),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      const Text(
+                        'Anything we could improve? (Optional)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF263C2C),
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      TextField(
+                        controller: feedbackController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Tell us about your experience...',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const Text(
+                      'Maybe later',
+                      style: TextStyle(
+                        color: Color(0xFF52715B),
+                      ),
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: selectedRating == 0
+                        ? null
+                        : () async {
+                            try {
+                              await supabase
+                                  .from('users')
+                                  .update({
+                                'rating_prompt_completed': true,
+                                'app_rating': selectedRating,
+                                'rating_feedback':
+                                    feedbackController.text.trim().isEmpty
+                                        ? null
+                                        : feedbackController.text.trim(),
+                              }).eq(
+                                'username',
+                                Session.username,
+                              );
+
+                              if (dialogContext.mounted) {
+                                Navigator.pop(dialogContext);
+                              }
+                            } catch (e) {
+                              if (dialogContext.mounted) {
+                                ScaffoldMessenger.of(dialogContext)
+                                    .showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Could not save your rating: $e',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF176B3A),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Submit rating'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    } finally {
+      feedbackController.dispose();
+    }
+  } catch (e) {
+    debugPrint('Could not show rating dialog: $e');
+  }
+}
+
 Future<void> completeTask() async {
   try {
-    await showFriendInteractionDialog(
+    final interactionSaved = await showFriendInteractionDialog(
       context,
       currentStage,
     );
 
-    if (!mounted) return;
+    if (!interactionSaved || !mounted) return;
 
-    // The interaction has been saved successfully.
-    // Now increment the appropriate progression.
+    // Increment progression only after successful interaction saving.
     await increaseProgress(1);
 
     if (!mounted) return;
