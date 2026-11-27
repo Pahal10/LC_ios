@@ -5802,18 +5802,7 @@ class _RewardsPageState extends State<RewardsPage> {
                 letterSpacing: 1.8,
               ),
             ),
-            SizedBox(height: 7 * scale),
-            Text(
-              'Every connection counts.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 29 * scale,
-                height: 1.12,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
             SizedBox(height: 20 * scale),
-
             // Aurora-glass membership card
             ClipRRect(
               borderRadius: BorderRadius.circular(27),
