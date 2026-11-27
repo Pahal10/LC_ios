@@ -4687,12 +4687,6 @@ class _MainPageState extends State<MainPage> {
         });
       }
     });
-	    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (!mounted) return;
-        ReviewService.maybeRequestReview();
-      });
-    });
   }
 
   @override
