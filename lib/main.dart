@@ -6188,21 +6188,25 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
             ),
           ),
           SizedBox(height: 22 * scale),
-          ClipRRect(
+                    ClipRRect(
             borderRadius: BorderRadius.circular(27),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: Image.network(
-                kEarnFriendsImageUrl,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, progress) => progress == null
-                    ? child
-                    : const Center(
+            child: Image.network(
+              kEarnFriendsImageUrl,
+              width: double.infinity,
+              fit: BoxFit.fitWidth, // full image, height follows its own ratio
+              loadingBuilder: (context, child, progress) => progress == null
+                  ? child
+                  : SizedBox(
+                      height: 240 * scale,
+                      child: const Center(
                         child: CircularProgressIndicator(
                           color: Color(0xFF9AF0C0),
                         ),
                       ),
-                errorBuilder: (_, __, ___) => const DecoratedBox(
+                    ),
+              errorBuilder: (_, __, ___) => SizedBox(
+                height: 240 * scale,
+                child: const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -6215,22 +6219,49 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
             ),
           ),
           SizedBox(height: 24 * scale),
-          SizedBox(
-            height: 54 * scale,
-            child: ElevatedButton(
-              onPressed: () => _openForm(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9AF0C0),
-                foregroundColor: const Color(0xFF062B1F),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
+                    Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFDBB05B),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFDBB05B).withOpacity(.28),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              child: Text(
-                'Show interest',
-                style: TextStyle(
-                  fontSize: 16 * scale,
-                  fontWeight: FontWeight.w800,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  splashColor: Colors.white.withOpacity(.3),
+                  onTap: () => _openForm(context),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 30 * scale,
+                      vertical: 18 * scale,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Show your interest',
+                          style: GoogleFonts.inter(
+                            fontSize: 19 * scale,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1A12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
