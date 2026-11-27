@@ -5457,7 +5457,7 @@ Widget buildDrawer() {
               Navigator.pop(context);
 
               controller.animateToPage(
-                4,
+                5,
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
               );
@@ -5651,7 +5651,10 @@ FriendsPage(
       // 3 — EXERCISES
       const ExercisesPage(),
 
-      // 4 — PROFILE
+      // 4 — REWARDS
+      const RewardsPage(),
+
+      // 5 — PROFILE
       _ProfileTab(
         username: Session.username,
 
@@ -5722,6 +5725,473 @@ bottomNavigationBar: SafeArea(
   }
 }
 
+class RewardsPage extends StatefulWidget {
+  const RewardsPage({super.key});
+  @override
+  State<RewardsPage> createState() => _RewardsPageState();
+}
+
+class _RewardsPageState extends State<RewardsPage> {
+  bool _loading = true;
+  String? _error;
+  int _verifiedTasks = 0;
+  int _totalTasks = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTaskCounts();
+  }
+
+  Future<void> _loadTaskCounts() async {
+    if (Session.username.trim().isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = 'Please sign in again to view your progress.';
+      });
+      return;
+    }
+    try {
+      final username = Session.username.trim();
+      final supabase = Supabase.instance.client;
+      final verifiedResponse = await supabase
+          .from('verification_pairs')
+          .select('user1')
+          .or('user1.eq.$username,user2.eq.$username');
+      final totalResponse = await supabase
+          .from('friend_interactions')
+          .select('id')
+          .eq('username', username);
+      if (!mounted) return;
+      setState(() {
+        _verifiedTasks = (verifiedResponse as List).length;
+        _totalTasks = (totalResponse as List).length;
+        _loading = false;
+        _error = null;
+      });
+    } catch (e) {
+      debugPrint('Could not load Rewards progress: $e');
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = 'We couldn’t load your progress right now.';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = lcScale(context);
+    final progressInCycle = _verifiedTasks % 3;
+    return _LCPageBackground(
+      child: RefreshIndicator(
+        color: const Color(0xFF9AF0C0),
+        backgroundColor: const Color(0xFF104B35),
+        onRefresh: _loadTaskCounts,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(20, 18 * scale, 20, 34),
+          children: [
+            const Text(
+              'YOUR REWARDS',
+              style: TextStyle(
+                color: Color(0xFFB8F4CE),
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.8,
+              ),
+            ),
+            SizedBox(height: 7 * scale),
+            Text(
+              'Every connection counts.',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 29 * scale,
+                height: 1.12,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            SizedBox(height: 20 * scale),
+
+            // Aurora-glass membership card
+            ClipRRect(
+              borderRadius: BorderRadius.circular(27),
+              child: Stack(
+                children: [
+                  const Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF0D8060),
+                            Color(0xFF176D72),
+                            Color(0xFF234C72),
+                            Color(0xFF102F43),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -65,
+                    right: -25,
+                    child: Container(
+                      width: 190,
+                      height: 190,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF7DFFD0).withOpacity(.23),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -100,
+                    left: -40,
+                    child: Container(
+                      width: 230,
+                      height: 190,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF60BFFF).withOpacity(.20),
+                      ),
+                    ),
+                  ),
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: Container(
+                      padding: EdgeInsets.all(22 * scale),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(.075),
+                        border: Border.all(color: Colors.white.withOpacity(.24)),
+                        borderRadius: BorderRadius.circular(27),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 43,
+                                height: 43,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(.16),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.white.withOpacity(.25)),
+                                ),
+                                child: const Icon(
+                                  Icons.workspace_premium_rounded,
+                                  color: Color(0xFFB9FFE0),
+                                  size: 24,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                'LC  /  MEMBERSHIP',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(.78),
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 27 * scale),
+                          const Text(
+                            'CONNECTION BUILDER',
+                            style: TextStyle(
+                              color: Color(0xFFD2FFEB),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2.1,
+                            ),
+                          ),
+                          SizedBox(height: 7 * scale),
+                          Text(
+                            Session.username,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 27 * scale,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -.5,
+                            ),
+                          ),
+                          SizedBox(height: 18 * scale),
+                          Row(
+                            children: [
+                              const Icon(Icons.auto_awesome_rounded,
+                                  color: Color(0xFFC6FFE6), size: 15),
+                              const SizedBox(width: 7),
+                              Text(
+                                'Building meaningful connections',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(.82),
+                                  fontSize: 11.5 * scale,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 17 * scale),
+
+            if (_loading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 28),
+                child: Center(
+                  child: CircularProgressIndicator(color: Color(0xFFB8F4CE)),
+                ),
+              )
+            else if (_error != null)
+              _RewardsGlassPanel(
+                child: Column(
+                  children: [
+                    const Icon(Icons.cloud_off_rounded,
+                        color: Color(0xFFB8F4CE), size: 28),
+                    const SizedBox(height: 10),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: _loadTaskCounts,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Try again'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFB8F4CE),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: _RewardsMetricCard(
+                      icon: Icons.verified_rounded,
+                      label: 'VERIFIED TASKS',
+                      value: _verifiedTasks,
+                      accent: const Color(0xFF9CFFD6),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _RewardsMetricCard(
+                      icon: Icons.check_circle_outline_rounded,
+                      label: 'TOTAL TASKS',
+                      value: _totalTasks,
+                      accent: const Color(0xFF9BD9FF),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15 * scale),
+              _RewardsGlassPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Your next reward',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '$progressInCycle out of 3',
+                          style: const TextStyle(
+                            color: Color(0xFFB8F4CE),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'Complete 3 verified tasks to reach your next milestone.',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(.68),
+                        fontSize: 12,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: LinearProgressIndicator(
+                        value: progressInCycle / 3,
+                        minHeight: 9,
+                        backgroundColor: Colors.white.withOpacity(.12),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Color(0xFF9AF0C0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 9),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(3, (index) {
+                        return Row(
+                          children: [
+                            Icon(
+                              index < progressInCycle
+                                  ? Icons.check_circle_rounded
+                                  : Icons.circle_outlined,
+                              size: 13,
+                              color: index < progressInCycle
+                                  ? const Color(0xFF9AF0C0)
+                                  : Colors.white38,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Task \${index + 1}',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(.58),
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            SizedBox(height: 18 * scale),
+            _RewardsGlassPanel(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9AF0C0).withOpacity(.13),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: const Icon(
+                      Icons.favorite_rounded,
+                      color: Color(0xFFB8F4CE),
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 13),
+                  Expanded(
+                    child: Text(
+                      'Your effort to build meaningful connections is valued by us.',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(.9),
+                        fontSize: 14 * scale,
+                        height: 1.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardsMetricCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final int value;
+  final Color accent;
+
+  const _RewardsMetricCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _RewardsGlassPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: accent, size: 21),
+          const SizedBox(height: 15),
+          Text(
+            '$value',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 29,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white.withOpacity(.62),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: .8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RewardsGlassPanel extends StatelessWidget {
+  final Widget child;
+  const _RewardsGlassPanel({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(.085),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withOpacity(.15)),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 class _GlassBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelected;
@@ -5736,6 +6206,7 @@ class _GlassBottomNavigation extends StatelessWidget {
     (Icons.people_alt_rounded, 'Friends'),
 	(Icons.lightbulb_outline_rounded, 'Help'),
     (Icons.psychology_alt_rounded, 'Exercise'),
+    (Icons.workspace_premium_rounded, 'Rewards'),
     (Icons.person_rounded, 'Profile'),
   ];
 
