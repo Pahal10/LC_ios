@@ -6064,7 +6064,7 @@ class _RewardsPageState extends State<RewardsPage> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Task \${index + 1}',
+                              'Task ${index + 1}',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(.58),
                                 fontSize: 10,
