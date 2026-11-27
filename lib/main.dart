@@ -34,6 +34,9 @@ void main() async {
   );
   runApp(const MyApp());
 }
+const String kInterestFormUrl = 'https://forms.gle/HtGegaPbMpSo37968';
+const String kEarnFriendsImageUrl =
+    'https://lcletsconnect.com/assets/aurora-deep-Dx9eri1o.jpg';
 const Map<String, int> stageOrder = {
   "smalltalk": 1,
   "mediumtalk": 2,
