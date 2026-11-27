@@ -4250,7 +4250,7 @@ if (widget.friendId != null) {
   }
 
   // Save the original user-wide progress.
-  await supabase
+    await supabase
       .from('users')
       .update({
         'current_stage': currentStage,
@@ -4258,6 +4258,13 @@ if (widget.friendId != null) {
         'verifyshow': true,
       })
       .eq('username', Session.username);
+
+  // Also support the original user-wide progression.
+  if (!mounted) return;
+
+  if (currentStage != previousStage) {
+    await maybeShowInAppRating();
+  }
 }
 
   @override
