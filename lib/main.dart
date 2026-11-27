@@ -4195,7 +4195,9 @@ if (widget.friendId != null) {
   if (!mounted) return;
 
   setState(() {});
-
+  if (currentStage != previousStage) {
+    await maybeShowInAppRating();
+  }
   return;
 }
 
