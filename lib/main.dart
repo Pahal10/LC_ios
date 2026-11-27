@@ -6125,7 +6125,91 @@ class _RewardsPageState extends State<RewardsPage> {
     );
   }
 }
+class _GetPaidToMakeFriendsView extends StatelessWidget {
+  const _GetPaidToMakeFriendsView();
 
+  Future<void> _openForm(BuildContext context) async {
+    final ok = await launchUrl(
+      Uri.parse(kInterestFormUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Couldn't open the form.")),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = lcScale(context);
+    return _LCPageBackground(
+      child: ListView(
+        padding: EdgeInsets.fromLTRB(20, 18 * scale, 20, 34),
+        children: [
+          Text(
+            'Want to get paid to make friends?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28 * scale,
+              height: 1.2,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: 22 * scale),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(27),
+            child: AspectRatio(
+              aspectRatio: 4 / 3,
+              child: Image.network(
+                kEarnFriendsImageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, progress) => progress == null
+                    ? child
+                    : const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF9AF0C0),
+                        ),
+                      ),
+                errorBuilder: (_, __, ___) => const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF0D8060), Color(0xFF102F43)],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 24 * scale),
+          SizedBox(
+            height: 54 * scale,
+            child: ElevatedButton(
+              onPressed: () => _openForm(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF9AF0C0),
+                foregroundColor: const Color(0xFF062B1F),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+              child: Text(
+                'Show interest',
+                style: TextStyle(
+                  fontSize: 16 * scale,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 class _RewardsMetricCard extends StatelessWidget {
   final IconData icon;
   final String label;
