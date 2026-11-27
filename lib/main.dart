@@ -36,7 +36,7 @@ void main() async {
 }
 const String kInterestFormUrl = 'https://forms.gle/HtGegaPbMpSo37968';
 const String kEarnFriendsImageUrl =
-    'https://lcletsconnect.com/assets/aurora-deep-Dx9eri1o.jpg';
+    'https://lcletsconnect.com/assets/loyalty-steps-5QEMeqfH.png';
 const Map<String, int> stageOrder = {
   "smalltalk": 1,
   "mediumtalk": 2,
