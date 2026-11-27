@@ -6147,14 +6147,44 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.fromLTRB(20, 18 * scale, 20, 34),
         children: [
-          Text(
-            'Want to get paid to make friends?',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28 * scale,
-              height: 1.2,
-              fontWeight: FontWeight.w900,
+                    ShaderMask(
+            blendMode: BlendMode.srcIn,
+            shaderCallback: (rect) => const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFFFFFF), Color(0xFFB8F4CE), Color(0xFF9AF0C0)],
+            ).createShader(rect),
+            child: Column(
+              children: [
+                Text(
+                  'Want to get',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 26 * scale,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'paid',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 68 * scale,
+                    height: 1.0,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'to make friends?',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 30 * scale,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: 22 * scale),
