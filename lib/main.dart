@@ -5910,22 +5910,6 @@ class _RewardsPageState extends State<RewardsPage> {
                               letterSpacing: -.5,
                             ),
                           ),
-                          SizedBox(height: 18 * scale),
-                          Row(
-                            children: [
-                              const Icon(Icons.auto_awesome_rounded,
-                                  color: Color(0xFFC6FFE6), size: 15),
-                              const SizedBox(width: 7),
-                              Text(
-                                'Building meaningful connections',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(.82),
-                                  fontSize: 11.5 * scale,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ),
