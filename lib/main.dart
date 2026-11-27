@@ -5803,6 +5803,19 @@ class _RewardsPageState extends State<RewardsPage> {
 
   @override
   Widget build(BuildContext context) {
+	// NEW: gate on loading / premium
+    if (_loading) {
+      return const _LCPageBackground(
+        child: Center(
+          child: CircularProgressIndicator(color: Color(0xFF9AF0C0)),
+        ),
+      );
+    }
+    // If the premium lookup failed (_error != null), fall through to the
+    // existing page, which already shows the error state.
+    if (!_isPremium && _error == null) {
+      return const _GetPaidToMakeFriendsView();
+    }
     final scale = lcScale(context);
     final progressInCycle = _verifiedTasks % 3;
     return _LCPageBackground(
