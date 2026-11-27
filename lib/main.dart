@@ -5759,6 +5759,22 @@ class _RewardsPageState extends State<RewardsPage> {
     try {
       final username = Session.username.trim();
       final supabase = Supabase.instance.client;
+	  // NEW: premium gate
+      final userRow = await supabase
+          .from('users')
+          .select('premium')
+          .eq('username', username)
+          .single();
+      final premium = userRow['premium'] == true;
+      if (!premium) {
+        if (!mounted) return;
+        setState(() {
+          _isPremium = false;
+          _loading = false;
+          _error = null;
+        });
+        return; // skip task-count queries for non-premium users
+      }
       final verifiedResponse = await supabase
           .from('verification_pairs')
           .select('user1')
@@ -5769,6 +5785,7 @@ class _RewardsPageState extends State<RewardsPage> {
           .eq('username', username);
       if (!mounted) return;
       setState(() {
+		_isPremium = true;
         _verifiedTasks = (verifiedResponse as List).length;
         _totalTasks = (totalResponse as List).length;
         _loading = false;
