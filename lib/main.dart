@@ -4125,6 +4125,7 @@ Future<void> completeTask() async {
 
 
   Future<void> increaseProgress(int amount) async {
+  final previousStage = currentStage;
   // Keep this user-level flag, regardless of whether the task is
   // associated with a particular friend.
   await supabase
