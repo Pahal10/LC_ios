@@ -3565,7 +3565,7 @@ Future<bool> showFriendInteractionDialog(
     addNewFriend = true;
   }
 
-  if (!mounted) return;
+  if (!mounted) return false;
 
   final saved = await showDialog<bool>(
     context: context,
