@@ -6125,6 +6125,7 @@ class _RewardsPageState extends State<RewardsPage> {
     );
   }
 }
+
 class _GetPaidToMakeFriendsView extends StatelessWidget {
   const _GetPaidToMakeFriendsView();
 
@@ -6133,6 +6134,7 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
       Uri.parse(kInterestFormUrl),
       mode: LaunchMode.externalApplication,
     );
+
     if (!ok && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Couldn't open the form.")),
@@ -6143,105 +6145,184 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scale = lcScale(context);
-    return _LCPageBackground(
-      child: ListView(
-        padding: EdgeInsets.fromLTRB(20, 18 * scale, 20, 34),
-        children: [
-                    ShaderMask(
-            blendMode: BlendMode.srcIn,
-            shaderCallback: (rect) => const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFFFFFFF), Color(0xFFB8F4CE), Color(0xFF9AF0C0)],
-            ).createShader(rect),
-            child: Column(
+
+    return Stack(
+      children: [
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF075B39),
+                  Color(0xFF087344),
+                  Color(0xFF06472F),
+                  Color(0xFF032F25),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const Positioned.fill(
+          child: CustomPaint(
+            painter: _LCAuroraPainter(),
+          ),
+        ),
+
+        ListView(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            18 * scale,
+            20,
+            145 * scale,
+          ),
+          children: [
+            // Section label
+            Row(
               children: [
-                Text(
-                  'Want to get',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 26 * scale,
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                Expanded(
+                  child: Container(
+                    height: 1,
+                    color: const Color(0xFFB8F4CE)
+                        .withOpacity(.35),
                   ),
                 ),
-                Text(
-                  'paid',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 68 * scale,
-                    height: 1.0,
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 13 * scale,
+                  ),
+                  child: Text(
+                    'LC LOYALTY PROGRAM',
+                    style: TextStyle(
+                      color: const Color(0xFFD4F9DF),
+                      fontSize: 12 * scale,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 3,
+                    ),
                   ),
                 ),
-                Text(
-                  'to make friends?',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 30 * scale,
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                Expanded(
+                  child: Container(
+                    height: 1,
+                    color: const Color(0xFFB8F4CE)
+                        .withOpacity(.35),
                   ),
                 ),
               ],
             ),
-          ),
-			SizedBox(height: 30 * scale),
-			_LoyaltyStepsIllustration(scale: scale),
-			SizedBox(height: 30 * scale),
-			Center(
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFDBB05B),
-                borderRadius: BorderRadius.circular(999),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFDBB05B).withOpacity(.28),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.25),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+
+            SizedBox(height: 65 * scale),
+
+            // Main headline
+            Text(
+              'Make friends and get',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 32 * scale,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFFE3F9E9),
               ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  splashColor: Colors.white.withOpacity(.3),
-                  onTap: () => _openForm(context),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 30 * scale,
-                      vertical: 18 * scale,
+            ),
+
+            SizedBox(height: 3 * scale),
+
+            ShaderMask(
+              shaderCallback: (bounds) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFFFF2BD),
+                    Color(0xFFFFD66D),
+                    Color(0xFFDBA83D),
+                  ],
+                ).createShader(bounds);
+              },
+              child: Text(
+                '\$21',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 112 * scale,
+                  height: .95,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+
+            Text(
+              'back.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 43 * scale,
+                fontStyle: FontStyle.italic,
+                color: const Color(0xFFE3F9E9),
+              ),
+            ),
+
+            SizedBox(height: 55 * scale),
+
+            // Three illustrated bubbles
+            _LoyaltyStepsIllustration(scale: scale),
+
+            SizedBox(height: 65 * scale),
+
+            // Join button
+            Center(
+              child: SizedBox(
+                width: double.infinity,
+                height: 68 * scale,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFFE49B),
+                        Color(0xFFE9BC57),
+                        Color(0xFFD9A642),
+                      ],
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Show your interest',
-                          style: GoogleFonts.inter(
-                            fontSize: 19 * scale,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1A1A12),
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFD36C)
+                            .withOpacity(.3),
+                        blurRadius: 28,
+                        offset: const Offset(0, 7),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(999),
+                      onTap: () => _openForm(context),
+                      child: Center(
+                        child: Text(
+                          'Join today!!',
+                          style: GoogleFonts.playfairDisplay(
+                            color: const Color(0xFF17472D),
+                            fontSize: 25 * scale,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }
+
 
 class _LoyaltyStepsIllustration extends StatelessWidget {
   final double scale;
@@ -6250,40 +6331,38 @@ class _LoyaltyStepsIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bubbleSize = 78.0 * scale;
+    final size = 104.0 * scale;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: _buildStep(
-            size: bubbleSize,
-            icon: Icons.credit_card_rounded,
-            iconColor: Colors.white,
+          child: _step(
+            image: 'asset/deposit_card.png',
+            size: size,
             title: 'Deposit',
             subtitle: '\$20',
-            pillColor: const Color(0xFFDBB05B),
+            pillColor: const Color(0xFFE8BB55),
           ),
         ),
 
-        _connector(),
+        _connector(scale),
 
         Expanded(
-          child: _buildStep(
-            size: bubbleSize,
+          child: _step(
+            image: 'asset/friends_photo.png',
+            size: size,
             title: 'Make friends',
             subtitle: '3 verified tasks\nin 3 months',
-            photo: true,
           ),
         ),
 
-        _connector(),
+        _connector(scale),
 
         Expanded(
-          child: _buildStep(
-            size: bubbleSize,
-            icon: Icons.storage_rounded,
-            iconColor: const Color(0xFFDBB05B),
+          child: _step(
+            image: 'asset/reward_coins.png',
+            size: size,
             title: 'Get it back',
             subtitle: '\$21',
             pillColor: const Color(0xFF9AF0C0),
@@ -6293,32 +6372,35 @@ class _LoyaltyStepsIllustration extends StatelessWidget {
     );
   }
 
-  Widget _connector() {
+  Widget _connector(double scale) {
     return Padding(
-      padding: EdgeInsets.only(top: 38 * scale),
+      padding: EdgeInsets.only(top: 49 * scale),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: List.generate(
           3,
-          (index) => Container(
-            width: 5 * scale,
-            height: 2,
-            margin: EdgeInsets.symmetric(horizontal: 1 * scale),
-            color: const Color(0xFFB8F4CE).withOpacity(.65),
+          (i) => Container(
+            width: 4 * scale,
+            height: 3 * scale,
+            margin: EdgeInsets.symmetric(
+              horizontal: 1 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFD36C),
+              borderRadius: BorderRadius.circular(3),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildStep({
+  Widget _step({
+    required String image,
     required double size,
     required String title,
     required String subtitle,
-    IconData? icon,
-    Color iconColor = Colors.white,
     Color? pillColor,
-    bool photo = false,
   }) {
     return Column(
       children: [
@@ -6327,69 +6409,49 @@ class _LoyaltyStepsIllustration extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(.27),
-                Colors.white.withOpacity(.08),
-              ],
-            ),
-            border: Border.all(
-              color: Colors.white.withOpacity(.38),
-              width: 1.2,
-            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(.12),
-                blurRadius: 14,
-                offset: const Offset(0, 5),
+                color: const Color(0xFFB8F4CE)
+                    .withOpacity(.24),
+                blurRadius: 19,
+                spreadRadius: 2,
               ),
             ],
           ),
           child: ClipOval(
-            child: photo
-                ? Image.asset(
-                    'asset/friends_photo.jpg',
-                    width: size,
-                    height: size,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.people_rounded,
-                      color: Colors.white,
-                      size: 38,
-                    ),
-                  )
-                : Center(
-                    child: Icon(
-                      icon,
-                      color: iconColor,
-                      size: 37 * scale,
-                    ),
-                  ),
+            child: Image.asset(
+              image,
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(
+                Icons.image_not_supported_outlined,
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
 
-        SizedBox(height: 12 * scale),
+        SizedBox(height: 13 * scale),
 
         Text(
           title,
           textAlign: TextAlign.center,
           maxLines: 1,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 13 * scale,
-            fontWeight: FontWeight.w800,
+          style: GoogleFonts.playfairDisplay(
+            color: const Color(0xFFFFF8E9),
+            fontSize: 16 * scale,
+            fontWeight: FontWeight.w700,
           ),
         ),
 
-        SizedBox(height: 7 * scale),
+        SizedBox(height: 8 * scale),
 
         if (pillColor != null)
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: 14 * scale,
-              vertical: 5 * scale,
+              horizontal: 16 * scale,
+              vertical: 6 * scale,
             ),
             decoration: BoxDecoration(
               color: pillColor,
@@ -6398,8 +6460,8 @@ class _LoyaltyStepsIllustration extends StatelessWidget {
             child: Text(
               subtitle,
               style: TextStyle(
-                color: const Color(0xFF102D20),
-                fontSize: 14 * scale,
+                color: const Color(0xFF123B27),
+                fontSize: 17 * scale,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -6409,16 +6471,16 @@ class _LoyaltyStepsIllustration extends StatelessWidget {
             subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withOpacity(.9),
-              fontSize: 11.5 * scale,
-              height: 1.35,
-              fontWeight: FontWeight.w500,
+              color: const Color(0xFFE4F4E9),
+              fontSize: 13 * scale,
+              height: 1.45,
             ),
           ),
       ],
     );
   }
 }
+
 
 class _RewardsMetricCard extends StatelessWidget {
   final IconData icon;
