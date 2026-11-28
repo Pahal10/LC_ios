@@ -6242,6 +6242,184 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
     );
   }
 }
+
+class _LoyaltyStepsIllustration extends StatelessWidget {
+  final double scale;
+
+  const _LoyaltyStepsIllustration({required this.scale});
+
+  @override
+  Widget build(BuildContext context) {
+    final bubbleSize = 78.0 * scale;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _buildStep(
+            size: bubbleSize,
+            icon: Icons.credit_card_rounded,
+            iconColor: Colors.white,
+            title: 'Deposit',
+            subtitle: '\$20',
+            pillColor: const Color(0xFFDBB05B),
+          ),
+        ),
+
+        _connector(),
+
+        Expanded(
+          child: _buildStep(
+            size: bubbleSize,
+            title: 'Make friends',
+            subtitle: '3 verified tasks\nin 3 months',
+            photo: true,
+          ),
+        ),
+
+        _connector(),
+
+        Expanded(
+          child: _buildStep(
+            size: bubbleSize,
+            icon: Icons.database_rounded,
+            iconColor: const Color(0xFFDBB05B),
+            title: 'Get it back',
+            subtitle: '\$21',
+            pillColor: const Color(0xFF9AF0C0),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _connector() {
+    return Padding(
+      padding: EdgeInsets.only(top: 38 * scale),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          3,
+          (index) => Container(
+            width: 5 * scale,
+            height: 2,
+            margin: EdgeInsets.symmetric(horizontal: 1 * scale),
+            color: const Color(0xFFB8F4CE).withOpacity(.65),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStep({
+    required double size,
+    required String title,
+    required String subtitle,
+    IconData? icon,
+    Color iconColor = Colors.white,
+    Color? pillColor,
+    bool photo = false,
+  }) {
+    return Column(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(.27),
+                Colors.white.withOpacity(.08),
+              ],
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(.38),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.12),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: photo
+                ? Image.asset(
+                    'asset/friends_photo.jpg',
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.people_rounded,
+                      color: Colors.white,
+                      size: 38,
+                    ),
+                  )
+                : Center(
+                    child: Icon(
+                      icon,
+                      color: iconColor,
+                      size: 37 * scale,
+                    ),
+                  ),
+          ),
+        ),
+
+        SizedBox(height: 12 * scale),
+
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 13 * scale,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+
+        SizedBox(height: 7 * scale),
+
+        if (pillColor != null)
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 14 * scale,
+              vertical: 5 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: pillColor,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              subtitle,
+              style: TextStyle(
+                color: const Color(0xFF102D20),
+                fontSize: 14 * scale,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          )
+        else
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(.9),
+              fontSize: 11.5 * scale,
+              height: 1.35,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _RewardsMetricCard extends StatelessWidget {
   final IconData icon;
   final String label;
