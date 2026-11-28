@@ -6148,29 +6148,13 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
 
     return Stack(
       children: [
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF075B39),
-                  Color(0xFF087344),
-                  Color(0xFF06472F),
-                  Color(0xFF032F25),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        const Positioned.fill(
-          child: CustomPaint(
-            painter: _LCAuroraPainter(),
-          ),
-        ),
-
+        Positioned.fill(
+      child: Image.asset(
+        'asset/rewards_aurora_bg.png',
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+      ),
+    ),
         ListView(
           padding: EdgeInsets.fromLTRB(
             20,
