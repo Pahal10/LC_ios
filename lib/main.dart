@@ -6282,7 +6282,7 @@ class _LoyaltyStepsIllustration extends StatelessWidget {
         Expanded(
           child: _buildStep(
             size: bubbleSize,
-            icon: Icons.database_rounded,
+            icon: Icons.storage_rounded,
             iconColor: const Color(0xFFDBB05B),
             title: 'Get it back',
             subtitle: '\$21',
