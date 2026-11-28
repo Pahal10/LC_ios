@@ -5542,6 +5542,14 @@ Widget buildDrawer() {
         elevation: 0,
 		scrolledUnderElevation: 0,
 
+		flexibleSpace: currentPage == 4
+      ? Image.asset(
+          'asset/rewards_aurora_bg.png',
+          fit: BoxFit.cover,
+          alignment: Alignment.topCenter,
+        )
+      : null,
+
         
         title: const CircleAvatar(
           radius: 20,
