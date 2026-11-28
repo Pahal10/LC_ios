@@ -6150,169 +6150,196 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final scale = lcScale(context);
+  
+@override
+Widget build(BuildContext context) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
 
-    return Stack(
-      children: [
-        Positioned.fill(
-      child: Image.asset(
-        'asset/rewards_aurora_bg.png',
-        fit: BoxFit.cover,
-        alignment: Alignment.center,
-      ),
-    ),
-        ListView(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            18 * scale,
-            20,
-            145 * scale,
+      // Automatically calculate scale using available screen height.
+      final widthScale = lcScale(context);
+
+      final heightScale =
+          (constraints.maxHeight / 760).clamp(0.55, 1.0);
+
+      final scale = min(widthScale, heightScale);
+
+      return Stack(
+        children: [
+          // Aurora background
+          Positioned.fill(
+            child: Image.asset(
+              'asset/rewards_aurora_bg.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
           ),
-          children: [
-            // Section label
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: const Color(0xFFB8F4CE)
-                        .withOpacity(.35),
+
+          // Responsive content
+          SizedBox.expand(
+            child: Center(
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    10 * scale,
+                    20,
+                    10 * scale,
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 13 * scale,
-                  ),
-                  child: Text(
-                    'LC LOYALTY PROGRAM',
-                    style: TextStyle(
-                      color: const Color(0xFFD4F9DF),
-                      fontSize: 12 * scale,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: const Color(0xFFB8F4CE)
-                        .withOpacity(.35),
-                  ),
-                ),
-              ],
-            ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
 
-            SizedBox(height: 65 * scale),
-
-            // Main headline
-            Text(
-              'Make friends and get',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 32 * scale,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFFE3F9E9),
-              ),
-            ),
-
-            SizedBox(height: 3 * scale),
-
-            ShaderMask(
-              shaderCallback: (bounds) {
-                return const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFFFF2BD),
-                    Color(0xFFFFD66D),
-                    Color(0xFFDBA83D),
-                  ],
-                ).createShader(bounds);
-              },
-              child: Text(
-                '\$21',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 112 * scale,
-                  height: .95,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-
-            Text(
-              'back.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 43 * scale,
-                fontStyle: FontStyle.italic,
-                color: const Color(0xFFE3F9E9),
-              ),
-            ),
-
-            SizedBox(height: 55 * scale),
-
-            // Three illustrated bubbles
-            _LoyaltyStepsIllustration(scale: scale),
-
-            SizedBox(height: 65 * scale),
-
-            // Join button
-            Center(
-              child: SizedBox(
-                width: double.infinity,
-                height: 68 * scale,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFFFE49B),
-                        Color(0xFFE9BC57),
-                        Color(0xFFD9A642),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFFD36C)
-                            .withOpacity(.3),
-                        blurRadius: 28,
-                        offset: const Offset(0, 7),
+                      // Section label
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              color: const Color(0xFFB8F4CE)
+                                  .withOpacity(.35),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 13 * scale,
+                            ),
+                            child: Text(
+                              'LC LOYALTY PROGRAM',
+                              style: TextStyle(
+                                color: const Color(0xFFD4F9DF),
+                                fontSize: 12 * scale,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 3 * scale,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              color: const Color(0xFFB8F4CE)
+                                  .withOpacity(.35),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(999),
-                      onTap: () => _openForm(context),
-                      child: Center(
+
+                      SizedBox(height: 65 * scale),
+
+                      // Headline
+                      Text(
+                        'Make friends and get',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 32 * scale,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFFE3F9E9),
+                        ),
+                      ),
+
+                      SizedBox(height: 3 * scale),
+
+                      // Golden $21
+                      ShaderMask(
+                        shaderCallback: (bounds) {
+                          return const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFFFFF2BD),
+                              Color(0xFFFFD66D),
+                              Color(0xFFDBA83D),
+                            ],
+                          ).createShader(bounds);
+                        },
                         child: Text(
-                          'Join today!!',
+                          '\$21',
+                          textAlign: TextAlign.center,
                           style: GoogleFonts.playfairDisplay(
-                            color: const Color(0xFF17472D),
-                            fontSize: 25 * scale,
+                            fontSize: 112 * scale,
+                            height: .95,
                             fontWeight: FontWeight.w800,
+                            color: Colors.white,
                           ),
                         ),
                       ),
-                    ),
+
+                      Text(
+                        'back.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 43 * scale,
+                          fontStyle: FontStyle.italic,
+                          color: const Color(0xFFE3F9E9),
+                        ),
+                      ),
+
+                      SizedBox(height: 55 * scale),
+
+                      // Three bubbles
+                      _LoyaltyStepsIllustration(
+                        scale: scale,
+                      ),
+
+                      SizedBox(height: 65 * scale),
+
+                      // CTA
+                      SizedBox(
+                        width: double.infinity,
+                        height: 68 * scale,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFFFFE49B),
+                                Color(0xFFE9BC57),
+                                Color(0xFFD9A642),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(999),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFFD36C)
+                                    .withOpacity(.3),
+                                blurRadius: 28 * scale,
+                                offset: Offset(0, 7 * scale),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(999),
+                              onTap: () => _openForm(context),
+                              child: Center(
+                                child: Text(
+                                  'Join today!!',
+                                  style: GoogleFonts.playfairDisplay(
+                                    color: const Color(0xFF17472D),
+                                    fontSize: 25 * scale,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-      ],
-    );
-  }
+          ),
+        ],
+      );
+    },
+  );
+}
 }
 
 
