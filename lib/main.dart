@@ -6187,39 +6187,10 @@ class _GetPaidToMakeFriendsView extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 22 * scale),
-                    ClipRRect(
-            borderRadius: BorderRadius.circular(27),
-            child: Image.network(
-              kEarnFriendsImageUrl,
-              width: double.infinity,
-              fit: BoxFit.fitWidth, // full image, height follows its own ratio
-              loadingBuilder: (context, child, progress) => progress == null
-                  ? child
-                  : SizedBox(
-                      height: 240 * scale,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF9AF0C0),
-                        ),
-                      ),
-                    ),
-              errorBuilder: (_, __, ___) => SizedBox(
-                height: 240 * scale,
-                child: const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF0D8060), Color(0xFF102F43)],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 24 * scale),
-                    Center(
+			SizedBox(height: 30 * scale),
+			_LoyaltyStepsIllustration(scale: scale),
+			SizedBox(height: 30 * scale),
+			Center(
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFDBB05B),
